@@ -18,6 +18,7 @@ import { Link, useParams } from "react-router-dom";
 import * as uuidv4 from "uuid";
 import { CitizenCard } from "../../components/CitizenCard/CitizenCard";
 import useCommunity from "../../hooks/useCommunity";
+import logoUrl from "../../scrumlord-logo-1.jpg";
 
 export const Community = () => {
   const params = useParams();
@@ -34,11 +35,6 @@ export const Community = () => {
 
   const citizens = currentCommunity?.citizens || [];
   const [iAmCitizen, setIAmCitizen] = useState(null);
-
-  // useEffect(() => {
-
-  // }, [iAmCitizen]);
-
   const [error, setError] = useState(null);
 
   const [selectOptions, setSelectOptions] = useState([
@@ -48,7 +44,8 @@ export const Community = () => {
 
   // cleanup
   // todo: user state is all sorts of messed up
-  // still need something in storage
+  // delete causing some wild re-renders, cycling through users
+
   // go with mongo? https://cloud.mongodb.com/v2/6467e716e89e772d85c3b74c#/clusters
   useEffect(() => {
     return () => {
@@ -86,6 +83,7 @@ export const Community = () => {
     }
   };
 
+  // reclaim your user for a community if you've joined and returned
   const recoverUserFromStorage = () => {
     const userstate = localStorage.getItem("userstate") ?? "{}";
     const userstateObj = JSON.parse(userstate);
@@ -93,11 +91,14 @@ export const Community = () => {
     const citizens = currentCommunity?.citizens || [];
 
     if (cachedUserIdForCommunity && citizens.length) {
-      const user = citizens.find((citizen) => citizen.userId === cachedUserIdForCommunity);
+      const user = citizens.find(
+        (citizen) => citizen.userId === cachedUserIdForCommunity
+      );
       setIAmCitizen(user);
     }
   };
 
+  // when a user joins, save their id to local storage for this session so they can reclaim their user if they return
   const saveUserToStorage = (userId) => {
     const userState = localStorage.getItem("userstate") || "{}";
     const userStateObj = JSON.parse(userState);
@@ -152,10 +153,11 @@ export const Community = () => {
             >
               <MenuIcon />
             </IconButton>
+            <Link to="/">
+              <img src={logoUrl} height="50" width="50" />
+            </Link>
             <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-              <Link to="/" style={{ textDecoration: "none" }}>
-                Scrum Lord
-              </Link>
+              {currentCommunity && currentCommunity.name}
             </Typography>
             {!iAmCitizen ? (
               <Button variant="contained" color="primary" onClick={handleJoin}>
@@ -190,10 +192,9 @@ export const Community = () => {
               <Typography variant="h3">{error}</Typography>
             </Grid>
           )}
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <h1>{currentCommunity.name}</h1>
-            <p>{currentCommunity.id}</p>
-          </Grid>
+          </Grid> */}
           <Grid container item>
             {citizens.length ? (
               citizens.map((citizen) => {
@@ -209,7 +210,7 @@ export const Community = () => {
               })
             ) : (
               <Grid item xs={12}>
-                <p>This community has no citizens!</p>
+                <p>No one is here</p>
               </Grid>
             )}
           </Grid>

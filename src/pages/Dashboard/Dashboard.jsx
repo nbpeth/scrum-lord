@@ -1,8 +1,10 @@
-import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import { AppBar, Box, Button, Card, CardContent, Grid, Toolbar, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
+
+import logoUrl from "../../scrumlord-logo-2.png";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities } = useDashboard();
@@ -42,23 +44,9 @@ export const Dashboard = () => {
 
   return (
     <div>
-      <CreateRoomModal
-        open={createRoomModalOpen}
-        handleClose={createRoomModalClosed}
-        onBlur={createRoomModalClosed}
-      />
-
-      <Grid container spacing={2} direction="column">
-        <Grid item>
-          <h1>Scrum Lord</h1>
-        </Grid>
-        {error && (
-          <Grid item xs={12}>
-            <Typography variant="h3">{error}</Typography>
-          </Grid>
-        )}
-
-        <Grid item>
+      <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
+        <AppBar position="static">
+          <Toolbar>
           <Button
             variant="contained"
             disabled={createRoomModalOpen}
@@ -66,6 +54,35 @@ export const Dashboard = () => {
           >
             Create Room
           </Button>
+            {/* <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton> */}
+          </Toolbar>
+        </AppBar>
+      </Box>
+      <CreateRoomModal
+        open={createRoomModalOpen}
+        handleClose={createRoomModalClosed}
+        onBlur={createRoomModalClosed}
+      />
+      <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
+
+      <Grid container spacing={2} direction="column">
+        <Grid item></Grid>
+        {error && (
+          <Grid item xs={12}>
+            <Typography variant="h3">{error}</Typography>
+          </Grid>
+        )}
+
+        <Grid item>
+         
         </Grid>
 
         {/* communities component */}
