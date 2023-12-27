@@ -1,13 +1,15 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import './App.css';
-import { Dashboard } from './pages/Dashboard/Dashboard';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { Community } from './pages/Community/Community';
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import React from "react";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+
+import "./App.css";
+import { Community } from "./pages/Community/Community";
+import { Dashboard } from "./pages/Dashboard/Dashboard";
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
 });
 
@@ -31,6 +33,6 @@ const App = () => {
       </ThemeProvider>
     </div>
   );
-}
+};
 
 export default App;

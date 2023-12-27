@@ -157,8 +157,10 @@ export const Community = () => {
   const drawerWidth = 240;
 
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
 
+
+
+  const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
   };

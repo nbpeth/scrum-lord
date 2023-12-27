@@ -1,10 +1,10 @@
-import { Button, Card, CardActionArea, CardActions, CardContent } from "@mui/material";
+import { Button, Card, CardActionArea, CardActions, CardContent, useTheme } from "@mui/material";
 
 export const CitizenCard = ({ citizen, handleDeleteUser, iAmCitizen }) => {
   const isMe = iAmCitizen && citizen.userId === iAmCitizen.userId;
-
+  // const theme = useTheme();
   return (
-    <Card key={citizen.id} variant="outlined">
+    <Card  key={citizen.id} variant="outlined">
       {
         isMe && (
           <CardContent>

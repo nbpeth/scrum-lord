@@ -1,10 +1,14 @@
-import { AppBar, Box, Button, Card, CardContent, Grid, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Card, CardContent, Grid, Toolbar, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
+import { alpha } from "@mui/material";
+
 
 import logoUrl from "../../scrumlord-logo-2.png";
+import { Stars } from "../../components/Particles/Stars";
+import { HyperSpace } from "../../components/Particles/Hyperspace";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities } = useDashboard();
@@ -12,6 +16,7 @@ export const Dashboard = () => {
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
+  const theme = useTheme();
 
   // get the list of communities on mount
   useEffect(() => {
@@ -72,7 +77,7 @@ export const Dashboard = () => {
         onBlur={createRoomModalClosed}
       />
       <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
-
+      <HyperSpace />
       <Grid container spacing={2} direction="column">
         <Grid item></Grid>
         {error && (
@@ -90,9 +95,9 @@ export const Dashboard = () => {
           {communities.map((community) => {
             return (
               <Grid item key={community.id}>
-                <NavLink to={`/communities/${community.id}`}>
-                  <Card variant="outlined">
-                    <CardContent>
+                <NavLink to={`/communities/${community.id}`} style={{textDecoration: "none"}}>
+                  <Card variant="outlined" sx={{backgroundColor: alpha(theme.palette.secondary.dark, 0.5)}}>
+                    <CardContent >
                       <h3>{community.name}</h3>
                     </CardContent>
                   </Card>
