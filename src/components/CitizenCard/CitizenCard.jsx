@@ -1,26 +1,51 @@
-import { Button, Card, CardActionArea, CardActions, CardContent, useTheme } from "@mui/material";
+import { Card, CardContent, Typography, alpha, useTheme } from "@mui/material";
 
-export const CitizenCard = ({ citizen, handleDeleteUser, iAmCitizen }) => {
-  const isMe = iAmCitizen && citizen.userId === iAmCitizen.userId;
-  // const theme = useTheme();
+export const CitizenCard = ({
+  citizen,
+  currentCommunity,
+  handleDeleteUser,
+  iAmCitizen,
+}) => {
+  const isMyCard = iAmCitizen && citizen.userId === iAmCitizen.userId;
+  const theme = useTheme();
+  const { revealed } = currentCommunity;
+  const { vote, hasVoted, username } = citizen;
+
+  // drag and drop cards https://stackoverflow.com/questions/60043907/how-to-drag-drop-material-ui-cards
   return (
-    <Card  key={citizen.id} variant="outlined">
-      {
-        isMe && (
-          <CardContent>
-            <h3>Me</h3>
-          </CardContent>
-        )
-      }
-      <CardContent>
-        <h3>{citizen.username}</h3>
-        <h1>{citizen.vote}</h1>
+    <Card
+      key={citizen.id}
+      variant="outlined"
+      sx={{
+        backgroundColor: hasVoted
+          ? alpha(theme.palette.primary.dark, 0.8)
+          : "none",
+      }}
+    >
+      <CardContent
+        sx={{
+          padding: "5px",
+        }}
+      >
+        <Typography variant="body">{username}</Typography>
+
+        <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
       </CardContent>
-      <CardActionArea>
-        <CardActions>
-            <Button onClick={() => handleDeleteUser(citizen)}>Delete</Button>
-        </CardActions>
-      </CardActionArea>
     </Card>
+  );
+};
+
+export const CitizenVote = ({ isMyCard, revealed, vote }) => {
+  const getValue = () => {
+    if (revealed || isMyCard) {
+      return vote ?? "*";
+    }
+    return "?";
+  };
+
+  return (
+    <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+      {getValue()}
+    </Typography>
   );
 };

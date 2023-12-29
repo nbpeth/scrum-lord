@@ -1,23 +1,25 @@
 import styled from "@emotion/styled";
 import { useCallback } from "react";
 import { Particles } from "react-tsparticles";
-import { loadHyperspacePreset } from "tsparticles-preset-hyperspace";
+import { loadFireflyPreset } from "tsparticles-preset-firefly";
 
-export function HyperSpace(props) {
+export function Firefly(props) {
   const customInit = useCallback(async (engine) => {
-    await loadHyperspacePreset(engine);
+    await loadFireflyPreset(engine);
   });
 
   const options = {
-    preset: "hyperspace",
+    preset: "firefly",
+    // https://particles.js.org/docs/interfaces/tsParticles_Engine.Options_Interfaces_Particles_IParticlesOptions.IParticlesOptions.html
     particles: {
-      color: {
-        value: "#BBFFFF",
-      },
       size: {
-        value: 3
-      }
-    }
+        value: 10,
+      },
+      number: {
+        value: 1000,
+      },
+      
+    },
   };
 
   return <StyledParticles options={options} init={customInit} />;

@@ -1,10 +1,10 @@
-import { Button, Grid, Modal, TextField } from "@mui/material";
+import { Box, Button, Grid, Modal, TextField, Typography } from "@mui/material";
 import { generate } from "random-words";
 import { useState } from "react";
 
 export const CreateRoomModal = ({ open, handleClose }) => {
   const style = {
-    position: "absolute",
+    position: "relative",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
@@ -12,9 +12,7 @@ export const CreateRoomModal = ({ open, handleClose }) => {
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
-    pt: 2,
-    px: 4,
-    pb: 3,
+    p: 4,
   };
 
   const [newCommunity, setNewCommunity] = useState({ name: "" });
@@ -23,7 +21,12 @@ export const CreateRoomModal = ({ open, handleClose }) => {
     if (!newCommunity.name) {
       return {
         ...newCommunity,
-        name: generate({ exactly: 3, minLength: 5, join: "-" }),
+        name: generate({
+          exactly: 3,
+          minLength: 5,
+          join: "-",
+          camelCase: true,
+        }),
       };
     }
     return newCommunity;
@@ -36,7 +39,6 @@ export const CreateRoomModal = ({ open, handleClose }) => {
 
   return (
     <Modal
-      sx={style}
       open={open}
       onClose={(e, reason) => {
         if (reason !== "backdropClick") {
@@ -44,8 +46,11 @@ export const CreateRoomModal = ({ open, handleClose }) => {
         }
       }}
     >
-      <Grid container justifyContent="center" alignItems="space-between">
-        <form onSubmit={handleClose}>
+      <Box sx={style}>
+        <Grid container justifyContent="center" direction="column" spacing={2} xs={12}>
+          <Grid item>
+            <Typography variant="body2">Create a new community! No name provided will result in an auto-generated name.</Typography>
+          </Grid>
           <Grid item>
             <TextField
               onChange={(e) =>
@@ -57,16 +62,16 @@ export const CreateRoomModal = ({ open, handleClose }) => {
           </Grid>
           <Grid container item xs={12}>
             <Grid item>
-              <Button onClick={() => close(getCommunityName())}>
-                Create
-              </Button>
+              <Button onClick={() => close(getCommunityName())}>Create</Button>
             </Grid>
             <Grid item>
-              <Button onClick={() => close()}>Cancel</Button>
+              <Button color="error" onClick={() => close()}>
+                Cancel
+              </Button>
             </Grid>
           </Grid>
-        </form>
-      </Grid>
+        </Grid>
+      </Box>
     </Modal>
   );
 };

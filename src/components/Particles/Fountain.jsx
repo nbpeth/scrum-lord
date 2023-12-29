@@ -1,23 +1,15 @@
 import styled from "@emotion/styled";
 import { useCallback } from "react";
 import { Particles } from "react-tsparticles";
-import { loadHyperspacePreset } from "tsparticles-preset-hyperspace";
+import { loadFountainPreset } from "tsparticles-preset-fountain";
 
-export function HyperSpace(props) {
+export function Fountain(props) {
   const customInit = useCallback(async (engine) => {
-    await loadHyperspacePreset(engine);
+    await loadFountainPreset(engine);
   });
 
   const options = {
-    preset: "hyperspace",
-    particles: {
-      color: {
-        value: "#BBFFFF",
-      },
-      size: {
-        value: 3
-      }
-    }
+    preset: "fountain",
   };
 
   return <StyledParticles options={options} init={customInit} />;

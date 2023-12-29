@@ -64,10 +64,35 @@ const submitVote = ({ communityId, userId, vote }) => {
   }
 
   citizen.vote = vote;
+  citizen.hasVoted = true;
 
-//   console.log("##commiunities", communities);
-//   console.log("##communityId", communityId);
-//   console.log("##communities[communityId]", communities[communityId]);
+  return communities[communityId];
+};
+
+const reveal = ({ communityId }) => {
+  const targetCommunity = communities[communityId];
+
+  if (!targetCommunity) {
+    return Error(`Community "${communityId}" does not exist`);
+  }
+
+  targetCommunity.revealed = true;
+
+  return communities[communityId];
+};
+
+const reset = ({ communityId }) => {
+  const targetCommunity = communities[communityId];
+
+  if (!targetCommunity) {
+    return Error(`Community "${communityId}" does not exist`);
+  }
+
+  targetCommunity.revealed = false;
+  targetCommunity.citizens.forEach((citizen) => {
+    citizen.vote = null;
+    citizen.hasVoted = false;
+  });
 
   return communities[communityId];
 };
@@ -88,10 +113,28 @@ const updateCommunity = (community) => {
   communities[community.id] = community;
 };
 
-const deleteCommunity = (community) => {
-  delete communities[community.id];
+const deleteCommunity = ({ community, userId, username }) => {
+  try {
+    delete communities[community.id];
 
-  return communities;
+    const deleteConfirmation = {
+      deleted: true,
+      id: community.id,
+      userId,
+      username,
+    };
+
+    return { communities, ...deleteConfirmation };
+  } catch (e) {
+    console.log("failed to delete community", community, e);
+
+    return {
+      deleted: false,
+      id: community.id,
+      userId,
+      username,
+    };
+  }
 };
 
 module.exports = {
@@ -103,6 +146,8 @@ module.exports = {
   getCommunityBy,
   joinCommunity,
   leaveCommunity,
+  reveal,
+  reset,
   submitVote,
   updateCommunity,
 };

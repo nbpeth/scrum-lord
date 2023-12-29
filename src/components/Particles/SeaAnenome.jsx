@@ -1,23 +1,16 @@
 import styled from "@emotion/styled";
 import { useCallback } from "react";
+import { loadSeaAnemonePreset } from "tsparticles-preset-sea-anemone";
 import { Particles } from "react-tsparticles";
-import { loadHyperspacePreset } from "tsparticles-preset-hyperspace";
 
-export function HyperSpace(props) {
+export function SeaAnemone(props) {
   const customInit = useCallback(async (engine) => {
-    await loadHyperspacePreset(engine);
+    await loadSeaAnemonePreset(engine);
   });
 
   const options = {
-    preset: "hyperspace",
-    particles: {
-      color: {
-        value: "#BBFFFF",
-      },
-      size: {
-        value: 3
-      }
-    }
+    
+    preset: "seaAnemone",
   };
 
   return <StyledParticles options={options} init={customInit} />;

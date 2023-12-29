@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
 // probably move to separate hooks for dash and session
@@ -25,14 +24,14 @@ export default function useDashboard() {
       const { type, payload } = messageData;
 
       switch (type) {
-        case "list-communities":
+        case "list-communities-reply":
           // console.log("list-communities response", payload);
           const { communities: fetchedCommunities } = payload;
 
           setCommunities(fetchedCommunities);
 
           break;
-        case "community-created":
+        case "community-created-reply":
           // console.log("community-created response", payload);
           const { communities } = payload;
 
@@ -76,6 +75,7 @@ export default function useDashboard() {
     addCommunity,
     fetchCommunities,
     listCommunities,
+    readyState,
     removeCommunity,
   };
 }

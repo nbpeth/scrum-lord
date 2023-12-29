@@ -59,16 +59,26 @@ websocketServer.on("connection", (ws, request) => {
         handleGetCommunity(payload);
         break;
 
+      case "reveal":
+        handleReveal(payload);
+        break;
+
+      case "reset":
+        handleReset(payload);
+        break;
+
       case "submit-vote":
         handleSubmitVote(payload);
+        break;
+
+      case "delete-community":
+        handleDeleteCommunity(payload);
         break;
 
       default:
         console.error("unmatched event", message.toString());
         break;
     }
-
-    console.log("message", messageData);
   });
 
   ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
@@ -82,10 +92,12 @@ const notifyClients = ({ message, communityId }) => {
     if (isTargeted) {
       const clientIsTargeted = communityId == client.targetCommunityId;
       if (clientIsTargeted) {
+        console.log("replying to client", client.targetCommunityId, message);
         client.send(JSON.stringify(message));
       }
     } else {
       if (!client.targetCommunityId) {
+        console.log("replying to all clients", message);
         client.send(JSON.stringify(message));
       }
     }
@@ -99,11 +111,28 @@ const handleCreateCommunity = (payload) => {
   const communities = communityClient.getCommunitiesAsArray();
 
   const message = {
-    type: "community-created",
+    type: "community-created-reply",
     payload: { communities },
   };
 
   notifyClients({ message });
+};
+
+const handleDeleteCommunity = (payload) => {
+  const { community, userId, username } = payload;
+
+  const deleteResult = communityClient.deleteCommunity({
+    community,
+    userId,
+    username,
+  });
+
+  const message = {
+    type: "delete-community-reply",
+    payload: deleteResult,
+  };
+
+  notifyClients({ message, communityId: community.id });
 };
 
 const handleJoinCommunity = (payload) => {
@@ -118,7 +147,7 @@ const handleJoinCommunity = (payload) => {
   });
 
   const reply = {
-    type: "community-joined",
+    type: "community-joined-reply",
     payload: {
       joinedUser: { username, userId },
       community: updatedCommunity,
@@ -140,7 +169,7 @@ const handleLeaveCommunity = (payload) => {
   });
 
   const reply = {
-    type: "community-left",
+    type: "community-left-reply",
     payload: {
       leftUser: { username, userId },
       community: updatedCommunity,
@@ -154,7 +183,7 @@ const handleListCommunities = () => {
   const communitiesSummary = communityClient.getCommunitiesAsArray();
 
   const reply = {
-    type: "list-communities",
+    type: "list-communities-reply",
     payload: {
       communities: communitiesSummary,
     },
@@ -169,7 +198,7 @@ const handleGetCommunity = (payload) => {
   const result = communityClient.getCommunityBy(communityId);
 
   const reply = {
-    type: "get-community",
+    type: "get-community-reply",
     payload: { community: result },
   };
 
@@ -183,7 +212,36 @@ const handleSubmitVote = (payload) => {
   const result = communityClient.submitVote({ communityId, userId, vote });
 
   const reply = {
-    type: "submit-vote",
+    type: "submit-vote-reply",
+    payload: { community: result },
+  };
+
+  notifyClients({ message: reply, communityId });
+};
+
+// technically you can see points by inspecting the ws messages, but that'll be our little secret for now
+const handleReveal = (payload) => {
+  const { community } = payload;
+  const { id: communityId } = community;
+
+  const result = communityClient.reveal({ communityId });
+
+  const reply = {
+    type: "reveal-reply",
+    payload: { community: result },
+  };
+
+  notifyClients({ message: reply, communityId });
+};
+
+const handleReset = (payload) => {
+  const { community } = payload;
+  const { id: communityId } = community;
+
+  const result = communityClient.reset({ communityId });
+
+  const reply = {
+    type: "reset-reply",
     payload: { community: result },
   };
 

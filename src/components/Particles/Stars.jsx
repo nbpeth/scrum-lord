@@ -1,16 +1,61 @@
 import styled from "@emotion/styled";
 import { useCallback } from "react";
-import Particles from "react-particles";
-import { loadFull } from "tsparticles";
 import { loadStarsPreset } from "tsparticles-preset-stars";
+import { Particles } from "react-tsparticles";
 
 export function Stars(props) {
   const customInit = useCallback(async (engine) => {
     await loadStarsPreset(engine);
   });
-
+  // https://particles.js.org/docs/interfaces/tsParticles_Engine.Options_Interfaces_Particles_IParticlesOptions.IParticlesOptions.html#move
   const options = {
+    // events: {
+    //   onClick: {
+    //     enable: true,
+    //     mode: 'push', // This will push new particles on click
+    //   },
+    //   onHover: {
+    //     enable: true,
+    //     mode: 'repulse', // This will repulse particles on hover
+    //   },
+    // },
+    // interactivity: {
+    //   detectOn: 'canvas',
+    //   detect_on: 'win',
+    //   events: {
+    //     onClick: {
+    //       enable: true,
+    //       mode: 'push', // This will push new particles on click
+    //     },
+    //     // onHover: {
+    //     //   enable: true,
+    //     //   mode: 'repulse', // This will repulse particles on hover
+    //     // },
+    //   },
+    //   modes: {
+    //     push: {
+    //       quantity: 400, // This will push 4 new particles on click
+    //     },
+    //     // repulse: {
+    //     //   distance: 200, // This will repulse particles within a distance of 200
+    //     // },
+    //   },
+    // },
     preset: "stars",
+    particles: {
+      color: {
+        value: "#BBFFFF",
+      },
+      size: {
+        value: 5, // Increase this value to increase the speed
+      },
+      // life: {
+      //   count: 0,
+      //   duration: {
+      //     value: 0,
+      //   },
+      // },
+    },
   };
 
   return <StyledParticles options={options} init={customInit} />;

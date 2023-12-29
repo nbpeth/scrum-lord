@@ -2,100 +2,105 @@ import MenuIcon from "@mui/icons-material/Menu";
 import {
   Alert,
   Box,
-  Button,
-  Grid,
   IconButton,
-  MenuItem,
-  Select,
   Snackbar,
   Toolbar,
   Typography,
   styled,
   useTheme,
 } from "@mui/material";
-import { generate } from "random-words";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import * as uuidv4 from "uuid";
-import { CitizenCard } from "../../components/CitizenCard/CitizenCard";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
 import logoUrl from "../../scrumlord-logo-1.jpg";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MailIcon from "@mui/icons-material/Mail";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MuiAppBar from "@mui/material/AppBar";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import * as React from "react";
+import { CommunityCitizens } from "../../components/CommunityCitizens/CommunityCitizens";
+import { CommunityControls } from "../../components/CommunityControls/CommunityControls";
+import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
+import { Stars } from "../../components/Particles/Stars";
+import { Delete } from "@mui/icons-material";
+import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
 
 export const Community = () => {
   const params = useParams();
   const communityId = params.communityId;
+  const navigate = useNavigate();
 
   const {
     alertMessage,
     clearAlertMessage,
     joinCommunity,
     leaveCommunity,
+    handleReveal,
+    handleReset,
     community: currentCommunity,
     submitVote,
+    deleteCommunity,
+    roomEvents,
   } = useCommunity();
+
+  // handle external room events
+  useEffect(() => {
+    if (!roomEvents) {
+      return;
+    }
+    if (
+      roomEvents.communityDeleted &&
+      roomEvents.communityDeleted[communityId] &&
+      roomEvents.communityDeleted[communityId].deleted === true
+    ) {
+      navigate("/?error=9000", { state: { alertMessage: "Community deleted" }});
+    }
+  }, [roomEvents, currentCommunity]);
 
   const citizens = currentCommunity?.citizens || [];
   const [iAmCitizen, setIAmCitizen] = useState(null);
   const [error, setError] = useState(null);
+  const [joinCommunityModalOpen, setJoinCommunityModalOpen] = useState(false);
+  const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
+    useState(false);
 
-  const [selectOptions, setSelectOptions] = useState([
-    0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
-  ]);
-  const [selectedVote, setSelectedVote] = useState(0);
+  const [controlsList, setControlsList] = useState({
+    partyModeEngaged: false,
+  });
 
   // cleanup
   // todo: user state is all sorts of messed up
   // delete causing some wild re-renders, cycling through users
 
-  // go with mongo? https://cloud.mongodb.com/v2/6467e716e89e772d85c3b74c#/clusters
-  useEffect(() => {
-    return () => {
-      console.log("cleaned up");
-    };
-  }, []);
-
+  // go with mongo?
   // recover user from storage
   useEffect(() => {
     recoverUserFromStorage();
   }, [currentCommunity]);
 
-  const handleVoteChange = (event) => {
-    setSelectedVote(event.target.value);
-  };
-
-  const onVoteSubmit = () => {
-    submitVote({ communityId, userId: iAmCitizen.userId, vote: selectedVote });
-  };
-
   const handleJoin = () => {
-    const username = generate({ exactly: 2, minLength: 5, join: " " });
-    const userId = uuidv4.v4();
+    setJoinCommunityModalOpen(true);
+  };
+
+  const handleJoinCommunityModalClose = (newUser) => {
+    if (!newUser) {
+      setJoinCommunityModalOpen(false);
+      return;
+    }
+    const { username, userId } = newUser;
     saveUserToStorage(userId);
 
     try {
       joinCommunity({ communityId, userId, username });
-
       setIAmCitizen({ userId, username });
     } catch (e) {
       console.error(e);
-      error(e.message);
-
-      return;
+      setError(e.message);
     }
+
+    setJoinCommunityModalOpen(false);
   };
 
   // reclaim your user for a community if you've joined and returned
@@ -123,6 +128,7 @@ export const Community = () => {
   };
 
   const handleDeleteUser = (citizen) => {
+    console.log("deleting user", citizen);
     handleLeave({
       communityId,
       userId: citizen.userId,
@@ -140,7 +146,7 @@ export const Community = () => {
       setIAmCitizen(null);
     } catch (e) {
       console.error(e);
-      error(e.message);
+      setError(e.message);
 
       return;
     }
@@ -154,13 +160,28 @@ export const Community = () => {
     clearAlertMessage();
   };
 
-  const drawerWidth = 240;
+  const handleDeleteCommunity = () => {
+    setDeleteCommunityModalOpen(true);
+  };
 
+  const onDeleteCommunityModalClose = (communityId) => {
+    if (communityId) {
+      deleteCommunity({
+        communityId,
+        userId: iAmCitizen?.userId,
+        username: iAmCitizen?.username,
+      });
+      // redirect everyone with a message to the dashboard
+    }
+
+    setDeleteCommunityModalOpen(false);
+  };
+
+  // drawer
+  const drawerWidth = 240;
   const theme = useTheme();
 
-
-
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -169,6 +190,7 @@ export const Community = () => {
     setOpen(false);
   };
 
+  // extract these things out
   const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
     ({ theme, open }) => ({
       flexGrow: 1,
@@ -213,11 +235,24 @@ export const Community = () => {
     ...theme.mixins.toolbar,
     justifyContent: "flex-end",
   }));
+  // drawer
 
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
         {/* appbar component */}
+        {controlsList?.partyModeEngaged && <Stars />}
+        <JoinCommunityModal
+          open={joinCommunityModalOpen}
+          handleClose={handleJoinCommunityModalClose}
+        />
+
+        <DeleteCommunityModal
+          open={deleteCommunityModalOpen}
+          handleClose={onDeleteCommunityModalClose}
+          currentCommunity={currentCommunity}
+        />
+
         <AppBar position="fixed" open={open}>
           <Toolbar>
             <IconButton
@@ -236,15 +271,6 @@ export const Community = () => {
             <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
               {currentCommunity && currentCommunity.name}
             </Typography>
-            {/* {!iAmCitizen ? (
-              <Button variant="contained" color="primary" onClick={handleJoin}>
-                Join
-              </Button>
-            ) : (
-              <Button variant="contained" color="primary" onClick={handleLeave}>
-                Leave
-              </Button>
-            )} */}
           </Toolbar>
         </AppBar>
         <Drawer
@@ -270,23 +296,20 @@ export const Community = () => {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <List>
-            {/* join component */}
-            {!iAmCitizen ? (
-              <Button variant="outlined" color="success" onClick={handleJoin}>
-                Join
-              </Button>
-            ) : (
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleLeave}
-              >
-                Leave
-              </Button>
-            )}
-          </List>
-          {/* join component */}
+
+          <CommunityControls
+            handleDeleteCommunity={handleDeleteCommunity}
+            controlsList={controlsList}
+            setControlsList={setControlsList}
+            community={currentCommunity}
+            handleReveal={handleReveal}
+            handleReset={handleReset}
+            handleJoin={handleJoin}
+            handleLeave={handleLeave}
+            iAmCitizen={iAmCitizen}
+            communityId={communityId}
+            submitVote={submitVote}
+          />
 
           <Divider />
         </Drawer>
@@ -314,54 +337,13 @@ export const Community = () => {
             <Typography variant="h3">{error}</Typography>
             //  </Grid>
           )}
-          {/* <Grid item xs={12}>
-            <h1>{currentCommunity.name}</h1>
-          </Grid> */}
-          <Grid container direction="column">
-            <Grid container item>
-              {citizens.length ? (
-                citizens.map((citizen) => {
-                  return (
-                    <Grid item xs={3} key={citizen.userId}>
-                      <CitizenCard
-                        handleDeleteUser={handleDeleteUser}
-                        iAmCitizen={iAmCitizen}
-                        citizen={citizen}
-                      />
-                    </Grid>
-                  );
-                })
-              ) : (
-                <Grid item xs={12}>
-                  <p>No one is here</p>
-                </Grid>
-              )}
-            </Grid>
-            <Grid container item>
-              {iAmCitizen && (
-                <Grid item xs={12}>
-                  <Button variant="contained" onClick={onVoteSubmit}>
-                    Vote
-                  </Button>
-                  <Select
-                    labelId="vote-selector-label"
-                    id="vote-selector"
-                    value={selectedVote}
-                    label="Vote"
-                    onChange={handleVoteChange}
-                  >
-                    {selectOptions.map((option) => {
-                      return (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </Grid>
-              )}
-            </Grid>
-          </Grid>
+
+          <CommunityCitizens
+            citizens={citizens}
+            iAmCitizen={iAmCitizen}
+            handleDeleteUser={handleDeleteUser}
+            currentCommunity={currentCommunity}
+          />
         </Main>
       ) : null}
     </>

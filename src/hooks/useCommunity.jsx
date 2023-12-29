@@ -8,10 +8,12 @@ export default function useCommunity() {
   const websocketUrlRoot = "ws://localhost:8080/socket";
   const [socketUrl, setSocketUrl] = useState(null);
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
-
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
   // const [messageHistory, setMessageHistory] = useState([]);
+
+  const [roomEvents, setRoomEvents] = useState({});
+
   const navigate = useNavigate();
   // configure the socket url to target the community id
   useEffect(() => {
@@ -58,7 +60,20 @@ export default function useCommunity() {
     setAlertMessage(`${leftUser.username} left the community`);
   };
 
+  // blanket holistic updates for now, duplicated but unsure where to go in the future
   const handleSubmittedVote = (payload) => {
+    const { community } = payload;
+
+    setCommunity(community);
+  };
+
+  const handleResetReply = (payload) => {
+    const { community } = payload;
+
+    setCommunity(community);
+  };
+
+  const handleRevealReply = (payload) => {
     const { community } = payload;
 
     setCommunity(community);
@@ -69,10 +84,10 @@ export default function useCommunity() {
       const messageData = JSON.parse(lastMessage?.data);
       const { type, payload } = messageData;
 
-      console.log("messageData", messageData);
+      // console.log("messageData", messageData);
 
       switch (type) {
-        case "get-community":
+        case "get-community-reply":
           if (!payload.community) {
             navigate("/?error=404");
           } else {
@@ -80,16 +95,30 @@ export default function useCommunity() {
           }
 
           break;
-        case "community-joined":
+        case "community-joined-reply":
           handleCommunityJoined(payload);
 
           break;
-        case "community-left":
+        case "community-left-reply":
           handleCommunityLeft(payload);
 
           break;
-        case "submit-vote":
+        case "submit-vote-reply":
           handleSubmittedVote(payload);
+
+          break;
+
+        case "reveal-reply":
+          handleRevealReply(payload);
+
+          break;
+        case "reset-reply":
+          handleResetReply(payload);
+
+          break;
+
+        case "delete-community-reply":
+          handleCommunityDeletedReply(payload);
 
           break;
 
@@ -100,6 +129,35 @@ export default function useCommunity() {
       console.log("error parsing message", e);
     }
   }, [lastMessage]);
+
+  const handleCommunityDeletedReply = (payload) => {
+    setRoomEvents({
+      ...roomEvents,
+      communityDeleted: {
+        [payload.id]: {
+          deleted: payload.deleted,
+        },
+      },
+    });
+  };
+
+  const handleReveal = () => {
+    sendMessage(
+      JSON.stringify({
+        type: "reveal",
+        payload: { community: { id: communityId } },
+      })
+    );
+  };
+
+  const handleReset = () => {
+    sendMessage(
+      JSON.stringify({
+        type: "reset",
+        payload: { community: { id: communityId } },
+      })
+    );
+  };
 
   const joinCommunity = ({ communityId, username, userId }) => {
     sendMessage(
@@ -134,6 +192,15 @@ export default function useCommunity() {
     );
   };
 
+  const deleteCommunity = ({ communityId, userId, username }) => {
+    sendMessage(
+      JSON.stringify({
+        type: "delete-community",
+        payload: { community: { id: communityId }, userId, username },
+      })
+    );
+  };
+
   const clearAlertMessage = () => {
     setAlertMessage(null);
   };
@@ -142,8 +209,12 @@ export default function useCommunity() {
     alertMessage,
     clearAlertMessage,
     community,
+    deleteCommunity,
     joinCommunity,
+    handleReveal,
+    handleReset,
     leaveCommunity,
+    roomEvents,
     submitVote,
   };
 }

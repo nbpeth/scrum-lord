@@ -1,14 +1,22 @@
-import { AppBar, Box, Button, Card, CardContent, Grid, Toolbar, Typography, useTheme } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Toolbar,
+  Typography,
+  alpha,
+  useTheme,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
-import { alpha } from "@mui/material";
 
-
-import logoUrl from "../../scrumlord-logo-2.png";
-import { Stars } from "../../components/Particles/Stars";
 import { HyperSpace } from "../../components/Particles/Hyperspace";
+import logoUrl from "../../scrumlord-logo-2.png";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities } = useDashboard();
@@ -17,6 +25,7 @@ export const Dashboard = () => {
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
   const theme = useTheme();
+  
 
   // get the list of communities on mount
   useEffect(() => {
@@ -36,10 +45,11 @@ export const Dashboard = () => {
     if (newCommunity) {
       try {
         addCommunity(newCommunity);
+        // navigate when the community is created
+        
       } catch (e) {
         setError(e.message);
         setCreateRoomModalOpen(false);
-
         return;
       }
     }
@@ -47,18 +57,21 @@ export const Dashboard = () => {
     setCreateRoomModalOpen(false);
   };
 
+  // todo: idle time counter and self delete
+  // todo: websocket status component
+
   return (
     <div>
       <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
         <AppBar position="static">
           <Toolbar>
-          <Button
-            variant="contained"
-            disabled={createRoomModalOpen}
-            onClick={createRoomClicked}
-          >
-            Create Room
-          </Button>
+            <Button
+              variant="contained"
+              disabled={createRoomModalOpen}
+              onClick={createRoomClicked}
+            >
+              Create Room
+            </Button>
             {/* <IconButton
               size="large"
               edge="start"
@@ -86,18 +99,24 @@ export const Dashboard = () => {
           </Grid>
         )}
 
-        <Grid item>
-         
-        </Grid>
+        <Grid item></Grid>
 
         {/* communities component */}
         <Grid container item spacing={2} justifyContent="center">
           {communities.map((community) => {
             return (
               <Grid item key={community.id}>
-                <NavLink to={`/communities/${community.id}`} style={{textDecoration: "none"}}>
-                  <Card variant="outlined" sx={{backgroundColor: alpha(theme.palette.secondary.dark, 0.5)}}>
-                    <CardContent >
+                <NavLink
+                  to={`/communities/${community.id}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
+                    }}
+                  >
+                    <CardContent>
                       <h3>{community.name}</h3>
                     </CardContent>
                   </Card>
