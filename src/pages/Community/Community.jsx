@@ -26,6 +26,7 @@ import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinComm
 import { Stars } from "../../components/Particles/Stars";
 import { Delete } from "@mui/icons-material";
 import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
+import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 
 export const Community = () => {
   const params = useParams();
@@ -43,6 +44,7 @@ export const Community = () => {
     submitVote,
     deleteCommunity,
     roomEvents,
+    readyState
   } = useCommunity();
 
   // handle external room events
@@ -271,6 +273,7 @@ export const Community = () => {
             <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
               {currentCommunity && currentCommunity.name}
             </Typography>
+            <ConnectionStatus readyState={readyState} />
           </Toolbar>
         </AppBar>
         <Drawer

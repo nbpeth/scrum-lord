@@ -8,16 +8,6 @@ export default function useDashboard() {
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
 
-  /*
-  console.log("ready?", readyState);
-  if it's closed, tell them to refresh or click a button or something
-
-   0 = CONNECTING
-   1 = OPEN
-   2 = CLOSING
-   3 = CLOSED
-  */
-
   useEffect(() => {
     try {
       const messageData = JSON.parse(lastMessage?.data);

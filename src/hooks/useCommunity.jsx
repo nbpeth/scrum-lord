@@ -27,16 +27,6 @@ export default function useCommunity() {
     );
   }, [communityId]);
 
-  /*
-  console.log("ready?", readyState);
-  if it's closed, tell them to refresh or click a button or something
-
-   0 = CONNECTING
-   1 = OPEN
-   2 = CLOSING
-   3 = CLOSED
-  */
-
   const handleCommunityJoined = (payload) => {
     try {
       console.log("community-joined response", payload);
@@ -214,6 +204,7 @@ export default function useCommunity() {
     handleReveal,
     handleReset,
     leaveCommunity,
+    readyState,
     roomEvents,
     submitVote,
   };
