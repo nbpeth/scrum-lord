@@ -5,7 +5,6 @@ import useWebSocket from "react-use-websocket";
 export default function useCommunity() {
   const params = useParams();
   const communityId = params.communityId;
-  const websocketUrlRoot = "ws://localhost:8080/socket";
   const [socketUrl, setSocketUrl] = useState(null);
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   const [community, setCommunity] = useState(null);
@@ -15,9 +14,16 @@ export default function useCommunity() {
   const [roomEvents, setRoomEvents] = useState({});
 
   const navigate = useNavigate();
+
   // configure the socket url to target the community id
   useEffect(() => {
-    setSocketUrl(`${websocketUrlRoot}?communityId=${communityId}`);
+    const host = document.location.host;
+    const wsProtocol = document.location.protocol === "https:" ? "wss" : "ws";
+    let baseUrl = `${wsProtocol}://${host}/socket`;
+
+    console.log("baseUrl", baseUrl);
+
+    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
   }, [communityId]);
 
   // get community data on mount
@@ -29,7 +35,6 @@ export default function useCommunity() {
 
   const handleCommunityJoined = (payload) => {
     try {
-      console.log("community-joined response", payload);
       const { joinedUser, community } = payload;
 
       const { citizens: updatedCitizens, id } = community;
@@ -42,7 +47,6 @@ export default function useCommunity() {
   };
 
   const handleCommunityLeft = (payload) => {
-    console.log("community-left response", payload);
     const { leftUser, community } = payload;
     const { citizens: updatedCitizens, id } = community;
 
@@ -73,8 +77,6 @@ export default function useCommunity() {
     try {
       const messageData = JSON.parse(lastMessage?.data);
       const { type, payload } = messageData;
-
-      // console.log("messageData", messageData);
 
       switch (type) {
         case "get-community-reply":
