@@ -36,7 +36,7 @@
     "ws": "^8.15.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts build && node ./api/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
