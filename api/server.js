@@ -5,6 +5,8 @@ const url = require("url");
 
 const communityClient = require("./communityClient");
 
+console.log('SERVER TIME: ', process.env.PORT)
+
 const setTargetSessionOn = (ws, request) => {
   const queryParams = url.parse(request.url, { parseQueryString: true }).query;
   ws["targetCommunityId"] = queryParams.communityId;
