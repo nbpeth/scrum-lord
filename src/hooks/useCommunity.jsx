@@ -21,7 +21,7 @@ export default function useCommunity() {
     const wsProtocol = document.location.protocol === "https:" ? "wss" : "ws";
     let baseUrl = `${wsProtocol}://${host}/socket`;
 
-    console.log("baseUrl", baseUrl);
+    // console.log("baseUrl", baseUrl);
 
     setSocketUrl(`${baseUrl}?communityId=${communityId}`);
   }, [communityId]);
