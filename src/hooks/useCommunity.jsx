@@ -1,3 +1,4 @@
+import { useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
@@ -24,6 +25,7 @@ export default function useCommunity() {
     // console.log("baseUrl", baseUrl);
 
     setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    // setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
   }, [communityId]);
 
   // get community data on mount

@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 
+
 const startServer = () => {
   app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -28,7 +29,7 @@ const startServer = () => {
   app.use(bodyParser.json());
 
   app.get("*", (_, res) => {
-    res.sendFile(staticPath);
+    res.sendFile(path.join(staticPath, 'index.html'));
   });
 };
 

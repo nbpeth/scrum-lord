@@ -37,6 +37,7 @@
   },
   "scripts": {
     "start": "node ./api/server.js",
+    "start:rs": "react-scripts start",
     "build": "react-scripts build",
     "heroku-postbuild": "yarn build",
     "test": "react-scripts test",

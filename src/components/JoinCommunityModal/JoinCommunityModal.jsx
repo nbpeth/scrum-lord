@@ -22,7 +22,8 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
       boxShadow: 24,
       p: 4,
     };
-  
+    
+    // todo: show random name as default
     const [newUser, setNewUser] = useState({ username: "" });
   
     const getUserName = () => {

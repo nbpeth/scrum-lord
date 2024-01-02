@@ -11,7 +11,13 @@ export const CommunityCitizens = ({
 }) => {
   const theme = useTheme();
   return (
-    <Grid container direction="column">
+    <Grid
+      container
+      direction="column"
+      xs={12}
+      spacing={3}
+      sx={{ padding: "15px" }}
+    >
       <Grid container item spacing={3} xs={12} justifyContent="center">
         {citizens.length ? (
           citizens.map((citizen) => {
@@ -28,7 +34,11 @@ export const CommunityCitizens = ({
           })
         ) : (
           <Grid item xs={12}>
-            <Typography color={theme.palette.grey[700]} variant="h5" sx={{ fontStyle: "italic" }}>
+            <Typography
+              color={theme.palette.grey[700]}
+              variant="h5"
+              sx={{ fontStyle: "italic" }}
+            >
               No one is here
             </Typography>
           </Grid>

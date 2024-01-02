@@ -1,29 +1,14 @@
-import {
-  Button,
-  Grid,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Select,
-  Switch,
-} from "@mui/material";
+import { Button, Divider, Grid, List, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 
-import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
 import * as React from "react";
-import ModeNightIcon from "@mui/icons-material/ModeNight";
 export const CommunityControls = ({
-  handleJoin,
-  handleLeave,
   handleReveal,
   handleReset,
   iAmCitizen,
   communityId,
   submitVote,
   community,
-  controlsList,
-  setControlsList,
   handleDeleteCommunity,
 }) => {
   const [selectOptions, setSelectOptions] = useState([
@@ -48,42 +33,45 @@ export const CommunityControls = ({
       direction="column"
       justifyContent="space-between"
       xs={12}
+      spacing={3}
       sx={{ padding: "15px" }}
     >
-      <Grid container item spacing={2}>
-        <Grid item xs={12}>
-          {!iAmCitizen ? (
-            <Button
-              fullWidth
-              variant="outlined"
-              color="success"
-              onClick={handleJoin}
-            >
-              Join
-            </Button>
-          ) : (
-            <Button
-              fullWidth
-              variant="outlined"
-              color="secondary"
-              onClick={handleLeave}
-            >
-              Leave
-            </Button>
-          )}
+      <Grid container item spacing={1} xs={6} justifyContent="space-between">
+        <Grid item>
+          <Button variant="outlined">⚡</Button>
         </Grid>
-        <Grid item xs={12}>
-          <List>
-            <Divider />
-          </List>
+        <Grid item>
+          <Button variant="outlined">🎉</Button>
+        </Grid>
+        <Grid item>
+          <Button variant="outlined">🤔</Button>
+          {/* nonplussed */}
+        </Grid>
+        <Grid item>
+          <Button variant="outlined">👍</Button>
+        </Grid>
+        <Grid item>
+          <Button variant="outlined">👎</Button>
         </Grid>
       </Grid>
+
+      <Grid item xs={12}>
+        <List>
+          <Divider />
+        </List>
+      </Grid>
+      {/* </Grid> */}
       {iAmCitizen ? (
         <Grid container item spacing={2}>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <List>
               <Divider />
             </List>
+          </Grid> */}
+          <Grid item xs={12}>
+            <Button fullWidth variant="contained" onClick={onVoteSubmit}>
+              Vote
+            </Button>
           </Grid>
           <Grid item xs={12}>
             <Select
@@ -103,13 +91,11 @@ export const CommunityControls = ({
               })}
             </Select>
           </Grid>
-
           <Grid item xs={12}>
-            <Button fullWidth variant="contained" onClick={onVoteSubmit}>
-              Vote
-            </Button>
+            <List>
+              <Divider />
+            </List>
           </Grid>
-
           <Grid item xs={12}>
             {community && community.revealed ? (
               <Button
@@ -131,37 +117,31 @@ export const CommunityControls = ({
               </Button>
             )}
           </Grid>
-
+          {/* 
           <Grid item xs={12}>
             <List>
               <Divider />
             </List>
-          </Grid>
+          </Grid> */}
         </Grid>
       ) : null}
 
-      <Grid container item alignItems="center" justify="flex-start">
-        <ModeNightIcon />
-        <Switch
-          checked={!!controlsList?.partyModeEngaged}
-          onChange={() => {
-            setControlsList({
-              ...controlsList,
-              partyModeEngaged: !controlsList.partyModeEngaged,
-            });
-          }}
-        />
-      </Grid>
+      <Grid container item alignItems="center" justify="flex-start"></Grid>
+      {/* <Grid item xs={12}>
+        <List>
+          <Divider />
+        </List>
+      </Grid> */}
 
       <Grid item>
-        <Button
+        {/* <Button
           fullWidth
           variant="outlined"
           color="error"
           onClick={onDeleteCommunity}
         >
           Delete Room
-        </Button>
+        </Button> */}
       </Grid>
     </Grid>
   );

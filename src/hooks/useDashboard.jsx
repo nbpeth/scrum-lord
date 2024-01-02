@@ -16,6 +16,8 @@ export default function useDashboard() {
     // console.log("baseUrl", baseUrl);
 
     setSocketUrl(`${baseUrl}`);
+    // setSocketUrl(`ws://localhost:8080/socket`);
+
   }, []);
 
   useEffect(() => {

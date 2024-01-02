@@ -1,37 +1,44 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   Alert,
+  AppBar,
   Box,
+  Button,
+  Divider,
+  Grid,
   IconButton,
+  ListItemIcon,
+  MenuItem,
+  MenuList,
+  Paper,
   Snackbar,
+  Switch,
   Toolbar,
   Typography,
-  styled,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
 import logoUrl from "../../scrumlord-logo-1.jpg";
+import ModeNightIcon from "@mui/icons-material/ModeNight";
 
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MuiAppBar from "@mui/material/AppBar";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
 import * as React from "react";
 import { CommunityCitizens } from "../../components/CommunityCitizens/CommunityCitizens";
 import { CommunityControls } from "../../components/CommunityControls/CommunityControls";
+import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
+import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { Stars } from "../../components/Particles/Stars";
-import { Delete } from "@mui/icons-material";
-import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
-import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
+import { ScrumLordMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
+import { Home } from "@mui/icons-material";
 
 export const Community = () => {
   const params = useParams();
   const communityId = params.communityId;
   const navigate = useNavigate();
+  const fullsizeScreen = useMediaQuery("(min-width:800px)");
 
   const {
     alertMessage,
@@ -44,7 +51,7 @@ export const Community = () => {
     submitVote,
     deleteCommunity,
     roomEvents,
-    readyState
+    readyState,
   } = useCommunity();
 
   // handle external room events
@@ -57,7 +64,9 @@ export const Community = () => {
       roomEvents.communityDeleted[communityId] &&
       roomEvents.communityDeleted[communityId].deleted === true
     ) {
-      navigate("/?error=9000", { state: { alertMessage: "Community deleted" }});
+      navigate("/?error=9000", {
+        state: { alertMessage: "Community deleted" },
+      });
     }
   }, [roomEvents, currentCommunity]);
 
@@ -179,70 +188,9 @@ export const Community = () => {
     setDeleteCommunityModalOpen(false);
   };
 
-  // drawer
-  const drawerWidth = 240;
-  const theme = useTheme();
-
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  // extract these things out
-  const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-    ({ theme, open }) => ({
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-
-      ...(open && {
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create("margin", {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      }),
-    })
-  );
-
-  const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== "open",
-  })(({ theme, open }) => ({
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-      width: `calc(100% - ${drawerWidth}px)`,
-      marginLeft: `${drawerWidth}px`,
-      transition: theme.transitions.create(["margin", "width"], {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    }),
-  }));
-
-  const DrawerHeader = styled("div")(({ theme }) => ({
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: "flex-end",
-  }));
-  // drawer
-
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        {/* appbar component */}
         {controlsList?.partyModeEngaged && <Stars />}
         <JoinCommunityModal
           open={joinCommunityModalOpen}
@@ -254,101 +202,138 @@ export const Community = () => {
           handleClose={onDeleteCommunityModalClose}
           currentCommunity={currentCommunity}
         />
-
-        <AppBar position="fixed" open={open}>
+        <AppBar position="static">
           <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(open && { display: "none" }) }}
-            >
-              <MenuIcon />
-            </IconButton>
+            <ScrumLordMenu>
+              <Paper sx={{ width: 250, maxWidth: "100%" }}>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => {
+                      navigate("/");
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Home />
+                    </ListItemIcon>
+                    <Typography
+                      variant="h6"
+                      component="div"
+                      sx={{ flexGrow: 1 }}
+                    ></Typography>
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem>
+                    {!iAmCitizen ? (
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="success"
+                        onClick={handleJoin}
+                      >
+                        Join
+                      </Button>
+                    ) : (
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        onClick={handleLeave}
+                      >
+                        Leave
+                      </Button>
+                    )}
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem>
+                    <ListItemIcon>
+                      <ModeNightIcon />
+                    </ListItemIcon>
+                    <Switch
+                      checked={!!controlsList?.partyModeEngaged}
+                      onChange={() => {
+                        setControlsList({
+                          ...controlsList,
+                          partyModeEngaged: !controlsList.partyModeEngaged,
+                        });
+                      }}
+                    />
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="error"
+                      onClick={handleDeleteCommunity}
+                    >
+                      Delete Room
+                    </Button>
+                  </MenuItem>
+                </MenuList>
+              </Paper>
+            </ScrumLordMenu>
 
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <img src={logoUrl} height="50" width="50" />
-            </Link>
+            {/* <Link to="/" style={{ textDecoration: "none" }}>
+            <img src={logoUrl} height="50" width="50" />
+          </Link> */}
             <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
               {currentCommunity && currentCommunity.name}
             </Typography>
             <ConnectionStatus readyState={readyState} />
           </Toolbar>
         </AppBar>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: drawerWidth,
-              boxSizing: "border-box",
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === "ltr" ? (
-                <ChevronLeftIcon />
-              ) : (
-                <ChevronRightIcon />
-              )}
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-
+      </Box>
+      <Grid container xs={12} spacing={3}>
+        <Grid item xs={fullsizeScreen ? 3 : 12} xl={fullsizeScreen ? 2 : 12}>
+          {/* <Grid item>
+            <Link to="/" style={{ textDecoration: "none" }}>
+              <img src={logoUrl} height="250" width="250" />
+            </Link>
+          </Grid> */}
           <CommunityControls
-            handleDeleteCommunity={handleDeleteCommunity}
             controlsList={controlsList}
             setControlsList={setControlsList}
             community={currentCommunity}
             handleReveal={handleReveal}
             handleReset={handleReset}
-            handleJoin={handleJoin}
-            handleLeave={handleLeave}
             iAmCitizen={iAmCitizen}
             communityId={communityId}
             submitVote={submitVote}
           />
+        </Grid>
+        <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
+          {currentCommunity ? (
+            <>
+              <Snackbar
+                open={Boolean(alertMessage)}
+                autoHideDuration={6000}
+                onClose={handleAlertClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              >
+                <Alert
+                  onClose={handleAlertClose}
+                  severity="success"
+                  sx={{ width: "100%" }}
+                >
+                  {alertMessage}
+                </Alert>
+              </Snackbar>
+              {error && (
+                // <Grid item xs={12}>
+                <Typography variant="h3">{error}</Typography>
+                //  </Grid>
+              )}
 
-          <Divider />
-        </Drawer>
-        {/* appbar component */}
-      </Box>
-      {currentCommunity ? (
-        <Main open={open}>
-          <DrawerHeader />
-          <Snackbar
-            open={Boolean(alertMessage)}
-            autoHideDuration={6000}
-            onClose={handleAlertClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          >
-            <Alert
-              onClose={handleAlertClose}
-              severity="success"
-              sx={{ width: "100%" }}
-            >
-              {alertMessage}
-            </Alert>
-          </Snackbar>
-          {error && (
-            // <Grid item xs={12}>
-            <Typography variant="h3">{error}</Typography>
-            //  </Grid>
-          )}
-
-          <CommunityCitizens
-            citizens={citizens}
-            iAmCitizen={iAmCitizen}
-            handleDeleteUser={handleDeleteUser}
-            currentCommunity={currentCommunity}
-          />
-        </Main>
-      ) : null}
+              <CommunityCitizens
+                citizens={citizens}
+                iAmCitizen={iAmCitizen}
+                handleDeleteUser={handleDeleteUser}
+                currentCommunity={currentCommunity}
+              />
+            </>
+          ) : null}
+        </Grid>
+      </Grid>
     </>
   );
 };

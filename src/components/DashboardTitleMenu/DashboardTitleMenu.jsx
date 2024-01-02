@@ -8,14 +8,14 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
     <>
-      <MenuIcon onClick={handleClick}  sx={{ cursor: "pointer" }} />
+      <MenuIcon onClick={handleClick} sx={{ cursor: "pointer" }} />
 
       <Menu
         id="dashboard-menu"
@@ -31,6 +31,34 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
           </MenuList>
         </Paper>
       </Menu>
+    </>
+  );
+};
+
+export const ScrumLordMenu = ({ children }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <MenuIcon onClick={handleClick} sx={{ cursor: "pointer" }} />
+      
+        <Menu
+          id="dashboard-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          {children}
+        </Menu>
+      
     </>
   );
 };
