@@ -15,8 +15,8 @@ export default function useDashboard() {
 
     // console.log("baseUrl", baseUrl);
 
-    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
-  }, [communityId]);
+    setSocketUrl(`${baseUrl}`);
+  }, []);
 
   useEffect(() => {
     try {
