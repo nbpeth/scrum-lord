@@ -32,6 +32,12 @@ export const CitizenCard = ({
         backgroundColor: hasVoted
           ? alpha(theme.palette.primary.dark, 0.8)
           : "none",
+
+        cursor: "pointer",
+        transition: "background .5s ease-in-out",
+        "&:hover": {
+          backgroundColor: alpha(theme.palette.grey[800], 1),
+        },
       }}
     >
       <CardContent

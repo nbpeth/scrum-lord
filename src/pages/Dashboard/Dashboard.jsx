@@ -111,7 +111,13 @@ export const Dashboard = () => {
                     sx={{
                       backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
                       cursor: "pointer",
+                      transition: "background .5s ease-in-out",
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.secondary.dark, 1),
+                      }
                     }}
+                    
+                    
                   >
                     <CardContent>
                       <h3>{community.name}</h3>
