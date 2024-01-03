@@ -93,6 +93,7 @@ export const Community = () => {
   };
 
   const handleJoinCommunityModalClose = (newUser) => {
+    
     if (!newUser) {
       setJoinCommunityModalOpen(false);
       return;

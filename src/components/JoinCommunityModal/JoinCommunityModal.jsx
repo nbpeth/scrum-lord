@@ -34,10 +34,11 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
         }),
       };
     }
-    return { newUser, ...userId };
+    return { ...newUser, userId };
   };
 
   const onClose = (c) => {
+    
     setNewUser({ username: "" });
     handleClose(c);
   };

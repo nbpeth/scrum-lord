@@ -1,4 +1,11 @@
-import { Button, Divider, Grid, List, MenuItem, Select } from "@mui/material";
+import {
+  Button,
+  Divider,
+  Grid,
+  List,
+  MenuItem,
+  Select
+} from "@mui/material";
 import { useState } from "react";
 
 import * as React from "react";
@@ -129,7 +136,7 @@ export const CommunityControls = ({
                 <Button
                   fullWidth
                   variant="outlined"
-                  color="success"
+                  color="warning"
                   onClick={handleReset}
                 >
                   Reset
