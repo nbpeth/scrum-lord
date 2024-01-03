@@ -1,4 +1,4 @@
-import MenuIcon from "@mui/icons-material/Menu";
+import ModeNightIcon from "@mui/icons-material/ModeNight";
 import {
   Alert,
   AppBar,
@@ -6,7 +6,6 @@ import {
   Button,
   Divider,
   Grid,
-  IconButton,
   ListItemIcon,
   MenuItem,
   MenuList,
@@ -15,24 +14,21 @@ import {
   Switch,
   Toolbar,
   Typography,
-  useMediaQuery,
-  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
-import logoUrl from "../../scrumlord-logo-1.jpg";
-import ModeNightIcon from "@mui/icons-material/ModeNight";
 
+import { Home } from "@mui/icons-material";
 import * as React from "react";
 import { CommunityCitizens } from "../../components/CommunityCitizens/CommunityCitizens";
 import { CommunityControls } from "../../components/CommunityControls/CommunityControls";
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
+import { ScrumLordMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { Stars } from "../../components/Particles/Stars";
-import { ScrumLordMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
-import { Home } from "@mui/icons-material";
 
 export const Community = () => {
   const params = useParams();
@@ -139,7 +135,7 @@ export const Community = () => {
   };
 
   const handleDeleteUser = (citizen) => {
-    console.log("deleting user", citizen);
+    // console.log("deleting user", citizen);
     handleLeave({
       communityId,
       userId: citizen.userId,
@@ -148,6 +144,7 @@ export const Community = () => {
   };
 
   const handleLeave = ({ communityId: id, userId, username }) => {
+
     try {
       leaveCommunity({
         communityId: id ?? communityId,

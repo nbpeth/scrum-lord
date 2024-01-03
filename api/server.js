@@ -5,8 +5,6 @@ const url = require("url");
 
 const communityClient = require("./communityClient");
 
-console.log('#### SERVER TIME: ', process.env.PORT)
-
 const setTargetSessionOn = (ws, request) => {
   const queryParams = url.parse(request.url, { parseQueryString: true }).query;
   ws["targetCommunityId"] = queryParams.communityId;
@@ -255,8 +253,6 @@ setInterval(() => {
     client.send(JSON.stringify({ hey: "friend" }));
   });
 }, 30000);
-
-console.log('#### SERVER TIME about to listen: ', process.env.PORT)
 
 server.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);

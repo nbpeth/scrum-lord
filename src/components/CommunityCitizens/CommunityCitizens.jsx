@@ -9,6 +9,7 @@ export const CommunityCitizens = ({
   handleDeleteUser,
   currentCommunity,
 }) => {
+
   const theme = useTheme();
   return (
     <Grid
