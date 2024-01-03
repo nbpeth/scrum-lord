@@ -1,6 +1,8 @@
-import { Alert } from "@mui/material";
+import { Alert, useMediaQuery } from "@mui/material";
 
 export const ConnectionStatus = ({ readyState }) => {
+  const fullsizeScreen = useMediaQuery("(min-width:800px)");
+
   /*
   console.log("ready?", readyState);
   if it's closed, tell them to refresh or click a button or something
@@ -12,7 +14,6 @@ export const ConnectionStatus = ({ readyState }) => {
   */
 
   const getSeverity = (readyState) => {
-    
     switch (readyState) {
       case 0:
         return {
@@ -45,5 +46,5 @@ export const ConnectionStatus = ({ readyState }) => {
 
   const { severity, message } = getSeverity(readyState);
 
-  return <Alert severity={severity}>{message}</Alert>;
+  return <Alert severity={severity}>{fullsizeScreen ? message : null}</Alert>;
 };

@@ -18,11 +18,11 @@ export const CommunityCitizens = ({
       spacing={3}
       sx={{ padding: "15px" }}
     >
-      <Grid container item spacing={3} xs={12} justifyContent="center">
+      <Grid container item spacing={1} xs={12} justifyContent="center">
         {citizens.length ? (
           citizens.map((citizen) => {
             return (
-              <Grid item xs={2} key={citizen.userId}>
+              <Grid item  key={citizen.userId}>
                 <CitizenCard
                   currentCommunity={currentCommunity}
                   handleDeleteUser={handleDeleteUser}

@@ -17,6 +17,7 @@ export const CitizenCard = ({
       key={citizen.id}
       variant="outlined"
       sx={{
+        minWidth: "100px",
         backgroundColor: hasVoted
           ? alpha(theme.palette.primary.dark, 0.8)
           : "none",
