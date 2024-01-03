@@ -76,6 +76,7 @@ export default function useCommunity() {
         break;
       case "thinking":
         message = "🤔";
+        break;
       case "upvote":
         message = "👍";
         break;
