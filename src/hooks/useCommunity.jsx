@@ -24,8 +24,8 @@ export default function useCommunity() {
 
     // console.log("baseUrl", baseUrl);
 
-    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
     // setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
+    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
   }, [communityId]);
 
   // get community data on mount
@@ -42,7 +42,7 @@ export default function useCommunity() {
       const { citizens: updatedCitizens, id } = community;
 
       setCommunity(community);
-      setAlertMessage(`"${joinedUser.username}" joined!`);
+      setAlertMessage({ message: `"${joinedUser.username}" joined!` });
     } catch (e) {
       console.error(e);
     }
@@ -53,7 +53,7 @@ export default function useCommunity() {
     const { citizens: updatedCitizens, id } = community;
 
     setCommunity(community);
-    setAlertMessage(`${leftUser.username} left the community`);
+    setAlertMessage({ message: `${leftUser.username} left the community` });
   };
 
   // blanket holistic updates for now, duplicated but unsure where to go in the future
@@ -61,6 +61,32 @@ export default function useCommunity() {
     const { community } = payload;
 
     setCommunity(community);
+  };
+
+  const handleCommunityReactionReply = (payload) => {
+    const { event, userId, username } = payload;
+
+    let message;
+    switch (event) {
+      case "lightning":
+        message = "⚡";
+        break;
+      case "party":
+        message = "🎉";
+        break;
+      case "thinking":
+        message = "🤔";
+      case "upvote":
+        message = "👍";
+        break;
+      case "downvote":
+        message = "👎";
+        break;
+      default:
+        message = "🤷";
+    }
+
+    setAlertMessage({ message: `"${username}" - ${message}` });
   };
 
   const handleResetReply = (payload) => {
@@ -108,6 +134,10 @@ export default function useCommunity() {
           break;
         case "reset-reply":
           handleResetReply(payload);
+
+          break;
+        case "community-reaction-reply":
+          handleCommunityReactionReply(payload);
 
           break;
 
@@ -195,6 +225,15 @@ export default function useCommunity() {
     );
   };
 
+  const communityReaction = ({ event, userId, username }) => {
+    sendMessage(
+      JSON.stringify({
+        type: "community-reaction",
+        payload: { community: { id: communityId }, userId, username, event },
+      })
+    );
+  };
+
   const clearAlertMessage = () => {
     setAlertMessage(null);
   };
@@ -203,6 +242,7 @@ export default function useCommunity() {
     alertMessage,
     clearAlertMessage,
     community,
+    communityReaction,
     deleteCommunity,
     joinCommunity,
     handleReveal,

@@ -14,7 +14,7 @@ import {
   Switch,
   Toolbar,
   Typography,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -48,6 +48,7 @@ export const Community = () => {
     deleteCommunity,
     roomEvents,
     readyState,
+    communityReaction,
   } = useCommunity();
 
   // handle external room events
@@ -144,7 +145,6 @@ export const Community = () => {
   };
 
   const handleLeave = ({ communityId: id, userId, username }) => {
-
     try {
       leaveCommunity({
         communityId: id ?? communityId,
@@ -296,6 +296,7 @@ export const Community = () => {
             iAmCitizen={iAmCitizen}
             communityId={communityId}
             submitVote={submitVote}
+            communityReaction={communityReaction}
           />
         </Grid>
         <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
@@ -308,11 +309,11 @@ export const Community = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
               >
                 <Alert
-                  onClose={handleAlertClose}
-                  severity="success"
+                  // onClose={handleAlertClose}
+                  severity={alertMessage?.severity ?? "info"}
                   sx={{ width: "100%" }}
                 >
-                  {alertMessage}
+                  {alertMessage?.message}
                 </Alert>
               </Snackbar>
               {error && (

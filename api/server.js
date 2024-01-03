@@ -75,6 +75,10 @@ websocketServer.on("connection", (ws, request) => {
         handleDeleteCommunity(payload);
         break;
 
+      case "community-reaction":
+        handleCommunityReaction(payload);
+        break;
+
       default:
         console.error("unmatched event", message.toString());
         break;
@@ -103,6 +107,20 @@ const notifyClients = ({ message, communityId }) => {
     }
   });
 };
+
+const handleCommunityReaction = (payload) => {
+  const { community, event, userId, username } = payload;
+  const { id: communityId } = community;
+
+  // const result = communityClient.updateCommunity(community);
+
+  const reply = {
+    type: "community-reaction-reply",
+    payload: { event, userId, username },
+  };
+
+  notifyClients({ message: reply, communityId });
+}
 
 const handleCreateCommunity = (payload) => {
   const { community } = payload;
