@@ -65,15 +65,17 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
     >
       <Box sx={style}>
         <Grid container justifyContent="center">
-          <Grid item>
-            <TextField
-              onChange={(e) =>
-                setNewUser({ ...newUser, username: e.target.value })
-              }
-              label="User Name"
-              id="username"
-            />
-          </Grid>
+          {votingMemberChecked && (
+            <Grid item>
+              <TextField
+                onChange={(e) =>
+                  setNewUser({ ...newUser, username: e.target.value })
+                }
+                label="User Name"
+                id="username"
+              />
+            </Grid>
+          )}
           <Grid container item alignItems="center">
             <Grid item>
               <Switch
