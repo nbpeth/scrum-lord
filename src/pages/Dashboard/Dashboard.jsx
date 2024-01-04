@@ -86,7 +86,7 @@ export const Dashboard = () => {
         onBlur={createRoomModalClosed}
       />
       <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
-      <HyperSpace />
+
       <Grid container spacing={2} direction="column">
         <Grid item></Grid>
         {error && (
@@ -112,12 +112,10 @@ export const Dashboard = () => {
                       backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
                       cursor: "pointer",
                       transition: "background .5s ease-in-out",
-                      '&:hover': {
+                      "&:hover": {
                         backgroundColor: alpha(theme.palette.secondary.dark, 1),
-                      }
+                      },
                     }}
-                    
-                    
                   >
                     <CardContent>
                       <h3>{community.name}</h3>

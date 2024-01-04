@@ -28,9 +28,8 @@ import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionSt
 import { ScrumLordMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
-import { Stars } from "../../components/Particles/Stars";
 
-export const Community = () => {
+export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
   const params = useParams();
   const communityId = params.communityId;
   const navigate = useNavigate();
@@ -78,12 +77,16 @@ export const Community = () => {
     partyModeEngaged: false,
   });
 
+  useEffect(() => {
+    handleCommunityBackgroundAnimationChange(controlsList.partyModeEngaged);
+  }, [controlsList.partyModeEngaged]);
+
   // cleanup
   // todo: user state is all sorts of messed up
   // delete causing some wild re-renders, cycling through users
 
   // go with mongo?
-  // recover user from storage
+
   useEffect(() => {
     recoverUserFromStorage();
   }, [currentCommunity]);
@@ -100,7 +103,7 @@ export const Community = () => {
 
     const { username, userId, votingMember } = newUser;
     saveUserToStorage(userId);
-    
+
     try {
       joinCommunity({ communityId, userId, username, votingMember });
       setIAmCitizen({ userId, username, votingMember });
@@ -189,7 +192,7 @@ export const Community = () => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        {controlsList?.partyModeEngaged && <Stars />}
+        {/* {controlsList?.partyModeEngaged && <Stars />} */}
         <JoinCommunityModal
           open={joinCommunityModalOpen}
           handleClose={handleJoinCommunityModalClose}
@@ -248,7 +251,7 @@ export const Community = () => {
                     </ListItemIcon>
                     <Switch
                       checked={!!controlsList?.partyModeEngaged}
-                      onChange={() => {
+                      onChange={(e) => {
                         setControlsList({
                           ...controlsList,
                           partyModeEngaged: !controlsList.partyModeEngaged,
