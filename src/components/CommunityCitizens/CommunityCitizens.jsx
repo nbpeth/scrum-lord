@@ -9,7 +9,6 @@ export const CommunityCitizens = ({
   handleDeleteUser,
   currentCommunity,
 }) => {
-
   const theme = useTheme();
   return (
     <Grid
@@ -21,18 +20,20 @@ export const CommunityCitizens = ({
     >
       <Grid container item spacing={1} xs={12} justifyContent="center">
         {citizens.length ? (
-          citizens.map((citizen) => {
-            return (
-              <Grid item  key={citizen.userId}>
-                <CitizenCard
-                  currentCommunity={currentCommunity}
-                  handleDeleteUser={handleDeleteUser}
-                  iAmCitizen={iAmCitizen}
-                  citizen={citizen}
-                />
-              </Grid>
-            );
-          })
+          citizens
+            .filter((c) => c.votingMember)
+            .map((citizen) => {
+              return (
+                <Grid item key={citizen.userId}>
+                  <CitizenCard
+                    currentCommunity={currentCommunity}
+                    handleDeleteUser={handleDeleteUser}
+                    iAmCitizen={iAmCitizen}
+                    citizen={citizen}
+                  />
+                </Grid>
+              );
+            })
         ) : (
           <Grid item xs={12}>
             <Typography

@@ -1,11 +1,4 @@
-import {
-  Button,
-  Divider,
-  Grid,
-  List,
-  MenuItem,
-  Select
-} from "@mui/material";
+import { Button, Divider, Grid, List, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 
 import * as React from "react";
@@ -36,7 +29,8 @@ export const CommunityControls = ({
 
   return (
     <>
-      {" "}
+      {/* {" "} */}
+      {/* {JSON.stringify(iAmCitizen)} */}
       {iAmCitizen && (
         <Grid
           container
@@ -101,57 +95,58 @@ export const CommunityControls = ({
               <Divider />
             </List>
           </Grid>
-
-          <Grid container item spacing={2}>
-            <Grid item xs={12}>
-              <Button fullWidth variant="contained" onClick={onVoteSubmit}>
-                Vote
-              </Button>
+          {iAmCitizen && iAmCitizen.votingMember && (
+            <Grid container item spacing={2}>
+              <Grid item xs={12}>
+                <Button fullWidth variant="contained" onClick={onVoteSubmit}>
+                  Vote
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Select
+                  fullWidth
+                  labelId="vote-selector-label"
+                  id="vote-selector"
+                  value={selectedVote}
+                  label="Vote"
+                  onChange={handleVoteChange}
+                >
+                  {selectOptions.map((option) => {
+                    return (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </Grid>
+              <Grid item xs={12}>
+                <List>
+                  <Divider />
+                </List>
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Select
+          )}
+          <Grid item xs={12}>
+            {community && community.revealed ? (
+              <Button
                 fullWidth
-                labelId="vote-selector-label"
-                id="vote-selector"
-                value={selectedVote}
-                label="Vote"
-                onChange={handleVoteChange}
+                variant="outlined"
+                color="warning"
+                onClick={handleReset}
               >
-                {selectOptions.map((option) => {
-                  return (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </Grid>
-            <Grid item xs={12}>
-              <List>
-                <Divider />
-              </List>
-            </Grid>
-            <Grid item xs={12}>
-              {community && community.revealed ? (
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  color="warning"
-                  onClick={handleReset}
-                >
-                  Reset
-                </Button>
-              ) : (
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  color="success"
-                  onClick={handleReveal}
-                >
-                  Reveal
-                </Button>
-              )}
-            </Grid>
+                Reset
+              </Button>
+            ) : (
+              <Button
+                fullWidth
+                variant="outlined"
+                color="success"
+                onClick={handleReveal}
+              >
+                Reveal
+              </Button>
+            )}
           </Grid>
         </Grid>
       )}

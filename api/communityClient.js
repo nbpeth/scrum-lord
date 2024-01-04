@@ -21,14 +21,14 @@ const addCommunity = (community) => {
   communities[id] = communityWithId;
 };
 
-const joinCommunity = ({ communityId, username, userId }) => {
+const joinCommunity = ({ communityId, username, userId, votingMember }) => {
   const targetCommunity = communities[communityId];
 
   if (!targetCommunity) {
     return Error(`Community "${communityId}" does not exist`);
   }
 
-  communities[communityId].citizens.push({ username, userId });
+  communities[communityId].citizens.push({ username, userId, votingMember });
 
   return communities[communityId];
 };

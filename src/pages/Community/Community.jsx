@@ -93,17 +93,17 @@ export const Community = () => {
   };
 
   const handleJoinCommunityModalClose = (newUser) => {
-    
     if (!newUser) {
       setJoinCommunityModalOpen(false);
       return;
     }
-    const { username, userId } = newUser;
-    saveUserToStorage(userId);
 
+    const { username, userId, votingMember } = newUser;
+    saveUserToStorage(userId);
+    
     try {
-      joinCommunity({ communityId, userId, username });
-      setIAmCitizen({ userId, username });
+      joinCommunity({ communityId, userId, username, votingMember });
+      setIAmCitizen({ userId, username, votingMember });
     } catch (e) {
       console.error(e);
       setError(e.message);

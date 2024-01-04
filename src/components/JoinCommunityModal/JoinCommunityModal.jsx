@@ -1,4 +1,13 @@
-import { Box, Button, Grid, Modal, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Switch,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { generate } from "random-words";
 import { useState } from "react";
 import * as uuidv4 from "uuid";
@@ -17,28 +26,30 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
     p: 4,
   };
 
+  const theme = useTheme();
+
   // todo: show random name as default
-  const [newUser, setNewUser] = useState({ username: "", userId: uuidv4.v4() });
+  const [newUser, setNewUser] = useState({
+    username: generate({
+      exactly: 2,
+      minLength: 5,
+      join: " ",
+      camelCase: true,
+    }),
+  });
+
+  const [votingMemberChecked, setVotingMemberChecked] = useState(true);
 
   const getUserName = () => {
-    const userId = uuidv4.v4();
-    if (!newUser.username) {
-      return {
-        ...newUser,
-        userId,
-        username: generate({
-          exactly: 2,
-          minLength: 5,
-          join: " ",
-          camelCase: true,
-        }),
-      };
-    }
-    return { ...newUser, userId };
+    return {
+      ...newUser,
+      userId: uuidv4.v4(),
+      votingMember: votingMemberChecked,
+    };
   };
 
-  const onClose = (c) => {
-    
+  const onClose = (c, x) => {
+    // debugger;
     setNewUser({ username: "" });
     handleClose(c);
   };
@@ -54,27 +65,40 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
     >
       <Box sx={style}>
         <Grid container justifyContent="center">
-          <form onSubmit={handleClose}>
+          <Grid item>
+            <TextField
+              onChange={(e) =>
+                setNewUser({ ...newUser, username: e.target.value })
+              }
+              label="User Name"
+              id="username"
+            />
+          </Grid>
+          <Grid container item alignItems="center">
             <Grid item>
-              <TextField
-                onChange={(e) =>
-                  setNewUser({ ...newUser, username: e.target.value })
-                }
-                label="User Name"
-                id="username"
+              <Switch
+                checked={votingMemberChecked}
+                onChange={(c) => {
+                  setVotingMemberChecked(c.target.checked);
+                }}
               />
             </Grid>
-            <Grid container item xs={12}>
-              <Grid item>
-                <Button onClick={() => onClose(getUserName())}>Join</Button>
-              </Grid>
-              <Grid item>
-                <Button color="error" onClick={() => onClose()}>
-                  Cancel
-                </Button>
-              </Grid>
+            <Grid>
+              <Typography variant="body2" color={theme.palette.grey[400]}>
+                Voting Member
+              </Typography>
             </Grid>
-          </form>
+          </Grid>
+          <Grid container item xs={12}>
+            <Grid item>
+              <Button onClick={() => onClose(getUserName())}>Join</Button>
+            </Grid>
+            <Grid item>
+              <Button color="error" onClick={() => onClose()}>
+                Cancel
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
       </Box>
     </Modal>

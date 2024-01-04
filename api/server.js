@@ -155,19 +155,20 @@ const handleDeleteCommunity = (payload) => {
 
 const handleJoinCommunity = (payload) => {
   const {
-    community: { id: communityId, username, userId },
+    community: { id: communityId, username, userId, votingMember },
   } = payload;
 
   const updatedCommunity = communityClient.joinCommunity({
     communityId,
     username,
     userId,
+    votingMember
   });
 
   const reply = {
     type: "community-joined-reply",
     payload: {
-      joinedUser: { username, userId },
+      joinedUser: { username, userId, votingMember },
       community: updatedCommunity,
     },
   };

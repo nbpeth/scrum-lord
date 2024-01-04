@@ -24,8 +24,8 @@ export default function useCommunity() {
 
     // console.log("baseUrl", baseUrl);
 
-    setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
-    // setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    // setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
+    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
   }, [communityId]);
 
   // get community data on mount
@@ -184,7 +184,7 @@ export default function useCommunity() {
     );
   };
 
-  const joinCommunity = ({ communityId, username, userId }) => {
+  const joinCommunity = ({ communityId, username, userId, votingMember }) => {
     sendMessage(
       JSON.stringify({
         type: "join-community",
@@ -193,6 +193,7 @@ export default function useCommunity() {
             id: communityId,
             username,
             userId,
+            votingMember
           },
         },
       })
