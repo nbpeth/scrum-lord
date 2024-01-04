@@ -64,10 +64,12 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
       }}
     >
       <Box sx={style}>
-        <Grid container justifyContent="center">
+        <Grid container justifyContent="left">
           {votingMemberChecked && (
-            <Grid item>
+            <Grid item xs={12}>
               <TextField
+                fullWidth
+                value={newUser?.username}
                 onChange={(e) =>
                   setNewUser({ ...newUser, username: e.target.value })
                 }

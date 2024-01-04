@@ -15,7 +15,14 @@ export const CreateRoomModal = ({ open, handleClose }) => {
     p: 4,
   };
 
-  const [newCommunity, setNewCommunity] = useState({ name: "" });
+  const [newCommunity, setNewCommunity] = useState({
+    name: generate({
+      exactly: 3,
+      minLength: 5,
+      join: "-",
+      camelCase: true,
+    }),
+  });
 
   const getCommunityName = () => {
     if (!newCommunity.name) {
@@ -33,7 +40,14 @@ export const CreateRoomModal = ({ open, handleClose }) => {
   };
 
   const close = (c) => {
-    setNewCommunity({ name: "" });
+    setNewCommunity({
+      name: generate({
+        exactly: 3,
+        minLength: 5,
+        join: "-",
+        camelCase: true,
+      }),
+    });
     handleClose(c);
   };
 
@@ -47,12 +61,23 @@ export const CreateRoomModal = ({ open, handleClose }) => {
       }}
     >
       <Box sx={style}>
-        <Grid container justifyContent="center" direction="column" spacing={2} xs={12}>
+        <Grid
+          container
+          justifyContent="center"
+          direction="column"
+          spacing={2}
+          xs={12}
+        >
           <Grid item>
-            <Typography variant="body2">Create a new community! No name provided will result in an auto-generated name.</Typography>
+            <Typography variant="body2">
+              Create a new community! No name provided will result in an
+              auto-generated name.
+            </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <TextField
+              fullWidth
+              value={newCommunity?.name}
               onChange={(e) =>
                 setNewCommunity({ ...newCommunity, name: e.target.value })
               }
