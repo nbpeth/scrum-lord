@@ -15,9 +15,8 @@ import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModa
 import useDashboard from "../../hooks/useDashboard";
 
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
-import { HyperSpace } from "../../components/Particles/Hyperspace";
-import logoUrl from "../../scrumlord-logo-2.png";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
+import logoUrl from "../../scrumlord-logo-2.png";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities, readyState } =
@@ -99,7 +98,7 @@ export const Dashboard = () => {
 
         {/* communities component */}
         <Grid container item spacing={2} justifyContent="center">
-          {communities.map((community) => {
+          {communities?.map((community) => {
             return (
               <Grid item key={community.id}>
                 <NavLink

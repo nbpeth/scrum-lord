@@ -27,7 +27,7 @@ const websocketServer = new WebSocketServer({
 server.on("request", app);
 
 websocketServer.on("connection", (ws, request) => {
-  console.log("new client connected");
+  console.log("## new client connected");
   setTargetSessionOn(ws, request);
 
   ws.on("error", console.error);
@@ -120,13 +120,15 @@ const handleCommunityReaction = (payload) => {
   };
 
   notifyClients({ message: reply, communityId });
-}
+};
 
-const handleCreateCommunity = (payload) => {
+const handleCreateCommunity = async (payload) => {
   const { community } = payload;
-  communityClient.addCommunity(community);
+  const result = await communityClient.addCommunity(community);
+  // result is the created item
 
-  const communities = communityClient.getCommunitiesAsArray();
+  const communities = await communityClient.getCommunitiesAsArray();
+  
 
   const message = {
     type: "community-created-reply",
@@ -136,10 +138,10 @@ const handleCreateCommunity = (payload) => {
   notifyClients({ message });
 };
 
-const handleDeleteCommunity = (payload) => {
+const handleDeleteCommunity = async (payload) => {
   const { community, userId, username } = payload;
 
-  const deleteResult = communityClient.deleteCommunity({
+  const deleteResult = await communityClient.deleteCommunity({
     community,
     userId,
     username,
@@ -153,16 +155,16 @@ const handleDeleteCommunity = (payload) => {
   notifyClients({ message, communityId: community.id });
 };
 
-const handleJoinCommunity = (payload) => {
+const handleJoinCommunity = async (payload) => {
   const {
     community: { id: communityId, username, userId, votingMember },
   } = payload;
 
-  const updatedCommunity = communityClient.joinCommunity({
+  const updatedCommunity = await communityClient.joinCommunity({
     communityId,
     username,
     userId,
-    votingMember
+    votingMember,
   });
 
   const reply = {
@@ -176,12 +178,12 @@ const handleJoinCommunity = (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-const handleLeaveCommunity = (payload) => {
+const handleLeaveCommunity = async (payload) => {
   const {
     community: { id: communityId, username, userId },
   } = payload;
 
-  const updatedCommunity = communityClient.leaveCommunity({
+  const updatedCommunity = await communityClient.leaveCommunity({
     communityId,
     username,
     userId,
@@ -198,8 +200,8 @@ const handleLeaveCommunity = (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-const handleListCommunities = () => {
-  const communitiesSummary = communityClient.getCommunitiesAsArray();
+const handleListCommunities = async () => {
+  const communitiesSummary = await communityClient.getCommunitiesAsArray();
 
   const reply = {
     type: "list-communities-reply",
@@ -211,10 +213,10 @@ const handleListCommunities = () => {
   notifyClients({ message: reply });
 };
 
-const handleGetCommunity = (payload) => {
+const handleGetCommunity = async (payload) => {
   const { communityId } = payload;
 
-  const result = communityClient.getCommunityBy(communityId);
+  const result = await communityClient.getCommunityBy(communityId);
 
   const reply = {
     type: "get-community-reply",
@@ -253,11 +255,11 @@ const handleReveal = (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-const handleReset = (payload) => {
+const handleReset = async (payload) => {
   const { community } = payload;
   const { id: communityId } = community;
 
-  const result = communityClient.reset({ communityId });
+  const result = await communityClient.reset({ communityId });
 
   const reply = {
     type: "reset-reply",

@@ -1,4 +1,5 @@
-const uuid = require("uuid");
+const { post } = require("./http-server");
+const postgresClient = require("./postgresClient");
 
 const communities = {};
 
@@ -6,46 +7,84 @@ const getCommunities = () => {
   return communities;
 };
 
-const getCommunitiesAsArray = () => {
-  return Object.values(communities);
+const getCommunitiesAsArray = async () => {
+  const result = await postgresClient.getCommunities();
+
+  return result.map(({ id, data }) => {
+    return {
+      id,
+      name: data.name,
+      description: data.description,
+      citizens: data.citizens.length,
+    };
+  });
 };
 
-const getCommunityBy = (id) => {
-  return communities[id];
-};
+const getCommunityBy = async (id) => {
+  const result = await postgresClient.getCommunityById({ id });
 
-const addCommunity = (community) => {
-  const id = uuid.v4();
-  const communityWithId = { ...community, id: id, citizens: [] };
-
-  communities[id] = communityWithId;
-};
-
-const joinCommunity = ({ communityId, username, userId, votingMember }) => {
-  const targetCommunity = communities[communityId];
-
-  if (!targetCommunity) {
-    return Error(`Community "${communityId}" does not exist`);
+  if (result.length === 0) {
+    console.warn("no community found", id);
+    return null;
   }
 
-  communities[communityId].citizens.push({ username, userId, votingMember });
-
-  return communities[communityId];
+  return result[0].data;
 };
 
-const leaveCommunity = ({ communityId, username, userId }) => {
-  const targetCommunity = communities[communityId];
+const addCommunity = async (community) => {
+  const result = await postgresClient.addCommunity({
+    community: { ...community, citizens: [] },
+  });
 
-  if (!targetCommunity) {
-    return Error(`Community "${communityId}" does not exist`);
+  return result.map(({ id, data }) => {
+    return {
+      id,
+      name: data.name,
+      description: data.description,
+      citizens: data.citizens.length,
+    };
+  });
+};
+
+const joinCommunity = async ({
+  communityId,
+  username,
+  userId,
+  votingMember,
+}) => {
+  const result = await postgresClient.joinCommunity({
+    communityId,
+    username,
+    userId,
+    votingMember,
+  });
+
+  console.log("joinCommunity result", result);
+
+  if (result.length === 0) {
+    // something bad happened, what do
+    console.error(
+      "unable to join community",
+      { communityId, username, userId, votingMember },
+      result
+    );
   }
 
-  const filteredCitizens = targetCommunity.citizens.filter(
-    (citizen) => citizen.userId !== userId
-  );
-  communities[communityId].citizens = filteredCitizens;
+  const { data } = result[0];
 
-  return communities[communityId];
+  return data;
+};
+
+const leaveCommunity = async ({ communityId, username, userId }) => {
+  const result = await postgresClient.leaveCommunity({
+    communityId,
+    username,
+    userId,
+  });
+
+  const { data } = result[0];
+
+  return data;
 };
 
 const submitVote = ({ communityId, userId, vote }) => {
@@ -81,20 +120,25 @@ const reveal = ({ communityId }) => {
   return communities[communityId];
 };
 
-const reset = ({ communityId }) => {
-  const targetCommunity = communities[communityId];
+const reset = async ({ communityId }) => {
+  const result = await postgresClient.resetCommunity({ communityId });
 
-  if (!targetCommunity) {
-    return Error(`Community "${communityId}" does not exist`);
-  }
+  const { data } = result[0];
 
-  targetCommunity.revealed = false;
-  targetCommunity.citizens.forEach((citizen) => {
-    citizen.vote = null;
-    citizen.hasVoted = false;
-  });
+  return data;
+  // const targetCommunity = communities[communityId];
 
-  return communities[communityId];
+  // if (!targetCommunity) {
+  //   return Error(`Community "${communityId}" does not exist`);
+  // }
+
+  // targetCommunity.revealed = false;
+  // targetCommunity.citizens.forEach((citizen) => {
+  //   citizen.vote = null;
+  //   citizen.hasVoted = false;
+  // });
+
+  // return communities[communityId];
 };
 
 const communitiesSummary = () => {
@@ -108,33 +152,15 @@ const communitiesSummary = () => {
   });
 };
 
-// just a hard and rough replace
-const updateCommunity = (community) => {
-  communities[community.id] = community;
-};
+const deleteCommunity = async ({ community, userId, username }) => {
+  await postgresClient.deleteCommunity({ community });
 
-const deleteCommunity = ({ community, userId, username }) => {
-  try {
-    delete communities[community.id];
-
-    const deleteConfirmation = {
-      deleted: true,
-      id: community.id,
-      userId,
-      username,
-    };
-
-    return { communities, ...deleteConfirmation };
-  } catch (e) {
-    console.log("failed to delete community", community, e);
-
-    return {
-      deleted: false,
-      id: community.id,
-      userId,
-      username,
-    };
-  }
+  return {
+    deleted: true,
+    id: community.id,
+    userId,
+    username,
+  };
 };
 
 module.exports = {
@@ -149,5 +175,4 @@ module.exports = {
   reveal,
   reset,
   submitVote,
-  updateCommunity,
 };
