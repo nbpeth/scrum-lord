@@ -20,12 +20,9 @@ export const MessageBoard = ({ messageHistory, communityId }) => {
         {messages?.map((message) => {
           return (
             <ListItem sx={{ padding: 0 }} key={message.id}>
-              <Typography
-                fontSize="small"
-                variant="body2"
-                color={theme.palette.success.light}
-              >
-                ~ {message.text}
+              <Typography fontSize="small" variant="body2">
+                <span style={{ color: theme.palette.grey[500] }}>~</span>{" "}
+                <span style={{ color: message.userColor }}>{message.text}</span>
               </Typography>
             </ListItem>
           );

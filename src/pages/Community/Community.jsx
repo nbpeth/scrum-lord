@@ -149,12 +149,13 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     });
   };
 
-  const handleLeave = ({ communityId: id, userId, username }) => {
+  const handleLeave = ({ communityId: id, userId, username, userColor }) => {
     try {
       leaveCommunity({
         communityId: id ?? communityId,
         userId: userId ?? iAmCitizen.userId,
         username: username ?? iAmCitizen.username,
+        userColor: iAmCitizen?.userColor
       });
       setIAmCitizen(null);
     } catch (e) {

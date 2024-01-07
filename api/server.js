@@ -110,12 +110,12 @@ const notifyClients = ({ message, communityId }) => {
 };
 
 const handleCommunityReaction = (payload) => {
-  const { community, event, userId, username } = payload;
+  const { community, event, userId, username, userColor } = payload;
   const { id: communityId } = community;
 
   const reply = {
     type: "community-reaction-reply",
-    payload: { event, userId, username },
+    payload: { event, userId, username, userColor },
   };
 
   notifyClients({ message: reply, communityId });
@@ -137,7 +137,7 @@ const handleCreateCommunity = async (payload) => {
 };
 
 const handleDeleteCommunity = async (payload) => {
-  const { community, userId, username } = payload;
+  const { community, userId, username, userColor } = payload;
 
   const deleteResult = await communityClient.deleteCommunity({
     community,
@@ -160,7 +160,6 @@ const handleJoinCommunity = async (payload) => {
 
   const userColor = color.randomColor({
     luminosity: "bright",
-    format: "rgb",
   });
 
   const updatedCommunity = await communityClient.joinCommunity({
@@ -185,6 +184,7 @@ const handleJoinCommunity = async (payload) => {
 const handleLeaveCommunity = async (payload) => {
   const {
     community: { id: communityId, username, userId },
+    userColor,
   } = payload;
 
   const updatedCommunity = await communityClient.leaveCommunity({
@@ -196,7 +196,7 @@ const handleLeaveCommunity = async (payload) => {
   const reply = {
     type: "community-left-reply",
     payload: {
-      leftUser: { username, userId },
+      leftUser: { username, userId, userColor },
       community: updatedCommunity,
     },
   };
@@ -231,7 +231,7 @@ const handleGetCommunity = async (payload) => {
 };
 
 const handleSubmitVote = async (payload) => {
-  const { community } = payload;
+  const { community, userColor } = payload;
   const { id: communityId, userId, username, vote } = community;
 
   const result = await communityClient.submitVote({
@@ -242,7 +242,7 @@ const handleSubmitVote = async (payload) => {
 
   const reply = {
     type: "submit-vote-reply",
-    payload: { community: result, username, userId },
+    payload: { community: result, username, userId, userColor },
   };
 
   notifyClients({ message: reply, communityId });
@@ -250,28 +250,28 @@ const handleSubmitVote = async (payload) => {
 
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
 const handleReveal = async (payload) => {
-  const { community, username, userId } = payload;
+  const { community, username, userId, userColor } = payload;
   const { id: communityId } = community;
 
   const result = await communityClient.reveal({ communityId });
 
   const reply = {
     type: "reveal-reply",
-    payload: { community: result, username, userId },
+    payload: { community: result, username, userId, userColor },
   };
 
   notifyClients({ message: reply, communityId });
 };
 
 const handleReset = async (payload) => {
-  const { community, username, userId } = payload;
+  const { community, username, userId, userColor } = payload;
   const { id: communityId } = community;
 
   const result = await communityClient.reset({ communityId });
 
   const reply = {
     type: "reset-reply",
-    payload: { community: result, username, userId },
+    payload: { community: result, username, userId, userColor },
   };
 
   notifyClients({ message: reply, communityId });

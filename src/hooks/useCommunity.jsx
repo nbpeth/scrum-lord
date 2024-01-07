@@ -49,7 +49,11 @@ export default function useCommunity() {
       // setAlertMessage({ message: `"${joinedUser.username}" joined!` });
       setMessageHistory([
         ...messageHistory,
-        { communityId, text: `${joinedUser.username} has joined!` },
+        {
+          communityId,
+          text: `"${joinedUser.username}" has joined!`,
+          userColor: joinedUser.userColor,
+        },
       ]);
     } catch (e) {
       console.error(e);
@@ -64,24 +68,28 @@ export default function useCommunity() {
     // setAlertMessage({ message: `${leftUser.username} left the community` });
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `${leftUser.username} left the community` },
+      {
+        communityId,
+        text: `"${leftUser.username}" left the community`,
+        userColor: leftUser.userColor,
+      },
     ]);
   };
 
   // blanket holistic updates for now, duplicated but unsure where to go in the future
   const handleSubmittedVoteReply = (payload) => {
-    const { community, username } = payload;
+    const { community, username, userColor, userId } = payload;
 
     setCommunity(community);
 
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `"${username}" has voted` },
+      { communityId, text: `"${username}" has voted`, userColor },
     ]);
   };
 
   const handleCommunityReactionReply = (payload) => {
-    const { event, userId, username } = payload;
+    const { event, userId, username, userColor } = payload;
 
     let message;
     switch (event) {
@@ -107,29 +115,29 @@ export default function useCommunity() {
     // setAlertMessage({ message: `"${username}" - ${message}` });
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `"${username}" - ${message}` },
+      { communityId, text: `"${username}" - ${message}`, userColor },
     ]);
   };
 
   const handleResetReply = (payload) => {
-    const { community, username } = payload;
+    const { community, username, userColor } = payload;
 
     setCommunity(community);
 
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `"${username}" reset the vote` },
+      { communityId, text: `"${username}" reset the vote`, userColor },
     ]);
   };
 
   const handleRevealReply = (payload) => {
-    const { community, username } = payload;
+    const { community, username, userColor } = payload;
 
     setCommunity(community);
 
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `"${username}" revealed the votes` },
+      { communityId, text: `"${username}" revealed the votes`, userColor },
     ]);
   };
 
@@ -199,20 +207,30 @@ export default function useCommunity() {
     });
   };
 
-  const handleReveal = ({ username, userId }) => {
+  const handleReveal = ({ username, userId, userColor }) => {
     sendMessage(
       JSON.stringify({
         type: "reveal",
-        payload: { community: { id: communityId }, username, userId },
+        payload: {
+          community: { id: communityId },
+          username,
+          userId,
+          userColor,
+        },
       })
     );
   };
 
-  const handleReset = ({ username, userId }) => {
+  const handleReset = ({ username, userId, userColor }) => {
     sendMessage(
       JSON.stringify({
         type: "reset",
-        payload: { community: { id: communityId }, username, userId },
+        payload: {
+          community: { id: communityId },
+          username,
+          userId,
+          userColor,
+        },
       })
     );
   };
@@ -233,38 +251,59 @@ export default function useCommunity() {
     );
   };
 
-  const leaveCommunity = ({ communityId, userId, username }) => {
+  const leaveCommunity = ({ communityId, userId, username, userColor }) => {
     sendMessage(
       JSON.stringify({
         type: "leave-community",
-        payload: { community: { id: communityId, userId, username } },
+        payload: {
+          community: { id: communityId, userId, username },
+          userColor,
+          userId,
+          username,
+        },
       })
     );
   };
 
-  const submitVote = ({ communityId, username, userId, vote }) => {
+  const submitVote = ({ communityId, username, userId, userColor, vote }) => {
     sendMessage(
       JSON.stringify({
         type: "submit-vote",
-        payload: { community: { id: communityId, username, userId, vote } },
+        payload: {
+          community: { id: communityId, username, userId, vote },
+          userColor,
+          username,
+          userId,
+        },
       })
     );
   };
 
-  const deleteCommunity = ({ communityId, userId, username }) => {
+  const deleteCommunity = ({ communityId, userId, username, userColor }) => {
     sendMessage(
       JSON.stringify({
         type: "delete-community",
-        payload: { community: { id: communityId }, userId, username },
+        payload: {
+          community: { id: communityId },
+          userId,
+          username,
+          userColor,
+        },
       })
     );
   };
 
-  const communityReaction = ({ event, userId, username }) => {
+  const communityReaction = ({ event, userId, username, userColor }) => {
     sendMessage(
       JSON.stringify({
         type: "community-reaction",
-        payload: { community: { id: communityId }, userId, username, event },
+        payload: {
+          community: { id: communityId },
+          userId,
+          username,
+          userColor,
+          event,
+        },
       })
     );
   };

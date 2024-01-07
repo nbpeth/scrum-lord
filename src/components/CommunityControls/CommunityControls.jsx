@@ -22,13 +22,16 @@ export const CommunityControls = ({
   const onVoteSubmit = () => {
     submitVote({
       communityId,
-      userId: iAmCitizen.userId,
-      username: iAmCitizen.username,
+      // userId: iAmCitizen.userId,
+      // username: iAmCitizen.username,
       vote: selectedVote,
+      // userColor: iAmCitizen.userColor,
+      ...iAmCitizen,
     });
   };
 
   const onReaction = ({ event }) => {
+    
     communityReaction({
       event,
       userId: iAmCitizen.userId,
