@@ -1,7 +1,7 @@
-import { useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
+import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
 
 export default function useCommunity() {
   const params = useParams();
@@ -23,12 +23,12 @@ export default function useCommunity() {
     let baseUrl = `${wsProtocol}://${host}/socket`;
     const env = process.env.ENVIRONMENT;
 
-    const socketUrl =
-      env === "prod"
-        ? `${baseUrl}?communityId=${communityId}`
-        : `ws://localhost:8080/socket?communityId=${communityId}`;
-    // setSocketUrl(`${baseUrl}?communityId=${communityId}`);
-    setSocketUrl(socketUrl);
+    // const socketUrl =
+    //   env === "prod"
+    //     ? `${baseUrl}?communityId=${communityId}`
+    //     : `ws://localhost:8080/socket?communityId=${communityId}`;
+    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    // setSocketUrl(socketUrl);
   }, [communityId]);
 
   // get community data on mount
@@ -42,7 +42,13 @@ export default function useCommunity() {
     try {
       const { joinedUser, community } = payload;
 
-      const { citizens: updatedCitizens, id } = community;
+      // const { citizens: updatedCitizens, id } = community;
+
+      const messageText = [`"${joinedUser.username}" has joined`];
+      if (!joinedUser.votingMember) {
+        messageText.push("as a spectator");
+      }
+      messageText.push("!");
 
       setCommunity(community);
       // pretty sure shouldn't use two sets on state in the same function
@@ -51,7 +57,7 @@ export default function useCommunity() {
         ...messageHistory,
         {
           communityId,
-          text: `"${joinedUser.username}" has joined!`,
+          text: messageText.join(" "),
           userColor: joinedUser.userColor,
         },
       ]);
@@ -141,6 +147,21 @@ export default function useCommunity() {
     ]);
   };
 
+  const handleEditPointSchemeReply = (payload) => {
+    const { community, username, userColor, scheme } = payload;
+
+    setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      {
+        communityId,
+        text: `"${username}" has changed the point scheme to "${VoteOptionsLabels[scheme]}"`,
+        userColor,
+      },
+    ]);
+  };
+
   useEffect(() => {
     try {
       const messageData = JSON.parse(lastMessage?.data);
@@ -183,6 +204,11 @@ export default function useCommunity() {
 
         case "delete-community-reply":
           handleCommunityDeletedReply(payload);
+
+          break;
+
+        case "edit-point-scheme-reply":
+          handleEditPointSchemeReply(payload);
 
           break;
 
@@ -308,6 +334,21 @@ export default function useCommunity() {
     );
   };
 
+  const editPointScheme = ({ scheme, userId, username, userColor }) => {
+    sendMessage(
+      JSON.stringify({
+        type: "edit-point-scheme",
+        payload: {
+          community: { id: communityId },
+          userId,
+          username,
+          userColor,
+          scheme,
+        },
+      })
+    );
+  };
+
   const clearAlertMessage = () => {
     setAlertMessage(null);
   };
@@ -318,6 +359,7 @@ export default function useCommunity() {
     community,
     communityReaction,
     deleteCommunity,
+    editPointScheme,
     joinCommunity,
     handleReveal,
     handleReset,

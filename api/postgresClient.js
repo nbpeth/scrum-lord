@@ -197,9 +197,24 @@ const revealCommunity = async ({ communityId }) => {
   return result;
 };
 
+const editPointScheme = async ({ communityId, scheme }) => {
+  const query = `
+        UPDATE communities
+        SET data = jsonb_set(data::jsonb, '{pointScheme}', $1::jsonb)
+        WHERE id = $2
+        RETURNING *;
+    `;
+  const values = [JSON.stringify(scheme), communityId];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+}
+
 module.exports = {
   addCommunity,
   deleteCommunity,
+  editPointScheme,
   getCommunities,
   getCommunityById,
   joinCommunity,

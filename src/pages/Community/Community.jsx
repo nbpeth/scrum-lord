@@ -6,8 +6,6 @@ import {
   Button,
   Divider,
   Grid,
-  List,
-  ListItem,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -31,6 +29,7 @@ import { CommunityControls } from "../../components/CommunityControls/CommunityC
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { ScrumLordMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
+import { EditPointSchemeModal } from "../../components/EditPointSchemeModal/EditPointSchemeModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 
@@ -44,6 +43,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     alertMessage,
     clearAlertMessage,
     joinCommunity,
+    editPointScheme,
     leaveCommunity,
     handleReveal,
     handleReset,
@@ -77,6 +77,8 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
   const [iAmCitizen, setIAmCitizen] = useState(null);
   const [error, setError] = useState(null);
   const [joinCommunityModalOpen, setJoinCommunityModalOpen] = useState(false);
+  const [editPointSchemeModalOpen, setEditPointSchemeModalOpen] =
+    useState(false);
   const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
     useState(false);
 
@@ -207,6 +209,16 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
           handleClose={onDeleteCommunityModalClose}
           currentCommunity={currentCommunity}
         />
+
+        <EditPointSchemeModal
+          editPointScheme={editPointScheme}
+          open={editPointSchemeModalOpen}
+          handleClose={() => setEditPointSchemeModalOpen(false)}
+          currentCommunity={currentCommunity}
+          iamCitizen={iAmCitizen}
+          community={currentCommunity}
+        />
+
         <AppBar position="static">
           <Toolbar>
             <ScrumLordMenu>
@@ -218,7 +230,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                     }}
                   >
                     <ListItemIcon>
-                      <Home /> 
+                      <Home />
                     </ListItemIcon>
                     <ListItemText secondary="Home" />
                     <Typography
@@ -264,16 +276,18 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                     )}
                   </MenuItem>
                   <Divider />
-                  <MenuItem>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      color="success"
-                      onClick={handleJoin}
-                    >
-                      Edit Point Scheme
-                    </Button>
-                  </MenuItem>
+                  {iAmCitizen && (
+                    <MenuItem>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="success"
+                        onClick={() => setEditPointSchemeModalOpen(true)}
+                      >
+                        Edit Point Scheme
+                      </Button>
+                    </MenuItem>
+                  )}
                   <MenuItem>
                     <ListItemIcon>
                       <ModeNightIcon />

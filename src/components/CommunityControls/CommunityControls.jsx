@@ -2,36 +2,7 @@ import { Button, Divider, Grid, List, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 
 import * as React from "react";
-
-export const VoteOptions = {
-  fibonacci: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
-  tshirt: ["XS", "S", "M", "L", "XL", "XXL"],
-  yesNo: ["Yes", "No"],
-  boolean: ["True", "False"],
-  thumbs: ["👍", "👎", "🫰", "🤌"],
-  naturalNumbers: Array.from(Array(50).keys()),
-  deficientNumbers: [
-    1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 19, 21, 22, 23, 25, 26,
-    27, 29, 31, 32, 33, 34, 35, 37, 38, 39, 41, 43, 44, 45, 46, 47, 49, 50,
-  ],
-  abundantNumbers: [
-    12, 18, 20, 24, 30, 36, 40, 42, 48, 54, 56, 60, 66, 70, 72, 78, 80, 84, 88,
-    90, 96, 100, 102, 104, 108,
-  ],
-  foodEmojis: [
-    "🍕",
-    "🍟",
-    "🌭",
-    "🍔",
-    "🧀",
-    "🥔",
-    "🌮",
-    "🥩",
-    "🍖",
-    "🍺",
-    "🥪",
-  ],
-};
+import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
 
 export const CommunityControls = ({
   handleReveal,
@@ -42,10 +13,9 @@ export const CommunityControls = ({
   community,
   communityReaction,
 }) => {
-  const [selectOptions, setSelectOptions] = useState([
-    0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
-  ]);
+  const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
+
   const handleVoteChange = (event) => {
     setSelectedVote(event.target.value);
   };
@@ -66,6 +36,14 @@ export const CommunityControls = ({
       ...iAmCitizen,
     });
   };
+
+  React.useEffect(() => {
+    if (community) {
+      setSelectOptions(
+        VoteOptions[community?.pointScheme] ?? VoteOptions["fibonacci"]
+      );
+    }
+  }, [community]);
 
   return (
     <>
@@ -148,7 +126,6 @@ export const CommunityControls = ({
                   value={selectedVote}
                   label="Vote"
                   onChange={handleVoteChange}
-                  // style={{maxHeight: "300px"}}
                   MenuProps={{ style: { maxHeight: "400px" } }}
                 >
                   {selectOptions?.map((option) => {

@@ -10,7 +10,7 @@ const getCommunities = () => {
 const getCommunitiesAsArray = async () => {
   const result = await postgresClient.getCommunities();
 
-  if(!result) {
+  if (!result) {
     // SQL error, oops?
     return [];
   }
@@ -66,8 +66,6 @@ const joinCommunity = async ({
     votingMember,
   });
 
-  console.log("joinCommunity result", result);
-
   if (result.length === 0) {
     // something bad happened, what do
     console.error(
@@ -76,6 +74,14 @@ const joinCommunity = async ({
       result
     );
   }
+
+  const { data } = result[0];
+
+  return data;
+};
+
+const editPointScheme = async ({ communityId, scheme }) => {
+  const result = await postgresClient.editPointScheme({ communityId, scheme });
 
   const { data } = result[0];
 
@@ -144,6 +150,7 @@ module.exports = {
   addCommunity,
   communitiesSummary,
   deleteCommunity,
+  editPointScheme,
   getCommunities,
   getCommunitiesAsArray,
   getCommunityBy,

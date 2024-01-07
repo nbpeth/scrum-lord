@@ -80,6 +80,10 @@ websocketServer.on("connection", (ws, request) => {
         handleCommunityReaction(payload);
         break;
 
+      case "edit-point-scheme":
+        handleEditPointScheme(payload);
+        break;
+
       default:
         console.error("unmatched event", message.toString());
         break;
@@ -277,11 +281,25 @@ const handleReset = async (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-setInterval(() => {
-  websocketServer.clients.forEach((client) => {
-    client.send(JSON.stringify({ hey: "friend" }));
-  });
-}, 30000);
+const handleEditPointScheme = async (payload) => {
+  const { community, username, userId, userColor, scheme } = payload;
+  const { id: communityId } = community;
+
+  const result = await communityClient.editPointScheme({ communityId, scheme });
+
+  const reply = {
+    type: "edit-point-scheme-reply",
+    payload: { community: result, username, userId, userColor, scheme },
+  };
+
+  notifyClients({ message: reply, communityId });
+};
+
+// setInterval(() => {
+//   websocketServer.clients.forEach((client) => {
+//     client.send(JSON.stringify({ hey: "friend" }));
+//   });
+// }, 30000);
 
 server.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);
