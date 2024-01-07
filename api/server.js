@@ -258,10 +258,23 @@ const handleReveal = async (payload) => {
   const { id: communityId } = community;
 
   const result = await communityClient.reveal({ communityId });
+  const isSynergized =
+    result &&
+    result.citizens &&
+    result.citizens.length > 1 &&
+    result.citizens
+      .map((citizen) => citizen.vote)
+      .every((vote) => vote === result.citizens[0].vote);
 
   const reply = {
     type: "reveal-reply",
-    payload: { community: result, username, userId, userColor },
+    payload: {
+      community: { ...result, isSynergized },
+      username,
+      userId,
+      userColor,
+      isSynergized,
+    },
   };
 
   notifyClients({ message: reply, communityId });

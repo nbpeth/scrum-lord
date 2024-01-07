@@ -8,17 +8,23 @@ export default function useDashboard() {
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
 
+
+  // todo: full postgres URL
+  // dev/prod socket URL
+  // same vote synergy animation / sound
+  
+
   useEffect(() => {
     const host = document.location.host;
     const wsProtocol = document.location.protocol === "https:" ? "wss" : "ws";
     let baseUrl = `${wsProtocol}://${host}/socket`;
     const env = process.env.ENVIRONMENT;
 
-    // const socketUrl =
-    //   env === "prod" ? `${baseUrl}` : `ws://localhost:8080/socket`;
+    const socketUrl =
+      env === "prod" ? `${baseUrl}` : `ws://localhost:8080/socket`;
 
-    setSocketUrl(baseUrl);
-    // setSocketUrl(socketUrl);
+    // setSocketUrl(baseUrl);
+    setSocketUrl(socketUrl);
   }, []);
 
   useEffect(() => {

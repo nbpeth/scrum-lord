@@ -33,7 +33,10 @@ import { EditPointSchemeModal } from "../../components/EditPointSchemeModal/Edit
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 
-export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
+export const Community = ({
+  handleCommunityBackgroundAnimationChange,
+  handleCelebrationChange,
+}) => {
   const params = useParams();
   const communityId = params.communityId;
   const navigate = useNavigate();
@@ -94,7 +97,14 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
   // todo: give new users a random color for name plate and messaging
 
   useEffect(() => {
+    // debugger;
     recoverUserFromStorage();
+    if (currentCommunity?.isSynergized) {
+      handleCelebrationChange(true);
+      setTimeout(() => {
+        handleCelebrationChange(false);
+      }, 5000);
+    }
   }, [currentCommunity]);
 
   const handleJoin = () => {
