@@ -1,0 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE communities (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    data JSON,
+    last_modified TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

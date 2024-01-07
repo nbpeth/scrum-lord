@@ -236,7 +236,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                       <List>
                         <ListItem>
                           <Typography variant="body2" color={"gray"}>
-                            Joined as: {iAmCitizen.username}
+                            Joined as: "{iAmCitizen.username}"
                           </Typography>
                         </ListItem>
                         <ListItem>
@@ -329,11 +329,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                   {alertMessage?.message}
                 </Alert>
               </Snackbar>
-              {error && (
-                // <Grid item xs={12}>
-                <Typography variant="h3">{error}</Typography>
-                //  </Grid>
-              )}
+            
 
               <CommunityCitizens
                 citizens={citizens}

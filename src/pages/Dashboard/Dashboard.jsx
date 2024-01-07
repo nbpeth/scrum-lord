@@ -94,38 +94,45 @@ export const Dashboard = () => {
           </Grid>
         )}
 
-        <Grid item></Grid>
-
         {/* communities component */}
-        <Grid container item spacing={2} justifyContent="center">
+        <Grid container item spacing={2} xs={12} justifyContent="center">
           {communities?.map((community) => {
             return (
-              <Grid item key={community.id}>
-                <NavLink
-                  to={`/communities/${community.id}`}
-                  style={{ textDecoration: "none" }}
-                >
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
-                      cursor: "pointer",
-                      transition: "background .5s ease-in-out",
-                      "&:hover": {
-                        backgroundColor: alpha(theme.palette.secondary.dark, 1),
-                      },
-                    }}
-                  >
-                    <CardContent>
-                      <h3>{community.name}</h3>
-                    </CardContent>
-                  </Card>
-                </NavLink>
+              <Grid item xs={3} key={community.id}>
+                <CommunityCard community={community} />
               </Grid>
             );
           })}
         </Grid>
       </Grid>
     </div>
+  );
+};
+// postgres://bxngeexnpbiofo:293de31644fd48e10c63023096ba7e86cb44fb51219ab0723fc6e2c072c6afff@ec2-3-217-146-37.compute-1.amazonaws.com:5432/domikjnvvpso
+export const CommunityCard = ({ community }) => {
+  const theme = useTheme();
+  return (
+    <Card
+      variant="outlined"
+      sx={{
+        backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
+        cursor: "pointer",
+        transition: "background .5s ease-in-out",
+        "&:hover": {
+          backgroundColor: alpha(theme.palette.secondary.dark, 1),
+        },
+      }}
+    >
+      <CardContent>
+        <Typography variant="h5" color={theme.palette.grey[100]}>
+          <NavLink
+            to={`/communities/${community.id}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            {community.name}
+          </NavLink>
+        </Typography>
+      </CardContent>
+    </Card>
   );
 };

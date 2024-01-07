@@ -28,7 +28,8 @@ const executeQuery = async ({ query, values }) => {
 
 const addCommunity = async ({ community }) => {
   const id = uuid.v4();
-  const query = "INSERT INTO communities(id, data) VALUES($1, $2) RETURNING *;";
+  const query =
+    "INSERT INTO communities(id, data, last_modified) VALUES($1, $2, NOW()) RETURNING *;";
   const values = [id, { ...community, id }];
 
   const result = await executeQuery({ query, values });
@@ -58,7 +59,8 @@ const joinCommunity = async ({
 }) => {
   const query = `
     UPDATE communities
-    SET data = jsonb_set(data::jsonb, '{citizens}', COALESCE(data::jsonb->'citizens', '[]'::jsonb) || $1::jsonb)
+    SET data = jsonb_set(data::jsonb, '{citizens}', COALESCE(data::jsonb->'citizens', '[]'::jsonb) || $1::jsonb),
+    last_modified = NOW()
     WHERE id = $2
     RETURNING data;
   `;
@@ -83,7 +85,8 @@ const leaveCommunity = async ({ communityId, userId }) => {
       WHERE citizen_userId = $2
     )
     UPDATE communities
-    SET data = data::jsonb #- ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx)]
+    SET data = data::jsonb #- ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx)],
+    last_modified = NOW()
     WHERE id = $1
     RETURNING *;
       `;
@@ -123,7 +126,8 @@ const resetCommunity = async ({ communityId }) => {
       ),
       '{revealed}', 
       'false'::jsonb
-    )
+    ),
+    last_modified = NOW()
     WHERE id = $1
     RETURNING *;
   `;
@@ -155,7 +159,8 @@ const submitVote = async ({ communityId, userId, vote }) => {
         ),
         ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'vote'], 
         $3::jsonb
-      )
+      ),
+      last_modified = NOW()
       WHERE id = $1
       RETURNING *;
     `;

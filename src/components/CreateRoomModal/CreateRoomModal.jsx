@@ -85,7 +85,7 @@ export const CreateRoomModal = ({ open, handleClose }) => {
               id="name"
             />
           </Grid>
-          <Grid container item xs={12}>
+          <Grid container item xs={12} justifyContent="space-between">
             <Grid item>
               <Button onClick={() => close(getCommunityName())}>Create</Button>
             </Grid>

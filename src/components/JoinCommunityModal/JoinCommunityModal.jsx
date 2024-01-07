@@ -50,7 +50,14 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
 
   const onClose = (c, x) => {
     // debugger;
-    setNewUser({ username: "" });
+    setNewUser({
+      username: generate({
+        exactly: 2,
+        minLength: 5,
+        join: " ",
+        camelCase: true,
+      }),
+    });
     handleClose(c);
   };
 
@@ -93,9 +100,15 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
               </Typography>
             </Grid>
           </Grid>
-          <Grid container item xs={12}>
+          <Grid container item xs={12} justifyContent="space-between">
             <Grid item>
-              <Button onClick={() => onClose(getUserName())}>Join</Button>
+              <Button
+                variant="contained"
+                onClick={() => onClose(getUserName())}
+                disabled={votingMemberChecked && !newUser?.username}
+              >
+                Join
+              </Button>
             </Grid>
             <Grid item>
               <Button color="error" onClick={() => onClose()}>

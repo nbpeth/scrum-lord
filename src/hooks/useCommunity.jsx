@@ -24,8 +24,8 @@ export default function useCommunity() {
 
     // console.log("baseUrl", baseUrl);
 
-    // setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
-    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
+    // setSocketUrl(`${baseUrl}?communityId=${communityId}`);
   }, [communityId]);
 
   // get community data on mount
