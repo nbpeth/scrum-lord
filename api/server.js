@@ -4,6 +4,7 @@ const app = require("./http-server");
 const url = require("url");
 
 const communityClient = require("./communityClient");
+const color = require("randomcolor");
 
 const setTargetSessionOn = (ws, request) => {
   const queryParams = url.parse(request.url, { parseQueryString: true }).query;
@@ -157,17 +158,23 @@ const handleJoinCommunity = async (payload) => {
     community: { id: communityId, username, userId, votingMember },
   } = payload;
 
+  const userColor = color.randomColor({
+    luminosity: "bright",
+    format: "rgb",
+  });
+
   const updatedCommunity = await communityClient.joinCommunity({
     communityId,
     username,
     userId,
+    userColor,
     votingMember,
   });
 
   const reply = {
     type: "community-joined-reply",
     payload: {
-      joinedUser: { username, userId, votingMember },
+      joinedUser: { username, userId, votingMember, userColor },
       community: updatedCommunity,
     },
   };

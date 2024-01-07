@@ -7,12 +7,9 @@ const dbConnectionProperties = {
   database: process.env.DB_DATABASE ?? "postgres",
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: {
-    rejectUnauthorized: false,
-    
-  }
-  //   ssl: process.env.DB_SSL ?? false,
-  //   ssl: { rejectUnauthorized: false },
+  ...(process.env.ENV === "production"
+    ? { ssl: { rejectUnauthorized: false } }
+    : { ssl: false }),
 };
 
 let pool;
@@ -67,6 +64,7 @@ const joinCommunity = async ({
   communityId,
   username,
   userId,
+  userColor,
   votingMember,
 }) => {
   const query = `
@@ -76,7 +74,9 @@ const joinCommunity = async ({
     WHERE id = $2
     RETURNING data;
   `;
-  const citizen = JSON.stringify([{ username, userId, votingMember }]);
+  const citizen = JSON.stringify([
+    { username, userId, votingMember, userColor },
+  ]);
   const values = [citizen, communityId];
 
   const result = await executeQuery({ query, values });

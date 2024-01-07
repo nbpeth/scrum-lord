@@ -18,7 +18,7 @@ export const CitizenCard = ({
   const isMyCard = iAmCitizen && citizen.userId === iAmCitizen.userId;
   const theme = useTheme();
   const { revealed } = currentCommunity;
-  const { vote, hasVoted, username } = citizen;
+  const { vote, hasVoted, username, userColor } = citizen;
 
   // drag and drop cards https://stackoverflow.com/questions/60043907/how-to-drag-drop-material-ui-cards
   return (
@@ -49,7 +49,7 @@ export const CitizenCard = ({
         <Grid container spacing={2} justifyContent="center" alignItems="center">
      
           <Grid item>
-            <Typography variant="body2" color={theme.palette.grey[100]}>
+            <Typography variant="body2" color={userColor ?? theme.palette.grey[100]}>
               {username}
             </Typography>
           </Grid>

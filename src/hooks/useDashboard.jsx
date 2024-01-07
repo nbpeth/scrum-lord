@@ -17,8 +17,8 @@ export default function useDashboard() {
     const socketUrl =
       env === "prod" ? `${baseUrl}` : `ws://localhost:8080/socket`;
 
-    setSocketUrl(baseUrl);
-    // setSocketUrl(socketUrl);
+    // setSocketUrl(baseUrl);
+    setSocketUrl(socketUrl);
   }, []);
 
   useEffect(() => {

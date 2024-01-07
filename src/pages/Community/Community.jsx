@@ -86,7 +86,8 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
   }, [controlsList.partyModeEngaged]);
 
   // todo: delete causing some wild re-renders, cycling through users
-
+  // todo: give new users a random color for name plate and messaging 
+  
   useEffect(() => {
     recoverUserFromStorage();
   }, [currentCommunity]);

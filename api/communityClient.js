@@ -55,12 +55,14 @@ const joinCommunity = async ({
   communityId,
   username,
   userId,
+  userColor,
   votingMember,
 }) => {
   const result = await postgresClient.joinCommunity({
     communityId,
     username,
     userId,
+    userColor,
     votingMember,
   });
 

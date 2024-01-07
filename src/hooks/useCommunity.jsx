@@ -27,8 +27,8 @@ export default function useCommunity() {
       env === "prod"
         ? `${baseUrl}?communityId=${communityId}`
         : `ws://localhost:8080/socket?communityId=${communityId}`;
-    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
-    // setSocketUrl(socketUrl);
+    // setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    setSocketUrl(socketUrl);
   }, [communityId]);
 
   // get community data on mount
