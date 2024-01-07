@@ -9,6 +9,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
+  ListItemText,
   MenuItem,
   MenuList,
   Paper,
@@ -16,7 +17,8 @@ import {
   Switch,
   Toolbar,
   Typography,
-  useMediaQuery
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -54,6 +56,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     messageHistory,
   } = useCommunity();
 
+  const theme = useTheme();
   // handle external room events
   useEffect(() => {
     if (!roomEvents) {
@@ -86,8 +89,8 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
   }, [controlsList.partyModeEngaged]);
 
   // todo: delete causing some wild re-renders, cycling through users
-  // todo: give new users a random color for name plate and messaging 
-  
+  // todo: give new users a random color for name plate and messaging
+
   useEffect(() => {
     recoverUserFromStorage();
   }, [currentCommunity]);
@@ -155,7 +158,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
         communityId: id ?? communityId,
         userId: userId ?? iAmCitizen.userId,
         username: username ?? iAmCitizen.username,
-        userColor: iAmCitizen?.userColor
+        userColor: iAmCitizen?.userColor,
       });
       setIAmCitizen(null);
     } catch (e) {
@@ -215,14 +218,16 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                     }}
                   >
                     <ListItemIcon>
-                      <Home />
+                      <Home /> 
                     </ListItemIcon>
+                    <ListItemText secondary="Home" />
                     <Typography
                       variant="h6"
                       component="div"
                       sx={{ flexGrow: 1 }}
                     ></Typography>
                   </MenuItem>
+
                   <Divider />
                   <MenuItem>
                     {!iAmCitizen ? (
@@ -235,13 +240,17 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                         Join
                       </Button>
                     ) : (
-                      <List>
-                        <ListItem>
+                      <Grid container xs={12}>
+                        <Grid
+                          item
+                          xs={12}
+                          sx={{ textAlign: "center", paddingBottom: "10px" }}
+                        >
                           <Typography variant="body2" color={"gray"}>
                             Joined as: "{iAmCitizen.username}"
                           </Typography>
-                        </ListItem>
-                        <ListItem>
+                        </Grid>
+                        <Grid item xs={12}>
                           <Button
                             fullWidth
                             variant="outlined"
@@ -250,15 +259,27 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                           >
                             Leave
                           </Button>
-                        </ListItem>
-                      </List>
+                        </Grid>
+                      </Grid>
                     )}
                   </MenuItem>
                   <Divider />
                   <MenuItem>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="success"
+                      onClick={handleJoin}
+                    >
+                      Edit Point Scheme
+                    </Button>
+                  </MenuItem>
+                  <MenuItem>
                     <ListItemIcon>
                       <ModeNightIcon />
                     </ListItemIcon>
+                    <ListItemText secondary="Stars" />
+
                     <Switch
                       checked={!!controlsList?.partyModeEngaged}
                       onChange={(e) => {
@@ -292,28 +313,46 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
         </AppBar>
       </Box>
       <Grid container xs={12} spacing={3}>
-        <Grid item xs={fullsizeScreen ? 3 : 12} xl={fullsizeScreen ? 2 : 12}>
+        <Grid
+          container
+          item
+          xs={fullsizeScreen ? 3 : 12}
+          xl={fullsizeScreen ? 2 : 12}
+        >
           {/* <Grid item>
             <Link to="/" style={{ textDecoration: "none" }}>
               <img src={logoUrl} height="250" width="250" />
             </Link>
           </Grid> */}
-          <CommunityControls
-            controlsList={controlsList}
-            setControlsList={setControlsList}
-            community={currentCommunity}
-            handleReveal={handleReveal}
-            handleReset={handleReset}
-            iAmCitizen={iAmCitizen}
-            communityId={communityId}
-            submitVote={submitVote}
-            communityReaction={communityReaction}
-          />
-          <MessageBoard
-            messageHistory={messageHistory}
-            communityId={communityId}
-          />
+          <Grid item xs={12}>
+            <CommunityControls
+              controlsList={controlsList}
+              setControlsList={setControlsList}
+              community={currentCommunity}
+              handleReveal={handleReveal}
+              handleReset={handleReset}
+              iAmCitizen={iAmCitizen}
+              communityId={communityId}
+              submitVote={submitVote}
+              communityReaction={communityReaction}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              backgroundColor: controlsList?.partyModeEngaged
+                ? "#000"
+                : theme.palette.background.paper,
+            }}
+          >
+            <MessageBoard
+              messageHistory={messageHistory}
+              communityId={communityId}
+            />
+          </Grid>
         </Grid>
+
         <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
           {currentCommunity ? (
             <>
@@ -331,7 +370,6 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                   {alertMessage?.message}
                 </Alert>
               </Snackbar>
-            
 
               <CommunityCitizens
                 citizens={citizens}
@@ -346,4 +384,3 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     </>
   );
 };
-
