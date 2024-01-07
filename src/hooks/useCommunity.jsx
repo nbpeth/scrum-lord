@@ -22,12 +22,13 @@ export default function useCommunity() {
     const wsProtocol = document.location.protocol === "https:" ? "wss" : "ws";
     let baseUrl = `${wsProtocol}://${host}/socket`;
     const env = process.env.ENVIRONMENT;
-    
+
     const socketUrl =
       env === "prod"
         ? `${baseUrl}?communityId=${communityId}`
         : `ws://localhost:8080/socket?communityId=${communityId}`;
-    setSocketUrl(socketUrl);
+    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    // setSocketUrl(socketUrl);
   }, [communityId]);
 
   // get community data on mount
