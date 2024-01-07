@@ -15,8 +15,8 @@ export default function useDashboard() {
 
     // console.log("baseUrl", baseUrl);
 
-    // setSocketUrl(`${baseUrl}`);
-    setSocketUrl(`ws://localhost:8080/socket`);
+    setSocketUrl(`${baseUrl}`);
+    // setSocketUrl(`ws://localhost:8080/socket`);
 
   }, []);
 
@@ -27,14 +27,12 @@ export default function useDashboard() {
 
       switch (type) {
         case "list-communities-reply":
-          // console.log("list-communities response", payload);
           const { communities: fetchedCommunities } = payload;
 
           setCommunities(fetchedCommunities);
 
           break;
         case "community-created-reply":
-          // console.log("community-created response", payload);
           const { communities } = payload;
 
           setCommunities(communities);
