@@ -292,6 +292,7 @@ export default function useCommunity() {
   };
 
   const submitVote = ({ communityId, username, userId, userColor, vote }) => {
+    // debugger;
     sendMessage(
       JSON.stringify({
         type: "submit-vote",
@@ -300,6 +301,7 @@ export default function useCommunity() {
           userColor,
           username,
           userId,
+          vote
         },
       })
     );
