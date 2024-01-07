@@ -7,7 +7,8 @@ const dbConnectionProperties = {
   database: process.env.DB_DATABASE ?? "postgres",
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL ?? false,
+//   ssl: process.env.DB_SSL ?? false,
+ssl: { rejectUnauthorized: false },
 };
 
 const pool = new Pool({

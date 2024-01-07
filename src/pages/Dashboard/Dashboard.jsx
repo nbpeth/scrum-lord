@@ -58,6 +58,8 @@ export const Dashboard = () => {
 
   // todo: idle time counter and self delete
 
+  //  todo: last modified date on community: different color, label for idle?
+
   return (
     <div>
       <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
@@ -108,7 +110,7 @@ export const Dashboard = () => {
     </div>
   );
 };
-// postgres://bxngeexnpbiofo:293de31644fd48e10c63023096ba7e86cb44fb51219ab0723fc6e2c072c6afff@ec2-3-217-146-37.compute-1.amazonaws.com:5432/domikjnvvpso
+
 export const CommunityCard = ({ community }) => {
   const theme = useTheme();
   return (

@@ -10,6 +10,11 @@ const getCommunities = () => {
 const getCommunitiesAsArray = async () => {
   const result = await postgresClient.getCommunities();
 
+  if(!result) {
+    // SQL error, oops?
+    return [];
+  }
+
   return result.map(({ id, data }) => {
     return {
       id,
