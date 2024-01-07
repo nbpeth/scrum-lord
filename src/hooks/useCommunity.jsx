@@ -10,7 +10,7 @@ export default function useCommunity() {
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
-  // const [messageHistory, setMessageHistory] = useState([]);
+  const [messageHistory, setMessageHistory] = useState([]);
 
   const [roomEvents, setRoomEvents] = useState({});
 
@@ -24,8 +24,8 @@ export default function useCommunity() {
 
     // console.log("baseUrl", baseUrl);
 
-    setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
-    // setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    // setSocketUrl(`ws://localhost:8080/socket?communityId=${communityId}`);
+    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
   }, [communityId]);
 
   // get community data on mount
@@ -35,32 +35,46 @@ export default function useCommunity() {
     );
   }, [communityId]);
 
-  const handleCommunityJoined = (payload) => {
+  const handleCommunityJoinedReply = (payload) => {
     try {
       const { joinedUser, community } = payload;
 
       const { citizens: updatedCitizens, id } = community;
 
       setCommunity(community);
-      setAlertMessage({ message: `"${joinedUser.username}" joined!` });
+      // pretty sure shouldn't use two sets on state in the same function
+      // setAlertMessage({ message: `"${joinedUser.username}" joined!` });
+      setMessageHistory([
+        ...messageHistory,
+        { communityId, text: `${joinedUser.username} has joined!` },
+      ]);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const handleCommunityLeft = (payload) => {
+  const handleCommunityLeftReply = (payload) => {
     const { leftUser, community } = payload;
     const { citizens: updatedCitizens, id } = community;
 
     setCommunity(community);
-    setAlertMessage({ message: `${leftUser.username} left the community` });
+    // setAlertMessage({ message: `${leftUser.username} left the community` });
+    setMessageHistory([
+      ...messageHistory,
+      { communityId, text: `${leftUser.username} left the community` },
+    ]);
   };
 
   // blanket holistic updates for now, duplicated but unsure where to go in the future
-  const handleSubmittedVote = (payload) => {
-    const { community } = payload;
+  const handleSubmittedVoteReply = (payload) => {
+    const { community, username } = payload;
 
     setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      { communityId, text: `"${username}" has voted` },
+    ]);
   };
 
   const handleCommunityReactionReply = (payload) => {
@@ -87,19 +101,33 @@ export default function useCommunity() {
         message = "🤷";
     }
 
-    setAlertMessage({ message: `"${username}" - ${message}` });
+    // setAlertMessage({ message: `"${username}" - ${message}` });
+    setMessageHistory([
+      ...messageHistory,
+      { communityId, text: `"${username}" - ${message}` },
+    ]);
   };
 
   const handleResetReply = (payload) => {
-    const { community } = payload;
+    const { community, username } = payload;
 
     setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      { communityId, text: `"${username}" reset the vote` },
+    ]);
   };
 
   const handleRevealReply = (payload) => {
-    const { community } = payload;
+    const { community, username } = payload;
 
     setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      { communityId, text: `"${username}" revealed the votes` },
+    ]);
   };
 
   useEffect(() => {
@@ -117,15 +145,15 @@ export default function useCommunity() {
 
           break;
         case "community-joined-reply":
-          handleCommunityJoined(payload);
+          handleCommunityJoinedReply(payload);
 
           break;
         case "community-left-reply":
-          handleCommunityLeft(payload);
+          handleCommunityLeftReply(payload);
 
           break;
         case "submit-vote-reply":
-          handleSubmittedVote(payload);
+          handleSubmittedVoteReply(payload);
 
           break;
 
@@ -155,6 +183,8 @@ export default function useCommunity() {
     }
   }, [lastMessage]);
 
+  useEffect(() => {}, [lastMessage]);
+
   const handleCommunityDeletedReply = (payload) => {
     setRoomEvents({
       ...roomEvents,
@@ -166,20 +196,20 @@ export default function useCommunity() {
     });
   };
 
-  const handleReveal = () => {
+  const handleReveal = ({ username, userId }) => {
     sendMessage(
       JSON.stringify({
         type: "reveal",
-        payload: { community: { id: communityId } },
+        payload: { community: { id: communityId }, username, userId },
       })
     );
   };
 
-  const handleReset = () => {
+  const handleReset = ({ username, userId }) => {
     sendMessage(
       JSON.stringify({
         type: "reset",
-        payload: { community: { id: communityId } },
+        payload: { community: { id: communityId }, username, userId },
       })
     );
   };
@@ -193,7 +223,7 @@ export default function useCommunity() {
             id: communityId,
             username,
             userId,
-            votingMember
+            votingMember,
           },
         },
       })
@@ -209,11 +239,11 @@ export default function useCommunity() {
     );
   };
 
-  const submitVote = ({ communityId, userId, vote }) => {
+  const submitVote = ({ communityId, username, userId, vote }) => {
     sendMessage(
       JSON.stringify({
         type: "submit-vote",
-        payload: { community: { id: communityId, userId, vote } },
+        payload: { community: { id: communityId, username, userId, vote } },
       })
     );
   };
@@ -253,5 +283,6 @@ export default function useCommunity() {
     readyState,
     roomEvents,
     submitVote,
+    messageHistory,
   };
 }

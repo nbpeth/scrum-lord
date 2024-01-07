@@ -112,8 +112,6 @@ const handleCommunityReaction = (payload) => {
   const { community, event, userId, username } = payload;
   const { id: communityId } = community;
 
-  // const result = communityClient.updateCommunity(community);
-
   const reply = {
     type: "community-reaction-reply",
     payload: { event, userId, username },
@@ -128,7 +126,6 @@ const handleCreateCommunity = async (payload) => {
   // result is the created item
 
   const communities = await communityClient.getCommunitiesAsArray();
-  
 
   const message = {
     type: "community-created-reply",
@@ -226,44 +223,48 @@ const handleGetCommunity = async (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-const handleSubmitVote = (payload) => {
+const handleSubmitVote = async (payload) => {
   const { community } = payload;
-  const { id: communityId, userId, vote } = community;
+  const { id: communityId, userId, username, vote } = community;
 
-  const result = communityClient.submitVote({ communityId, userId, vote });
+  const result = await communityClient.submitVote({
+    communityId,
+    userId,
+    vote,
+  });
 
   const reply = {
     type: "submit-vote-reply",
-    payload: { community: result },
+    payload: { community: result, username, userId },
   };
 
   notifyClients({ message: reply, communityId });
 };
 
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
-const handleReveal = (payload) => {
-  const { community } = payload;
+const handleReveal = async (payload) => {
+  const { community, username, userId } = payload;
   const { id: communityId } = community;
 
-  const result = communityClient.reveal({ communityId });
+  const result = await communityClient.reveal({ communityId });
 
   const reply = {
     type: "reveal-reply",
-    payload: { community: result },
+    payload: { community: result, username, userId },
   };
 
   notifyClients({ message: reply, communityId });
 };
 
 const handleReset = async (payload) => {
-  const { community } = payload;
+  const { community, username, userId } = payload;
   const { id: communityId } = community;
 
   const result = await communityClient.reset({ communityId });
 
   const reply = {
     type: "reset-reply",
-    payload: { community: result },
+    payload: { community: result, username, userId },
   };
 
   notifyClients({ message: reply, communityId });

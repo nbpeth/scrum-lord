@@ -105,23 +105,74 @@ const deleteCommunity = async ({ community }) => {
 
 const resetCommunity = async ({ communityId }) => {
   const query = `
+    WITH updated_citizens AS (
+      SELECT jsonb_agg(
+        jsonb_set(
+          jsonb_set(citizen::jsonb, '{vote}', 'null'), 
+          '{hasVoted}', 'false'
+        )
+      ) AS citizens
+      FROM jsonb_array_elements((SELECT data::jsonb->'citizens' FROM communities WHERE id = $1)) AS citizen
+    )
     UPDATE communities
     SET data = jsonb_set(
-      data::jsonb, 
-      '{citizens}', 
-      (
-        SELECT jsonb_agg(
-          jsonb_set(
-            jsonb_set(citizen::jsonb, '{vote}', 'null'), 
-            '{hasVoted}', 'false'
-          )
-        )
-        FROM jsonb_array_elements(data::jsonb->'citizens') AS citizen
-      )::json
+      jsonb_set(
+        data::jsonb, 
+        '{citizens}', 
+        (SELECT citizens::jsonb FROM updated_citizens)
+      ),
+      '{revealed}', 
+      'false'::jsonb
     )
     WHERE id = $1
     RETURNING *;
   `;
+  const values = [communityId];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+};
+
+const submitVote = async ({ communityId, userId, vote }) => {
+  const query = `
+      WITH to_update AS (
+        SELECT jsonb_array_elements(data::jsonb->'citizens') ->> 'userId' AS citizen_userId, generate_series(0, jsonb_array_length(data::jsonb->'citizens')) AS index
+        FROM communities
+        WHERE id = $1
+      ),
+      idx AS (
+        SELECT index
+        FROM to_update
+        WHERE citizen_userId = $2
+      )
+      UPDATE communities
+      SET data = jsonb_set(
+        jsonb_set(
+          data::jsonb, 
+          ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'hasVoted'], 
+          'true'::jsonb
+        ),
+        ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'vote'], 
+        $3::jsonb
+      )
+      WHERE id = $1
+      RETURNING *;
+    `;
+  const values = [communityId, userId, JSON.stringify(vote)];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+};
+
+const revealCommunity = async ({ communityId }) => {
+  const query = `
+        UPDATE communities
+        SET data = jsonb_set(data::jsonb, '{revealed}', 'true')
+        WHERE id = $1
+        RETURNING *;
+    `;
   const values = [communityId];
 
   const result = await executeQuery({ query, values });
@@ -137,4 +188,6 @@ module.exports = {
   joinCommunity,
   leaveCommunity,
   resetCommunity,
+  revealCommunity,
+  submitVote,
 };

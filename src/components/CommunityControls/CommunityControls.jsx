@@ -20,17 +20,25 @@ export const CommunityControls = ({
   };
 
   const onVoteSubmit = () => {
-    submitVote({ communityId, userId: iAmCitizen.userId, vote: selectedVote });
+    submitVote({
+      communityId,
+      userId: iAmCitizen.userId,
+      username: iAmCitizen.username,
+      vote: selectedVote,
+    });
   };
 
   const onReaction = ({ event }) => {
-    communityReaction({ event, userId: iAmCitizen.userId, ...iAmCitizen });
+    communityReaction({
+      event,
+      userId: iAmCitizen.userId,
+      username: iAmCitizen.username,
+      ...iAmCitizen,
+    });
   };
 
   return (
     <>
-      {/* {" "} */}
-      {/* {JSON.stringify(iAmCitizen)} */}
       {iAmCitizen && (
         <Grid
           container
@@ -133,7 +141,7 @@ export const CommunityControls = ({
                 fullWidth
                 variant="outlined"
                 color="warning"
-                onClick={handleReset}
+                onClick={() => handleReset({ ...iAmCitizen, communityId })}
               >
                 Reset
               </Button>
@@ -142,7 +150,7 @@ export const CommunityControls = ({
                 fullWidth
                 variant="outlined"
                 color="success"
-                onClick={handleReveal}
+                onClick={() => handleReveal({ ...iAmCitizen, communityId })}
               >
                 Reveal
               </Button>

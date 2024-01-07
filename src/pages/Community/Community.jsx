@@ -6,6 +6,8 @@ import {
   Button,
   Divider,
   Grid,
+  List,
+  ListItem,
   ListItemIcon,
   MenuItem,
   MenuList,
@@ -14,7 +16,7 @@ import {
   Switch,
   Toolbar,
   Typography,
-  useMediaQuery,
+  useMediaQuery
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,6 +30,7 @@ import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionSt
 import { ScrumLordMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
+import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 
 export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
   const params = useParams();
@@ -48,6 +51,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     roomEvents,
     readyState,
     communityReaction,
+    messageHistory,
   } = useCommunity();
 
   // handle external room events
@@ -81,11 +85,7 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     handleCommunityBackgroundAnimationChange(controlsList.partyModeEngaged);
   }, [controlsList.partyModeEngaged]);
 
-  // cleanup
-  // todo: user state is all sorts of messed up
-  // delete causing some wild re-renders, cycling through users
-
-  // go with mongo?
+  // todo: delete causing some wild re-renders, cycling through users
 
   useEffect(() => {
     recoverUserFromStorage();
@@ -183,7 +183,6 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
         userId: iAmCitizen?.userId,
         username: iAmCitizen?.username,
       });
-      // redirect everyone with a message to the dashboard
     }
 
     setDeleteCommunityModalOpen(false);
@@ -234,14 +233,23 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
                         Join
                       </Button>
                     ) : (
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="secondary"
-                        onClick={handleLeave}
-                      >
-                        Leave
-                      </Button>
+                      <List>
+                        <ListItem>
+                          <Typography variant="body2" color={"gray"}>
+                            Joined as: {iAmCitizen.username}
+                          </Typography>
+                        </ListItem>
+                        <ListItem>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            color="secondary"
+                            onClick={handleLeave}
+                          >
+                            Leave
+                          </Button>
+                        </ListItem>
+                      </List>
                     )}
                   </MenuItem>
                   <Divider />
@@ -274,9 +282,6 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
               </Paper>
             </ScrumLordMenu>
 
-            {/* <Link to="/" style={{ textDecoration: "none" }}>
-            <img src={logoUrl} height="50" width="50" />
-          </Link> */}
             <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
               {currentCommunity && currentCommunity.name}
             </Typography>
@@ -301,6 +306,10 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
             communityId={communityId}
             submitVote={submitVote}
             communityReaction={communityReaction}
+          />
+          <MessageBoard
+            messageHistory={messageHistory}
+            communityId={communityId}
           />
         </Grid>
         <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
@@ -339,3 +348,4 @@ export const Community = ({ handleCommunityBackgroundAnimationChange }) => {
     </>
   );
 };
+

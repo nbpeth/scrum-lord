@@ -87,37 +87,20 @@ const leaveCommunity = async ({ communityId, username, userId }) => {
   return data;
 };
 
-const submitVote = ({ communityId, userId, vote }) => {
-  const targetCommunity = communities[communityId];
+const submitVote = async ({ communityId, userId, vote }) => {
+  const result = await postgresClient.submitVote({ communityId, userId, vote });
 
-  if (!targetCommunity) {
-    return Error(`Community "${communityId}" does not exist`);
-  }
+  const { data } = result[0];
 
-  const citizen = targetCommunity.citizens.find(
-    (citizen) => citizen.userId === userId
-  );
-
-  if (!citizen) {
-    return Error(`Citizen "${userId}" does not exist`);
-  }
-
-  citizen.vote = vote;
-  citizen.hasVoted = true;
-
-  return communities[communityId];
+  return data;
 };
 
-const reveal = ({ communityId }) => {
-  const targetCommunity = communities[communityId];
+const reveal = async ({ communityId }) => {
+  const result = await postgresClient.revealCommunity({ communityId });
 
-  if (!targetCommunity) {
-    return Error(`Community "${communityId}" does not exist`);
-  }
+  const { data } = result[0];
 
-  targetCommunity.revealed = true;
-
-  return communities[communityId];
+  return data;
 };
 
 const reset = async ({ communityId }) => {
@@ -126,19 +109,6 @@ const reset = async ({ communityId }) => {
   const { data } = result[0];
 
   return data;
-  // const targetCommunity = communities[communityId];
-
-  // if (!targetCommunity) {
-  //   return Error(`Community "${communityId}" does not exist`);
-  // }
-
-  // targetCommunity.revealed = false;
-  // targetCommunity.citizens.forEach((citizen) => {
-  //   citizen.vote = null;
-  //   citizen.hasVoted = false;
-  // });
-
-  // return communities[communityId];
 };
 
 const communitiesSummary = () => {

@@ -1,14 +1,13 @@
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import {
   Card,
   CardActions,
   CardContent,
+  Grid,
   Typography,
   alpha,
-  Grid,
   useTheme,
 } from "@mui/material";
-import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import SkateboardingIcon from "@mui/icons-material/Skateboarding";
 
 export const CitizenCard = ({
   citizen,
@@ -29,6 +28,7 @@ export const CitizenCard = ({
       sx={{
         padding: "10px",
         minWidth: "100px",
+        border: isMyCard ? `1px solid ${theme.palette.primary.dark}` : `1px solid ${theme.palette.grey[800]}`,
         backgroundColor: hasVoted
           ? alpha(theme.palette.primary.dark, 0.8)
           : "none",
@@ -47,13 +47,9 @@ export const CitizenCard = ({
         }}
       >
         <Grid container spacing={2} justifyContent="center" alignItems="center">
-          {isMyCard && (
-            <Grid item>
-              <SkateboardingIcon fontWeight="bold" fontSize="small" />
-            </Grid>
-          )}
+     
           <Grid item>
-            <Typography variant="body" color={theme.palette.grey[100]}>
+            <Typography variant="body2" color={theme.palette.grey[100]}>
               {username}
             </Typography>
           </Grid>
@@ -63,6 +59,7 @@ export const CitizenCard = ({
       </CardContent>
       <CardActions>
         <DeleteTwoToneIcon
+          fontSize="x-small"
           sx={{ cursor: "pointer" }}
           onClick={() => handleDeleteUser(citizen)}
         />
@@ -74,13 +71,13 @@ export const CitizenCard = ({
 export const CitizenVote = ({ isMyCard, revealed, vote }) => {
   const getValue = () => {
     if (revealed || isMyCard) {
-      return vote ?? "*";
+      return vote ?? "-";
     }
     return "?";
   };
 
   return (
-    <Typography variant="h1" sx={{ fontWeight: "bold" }}>
+    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
       {getValue()}
     </Typography>
   );
