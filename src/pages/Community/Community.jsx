@@ -94,15 +94,15 @@ export const Community = ({
   }, [controlsList.partyModeEngaged]);
 
   // todo: delete causing some wild re-renders, cycling through users
-  // todo: give new users a random color for name plate and messaging
 
   useEffect(() => {
-    // debugger;
     recoverUserFromStorage();
+
     if (currentCommunity?.isSynergized) {
       handleCelebrationChange(true);
       setTimeout(() => {
-        handleCelebrationChange(false);
+        // const audio = new Audio("path_to_your_sound_file.mp3");
+        handleCelebrationChange(true);
       }, 5000);
     }
   }, [currentCommunity]);
@@ -117,12 +117,12 @@ export const Community = ({
       return;
     }
 
-    const { username, userId, votingMember } = newUser;
+    const { username, userId, votingMember, userColor } = newUser;
     saveUserToStorage(userId);
 
     try {
-      joinCommunity({ communityId, userId, username, votingMember });
-      setIAmCitizen({ userId, username, votingMember });
+      joinCommunity({ communityId, userId, username, userColor, votingMember });
+      setIAmCitizen({ userId, username, votingMember, userColor });
     } catch (e) {
       console.error(e);
       setError(e.message);
@@ -156,7 +156,6 @@ export const Community = ({
   };
 
   const handleDeleteUser = (citizen) => {
-    // console.log("deleting user", citizen);
     handleLeave({
       communityId,
       userId: citizen.userId,

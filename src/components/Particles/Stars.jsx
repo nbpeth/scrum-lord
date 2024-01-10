@@ -58,7 +58,9 @@ export function Stars(props) {
     },
   };
 
-  return <StyledParticles options={options} init={customInit} />;
+  return (
+    <StyledParticles id="particles-stars" options={options} init={customInit} />
+  );
 }
 
 const StyledParticles = styled(Particles)`

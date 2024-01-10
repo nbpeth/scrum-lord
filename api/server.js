@@ -159,18 +159,22 @@ const handleDeleteCommunity = async (payload) => {
 
 const handleJoinCommunity = async (payload) => {
   const {
-    community: { id: communityId, username, userId, votingMember },
+    community: { id: communityId, username, userId, userColor, votingMember },
   } = payload;
 
-  const userColor = color.randomColor({
-    luminosity: "bright",
-  });
+  // const userColor = color.randomColor({
+  //   luminosity: "bright",
+  // });
 
   const updatedCommunity = await communityClient.joinCommunity({
     communityId,
     username,
     userId,
-    userColor,
+    userColor:
+      userColor ??
+      color.randomColor({
+        luminosity: "bright",
+      }),
     votingMember,
   });
 
@@ -258,6 +262,8 @@ const handleReveal = async (payload) => {
   const { id: communityId } = community;
 
   const result = await communityClient.reveal({ communityId });
+
+  // if all votes are the same for at least two people, let's party
   const isSynergized =
     result &&
     result.citizens &&
@@ -308,11 +314,18 @@ const handleEditPointScheme = async (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-// setInterval(() => {
-//   websocketServer.clients.forEach((client) => {
-//     client.send(JSON.stringify({ hey: "friend" }));
-//   });
-// }, 30000);
+setInterval(() => {
+  websocketServer.clients.forEach((client) => {
+    console.log(
+      "pinging client",
+      client.targetCommunityId,
+      "total connections:",
+      websocketServer.clients.size
+    );
+    client.ping();
+    // client.send(JSON.stringify({ hey: "friend" }));
+  });
+}, 30000);
 
 server.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);

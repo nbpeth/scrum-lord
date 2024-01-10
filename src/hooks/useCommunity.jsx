@@ -23,12 +23,12 @@ export default function useCommunity() {
     let baseUrl = `${wsProtocol}://${host}/socket`;
     const env = process.env.ENVIRONMENT;
 
-    // const socketUrl =
-    //   env === "prod"
-    //     ? `${baseUrl}?communityId=${communityId}`
-    //     : `ws://localhost:8080/socket?communityId=${communityId}`;
-    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
-    // setSocketUrl(socketUrl);
+    const socketUrl =
+      env === "prod"
+        ? `${baseUrl}?communityId=${communityId}`
+        : `ws://localhost:8080/socket?communityId=${communityId}`;
+    // setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    setSocketUrl(socketUrl);
   }, [communityId]);
 
   // get community data on mount
@@ -261,7 +261,13 @@ export default function useCommunity() {
     );
   };
 
-  const joinCommunity = ({ communityId, username, userId, votingMember }) => {
+  const joinCommunity = ({
+    communityId,
+    username,
+    userId,
+    userColor,
+    votingMember,
+  }) => {
     sendMessage(
       JSON.stringify({
         type: "join-community",
@@ -270,6 +276,7 @@ export default function useCommunity() {
             id: communityId,
             username,
             userId,
+            userColor,
             votingMember,
           },
         },
@@ -301,7 +308,7 @@ export default function useCommunity() {
           userColor,
           username,
           userId,
-          vote
+          vote,
         },
       })
     );

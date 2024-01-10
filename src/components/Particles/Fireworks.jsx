@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { useCallback } from "react";
 import { Particles } from "react-tsparticles";
 import { loadFireworksPreset } from "tsparticles-preset-fireworks";
+
 export function Fireworks(props) {
   const customInit = useCallback(async (engine) => {
     await loadFireworksPreset(engine);
@@ -9,7 +10,6 @@ export function Fireworks(props) {
 
   const options = {
     preset: "fireworks",
-   
   };
 
   return <StyledParticles options={options} init={customInit} />;
