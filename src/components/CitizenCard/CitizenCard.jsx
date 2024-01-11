@@ -16,17 +16,13 @@ const useStyles = makeStyles({
     animation: "$reveal-card 2s ease-in-out",
   },
   "@keyframes reveal-card": {
-    "0%": { transform: "rotateY(0deg)" },
-    "100%": { transform: "rotateY(180deg)" },
+    "0%": { transform: "perspective(200px) rotateY(0deg)" },
+    "100%": { transform: "perspective(200px) rotateY(180deg)" },
   },
   contentHide: {
     visibility: "hidden",
-    // animation: "$hide-content 25ms ease-in forwards",
   },
-  // "@keyframes hide-content": {
-  //   "0%": { opacity: 1 },
-  //   "100%": { opacity: 0 },
-  // },
+
   contentShow: {
     animation: "$show-content 500ms ease-in forwards",
   },
@@ -54,14 +50,24 @@ export const CitizenCard = ({
   const [cardAnimationInitiated, setCardAnimationInitiated] = useState(false);
 
   useEffect(() => {
+    // animation triggers, probably could use some refinement
+
+    // initial 'reveal' trigger from the server, we should display the card values
     if (revealed) {
+
+      // initiate the animation which hides the content of the card, so you can't see the values while it's "flipping"
       setCardAnimationInitiated(true);
+
       setTimeout(() => {
+        // initiate the flipping animation offset by the position of the card (flip them in order left to right)
         setCardAnimating(true);
+
         setTimeout(() => {
+          // clear animation state after two seconds
           setCardAnimating(false);
           setCardAnimationInitiated(false);
         }, 2000);
+
       }, position * 250);
     }
   }, [position, revealed]);
@@ -88,7 +94,9 @@ export const CitizenCard = ({
       }}
     >
       <span
-        className={cardAnimationInitiated ? classes.contentHide : classes.contentShow}
+        className={
+          cardAnimationInitiated ? classes.contentHide : classes.contentShow
+        }
       >
         <div>
           <CardContent
