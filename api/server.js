@@ -242,11 +242,12 @@ const handleSubmitVote = async (payload) => {
     communityId,
     userId,
     vote,
+
   });
 
   const reply = {
     type: "submit-vote-reply",
-    payload: { community: result, username, userId, userColor },
+    payload: { community: result, username, userId, userColor, doubleVote: result?.doubleVote, },
   };
 
   notifyClients({ message: reply, communityId });

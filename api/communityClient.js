@@ -1,4 +1,3 @@
-const { post } = require("./http-server");
 const postgresClient = require("./postgresClient");
 
 const communities = {};
@@ -101,11 +100,23 @@ const leaveCommunity = async ({ communityId, username, userId }) => {
 };
 
 const submitVote = async ({ communityId, userId, vote }) => {
-  const result = await postgresClient.submitVote({ communityId, userId, vote });
+  const communityState = await getCommunityBy(communityId);
+  const { revealed, citizens } = communityState;
+  const doubleVote =
+    revealed &&
+    Boolean(citizens.find((citizen) => citizen.userId === userId)?.vote);
+
+  const result = await postgresClient.submitVote({
+    communityId,
+    userId,
+    vote,
+    communityState,
+    doubleVote,
+  });
 
   const { data } = result[0];
 
-  return data;
+  return { ...data, doubleVote };
 };
 
 const reveal = async ({ communityId }) => {

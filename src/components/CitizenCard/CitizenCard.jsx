@@ -44,7 +44,7 @@ export const CitizenCard = ({
   const isMyCard = iAmCitizen && citizen.userId === iAmCitizen.userId;
   const theme = useTheme();
   const { revealed } = currentCommunity;
-  const { vote, hasVoted, username, userColor } = citizen;
+  const { vote, hasVoted, username, userColor, doubleVote } = citizen;
 
   const [cardAnimating, setCardAnimating] = useState(false);
   const [cardAnimationInitiated, setCardAnimationInitiated] = useState(false);
@@ -72,6 +72,17 @@ export const CitizenCard = ({
     }
   }, [position, revealed]);
 
+  const getBackgroundColor = () => {
+    console.log(hasVoted, doubleVote)
+    if(hasVoted && doubleVote) {
+      return alpha(theme.palette.warning.dark, 0.8)
+    } else if(hasVoted && !doubleVote) {
+      return alpha(theme.palette.primary.dark, 0.8)
+    }
+
+    return "none"
+  }
+
   return (
     <Card
       className={cardAnimating ? classes.cardReveal : null}
@@ -82,10 +93,7 @@ export const CitizenCard = ({
         border: isMyCard
           ? `1px solid ${theme.palette.primary.dark}`
           : `1px solid ${theme.palette.grey[800]}`,
-        backgroundColor: hasVoted
-          ? alpha(theme.palette.primary.dark, 0.8)
-          : "none",
-
+        backgroundColor: getBackgroundColor(),
         cursor: "pointer",
         transition: "background .5s ease-in-out",
         "&:hover": {

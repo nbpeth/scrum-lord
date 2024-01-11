@@ -84,13 +84,21 @@ export default function useCommunity() {
 
   // blanket holistic updates for now, duplicated but unsure where to go in the future
   const handleSubmittedVoteReply = (payload) => {
-    const { community, username, userColor, userId } = payload;
+    const { community, username, userColor, userId, doubleVote } = payload;
 
     setCommunity(community);
 
+    const message = () => {
+      if (doubleVote) {
+        return `"${username}" changed their vote after the reveal!`;
+      }
+
+      return `"${username}" has voted`;
+    };
+
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `"${username}" has voted`, userColor },
+      { communityId, text: message(), userColor },
     ]);
   };
 

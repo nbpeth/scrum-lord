@@ -150,7 +150,8 @@ const resetCommunity = async ({ communityId }) => {
   return result;
 };
 
-const submitVote = async ({ communityId, userId, vote }) => {
+const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
+
   const query = `
       WITH to_update AS (
         SELECT jsonb_array_elements(data::jsonb->'citizens') ->> 'userId' AS citizen_userId, generate_series(0, jsonb_array_length(data::jsonb->'citizens')) AS index
@@ -165,18 +166,22 @@ const submitVote = async ({ communityId, userId, vote }) => {
       UPDATE communities
       SET data = jsonb_set(
         jsonb_set(
-          data::jsonb, 
-          ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'hasVoted'], 
-          'true'::jsonb
+          jsonb_set(
+            data::jsonb, 
+            ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'hasVoted'], 
+            'true'::jsonb
+          ),
+          ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'vote'], 
+          $3::jsonb
         ),
-        ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'vote'], 
-        $3::jsonb
+        ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'doubleVote'], 
+        $4::jsonb
       ),
       last_modified = NOW()
       WHERE id = $1
       RETURNING *;
     `;
-  const values = [communityId, userId, JSON.stringify(vote)];
+  const values = [communityId, userId, JSON.stringify(vote), doubleVote];
 
   const result = await executeQuery({ query, values });
 
@@ -209,7 +214,7 @@ const editPointScheme = async ({ communityId, scheme }) => {
   const result = await executeQuery({ query, values });
 
   return result;
-}
+};
 
 module.exports = {
   addCommunity,
