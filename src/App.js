@@ -38,7 +38,6 @@ const useStyles = makeStyles({
 });
 
 // todo: re-voted after reveal - colors and event message
-// todo: vote transition
 // todo: filter out lurkers from synergy
 // todo: keep client from disconnecting
 // todo: allow user to select their own color

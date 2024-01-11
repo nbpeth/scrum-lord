@@ -8,27 +8,74 @@ import {
   alpha,
   useTheme,
 } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import { useEffect, useState } from "react";
+
+const useStyles = makeStyles({
+  cardReveal: {
+    animation: "$reveal-card 2s ease-in-out",
+  },
+  "@keyframes reveal-card": {
+    "0%": { transform: "rotateY(0deg)" },
+    "100%": { transform: "rotateY(180deg)" },
+  },
+  contentHide: {
+    visibility: "hidden",
+    // animation: "$hide-content 25ms ease-in forwards",
+  },
+  // "@keyframes hide-content": {
+  //   "0%": { opacity: 1 },
+  //   "100%": { opacity: 0 },
+  // },
+  contentShow: {
+    animation: "$show-content 500ms ease-in forwards",
+  },
+  "@keyframes show-content": {
+    "0%": { opacity: 0 },
+    "100%": { opacity: 1 },
+  },
+});
 
 export const CitizenCard = ({
   citizen,
   currentCommunity,
   handleDeleteUser,
   iAmCitizen,
+  position,
 }) => {
+  const classes = useStyles();
+
   const isMyCard = iAmCitizen && citizen.userId === iAmCitizen.userId;
   const theme = useTheme();
   const { revealed } = currentCommunity;
   const { vote, hasVoted, username, userColor } = citizen;
 
-  // drag and drop cards https://stackoverflow.com/questions/60043907/how-to-drag-drop-material-ui-cards
+  const [cardAnimating, setCardAnimating] = useState(false);
+  const [cardAnimationInitiated, setCardAnimationInitiated] = useState(false);
+
+  useEffect(() => {
+    if (revealed) {
+      setCardAnimationInitiated(true);
+      setTimeout(() => {
+        setCardAnimating(true);
+        setTimeout(() => {
+          setCardAnimating(false);
+          setCardAnimationInitiated(false);
+        }, 2000);
+      }, position * 250);
+    }
+  }, [position, revealed]);
+
   return (
     <Card
+      className={cardAnimating ? classes.cardReveal : null}
       key={citizen.id}
-      // variant="outlined"
       sx={{
         padding: "10px",
         minWidth: "100px",
-        border: isMyCard ? `1px solid ${theme.palette.primary.dark}` : `1px solid ${theme.palette.grey[800]}`,
+        border: isMyCard
+          ? `1px solid ${theme.palette.primary.dark}`
+          : `1px solid ${theme.palette.grey[800]}`,
         backgroundColor: hasVoted
           ? alpha(theme.palette.primary.dark, 0.8)
           : "none",
@@ -40,30 +87,44 @@ export const CitizenCard = ({
         },
       }}
     >
-      <CardContent
-        sx={{
-          padding: "5px",
-          textAlign: "center",
-        }}
+      <span
+        className={cardAnimationInitiated ? classes.contentHide : classes.contentShow}
       >
-        <Grid container spacing={2} justifyContent="center" alignItems="center">
-     
-          <Grid item>
-            <Typography variant="body2" color={userColor ?? theme.palette.grey[100]}>
-              {username}
-            </Typography>
-          </Grid>
-        </Grid>
+        <div>
+          <CardContent
+            sx={{
+              padding: "5px",
+              textAlign: "center",
+            }}
+          >
+            <Grid
+              container
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Grid item>
+                <Typography
+                  variant="body2"
+                  color={userColor ?? theme.palette.grey[100]}
+                >
+                  {username}
+                </Typography>
+              </Grid>
+            </Grid>
 
-        <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
-      </CardContent>
-      <CardActions>
-        <DeleteTwoToneIcon
-          fontSize="x-small"
-          sx={{ cursor: "pointer" }}
-          onClick={() => handleDeleteUser(citizen)}
-        />
-      </CardActions>
+            <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
+          </CardContent>
+
+          <CardActions>
+            <DeleteTwoToneIcon
+              fontSize="x-small"
+              sx={{ cursor: "pointer" }}
+              onClick={() => handleDeleteUser(citizen)}
+            />
+          </CardActions>
+        </div>
+      </span>
     </Card>
   );
 };
@@ -77,7 +138,7 @@ export const CitizenVote = ({ isMyCard, revealed, vote }) => {
   };
 
   return (
-    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+    <Typography variant="h3" sx={{ fontWeight: "bold" }}>
       {getValue()}
     </Typography>
   );

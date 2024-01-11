@@ -178,6 +178,10 @@ export const ColorSelector = ({ onColorChange }) => {
     colors[Math.floor(Math.random() * colors.length - 1)]
   );
 
+  React.useEffect(() => {
+    onColorChange(selectedColor);
+  }, []);
+
   const handleColorChange = (e) => {
     setSelectedColor(e.target.value);
     onColorChange(e.target.value);

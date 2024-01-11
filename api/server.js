@@ -162,10 +162,6 @@ const handleJoinCommunity = async (payload) => {
     community: { id: communityId, username, userId, userColor, votingMember },
   } = payload;
 
-  // const userColor = color.randomColor({
-  //   luminosity: "bright",
-  // });
-
   const updatedCommunity = await communityClient.joinCommunity({
     communityId,
     username,
@@ -269,6 +265,8 @@ const handleReveal = async (payload) => {
     result.citizens &&
     result.citizens.length > 1 &&
     result.citizens
+      // don't count votes for lurkers
+      .filter((citizen) => citizen.votingMember)
       .map((citizen) => citizen.vote)
       .every((vote) => vote === result.citizens[0].vote);
 

@@ -22,10 +22,11 @@ export const CommunityCitizens = ({
         {citizens.length ? (
           citizens
             .filter((c) => c.votingMember)
-            .map((citizen) => {
+            .map((citizen, i) => {
               return (
                 <Grid item xs={6} md={2} lg={2} key={citizen.userId}>
                   <CitizenCard
+                    position={i}
                     currentCommunity={currentCommunity}
                     handleDeleteUser={handleDeleteUser}
                     iAmCitizen={iAmCitizen}
