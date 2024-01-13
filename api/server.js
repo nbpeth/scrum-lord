@@ -30,7 +30,6 @@ const websocketServer = new WebSocketServer({
 server.on("request", app);
 
 websocketServer.on("listening", (x) => {});
-
 websocketServer.on("close", (code, reason) => {
   console.log(
     `WebSocket connection closed with code ${code} and reason ${reason}`
@@ -50,7 +49,7 @@ const heartbeat = (ws) => {
 };
 
 // the boatman ferries wayward connections to the other side
-const boatman = (ws) => setTimeout(() => heartbeat(ws), 8000);
+const boatman = (ws) => setTimeout(() => heartbeat(ws), 40000);
 
 websocketServer.on("connection", (ws, request) => {
   console.log("new client connected");
@@ -65,7 +64,7 @@ websocketServer.on("connection", (ws, request) => {
   const pong = () => {
     // live another day
     ws.isAlive = true;
-    console.log("pong  ", ws.id);
+    // console.log("pong  ", ws.id);
     clearTimeout(ws.pingTimeout);
 
     ws.pingTimeout = boatman(ws);
@@ -362,16 +361,16 @@ const handleEditPointScheme = async (payload) => {
 
 setInterval(() => {
   websocketServer.clients.forEach((client) => {
-    console.log(
-      "pinging client",
-      client.targetCommunityId,
-      "total connections:",
-      websocketServer.clients.size
-    );
-    console.log("alive?", client.id, client.isAlive);
+    // console.log(
+    //   "pinging client",
+    //   client.targetCommunityId,
+    //   "total connections:",
+    //   websocketServer.clients.size
+    // );
+    // console.log("alive?", client.id, client.isAlive);
     client.ping();
   });
-}, 5000);
+}, 30000);
 
 server.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);
