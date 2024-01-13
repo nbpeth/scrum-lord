@@ -24,7 +24,7 @@ const useStyles = makeStyles({
     height: "300px",
     width: "300px",
     zIndex: -2,
-    animation: "$move-image 10s linear infinite",
+    animation: "$move-image 60s linear infinite",
     // '&:hover': {
    
       
