@@ -14,11 +14,11 @@ export default function useDashboard() {
     let baseUrl = `${wsProtocol}://${host}/socket`;
     const env = process.env.ENVIRONMENT;
 
-    // const socketUrl =
-    //   env === "prod" ? `${baseUrl}` : `ws://localhost:8080/socket`;
+    const socketUrl =
+      env === "prod" ? `${baseUrl}` : `ws://localhost:8080/socket`;
 
-    setSocketUrl(baseUrl);
-    // setSocketUrl(socketUrl);
+    // setSocketUrl(baseUrl);
+    setSocketUrl(socketUrl);
   }, []);
 
   useEffect(() => {

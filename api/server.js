@@ -32,6 +32,9 @@ websocketServer.on("connection", (ws, request) => {
   setTargetSessionOn(ws, request);
 
   ws.on("error", console.error);
+  ws.on("pong", (x) => {
+    console.log("pong", x);
+  })
 
   ws.on("message", (message) => {
     const messageData = message.toString();
