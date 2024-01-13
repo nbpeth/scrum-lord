@@ -3,12 +3,14 @@ const server = require("http").createServer();
 const app = require("./http-server");
 const url = require("url");
 
+const uuid = require("uuid");
+
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
 
 const setTargetSessionOn = (ws, request) => {
   const queryParams = url.parse(request.url, { parseQueryString: true }).query;
-  ws["targetCommunityId"] = queryParams.communityId;
+  ws.targetCommunityId = queryParams.communityId;
 };
 
 app.use((req, res, next) => {
@@ -27,18 +29,51 @@ const websocketServer = new WebSocketServer({
 
 server.on("request", app);
 
-websocketServer.on("connection", (ws, request) => {
-  console.log("## new client connected");
-  setTargetSessionOn(ws, request);
+websocketServer.on("listening", (x) => {});
 
-  ws.on("error", console.error);
-  ws.on("pong", (x) => {
-    console.log("pong", x);
-  })
+websocketServer.on("close", (code, reason) => {
+  console.log(
+    `WebSocket connection closed with code ${code} and reason ${reason}`
+  );
+});
+
+const close = (ws) => (reason) => {
+  // looks like they might have left on their own
+  ws.isAlive = false;
+  console.log("client disconnected", ws.id, websocketServer.clients.size);
+};
+
+const heartbeat = (ws) => {
+  if (ws.isAlive) {
+    ws.terminate();
+  }
+};
+
+// the boatman ferries wayward connections to the other side
+const boatman = (ws) => setTimeout(() => heartbeat(ws), 8000);
+
+websocketServer.on("connection", (ws, request) => {
+  console.log("new client connected");
+  setTargetSessionOn(ws, request);
+  // set a unique id on the connection for science
+  ws.id = uuid.v4();
+
+  // ping-pong: handle terminiation of dead connections
+  ws.isAlive = true;
+  ws.pingTimeout = boatman(ws);
+
+  const pong = () => {
+    // live another day
+    ws.isAlive = true;
+    console.log("pong  ", ws.id);
+    clearTimeout(ws.pingTimeout);
+
+    ws.pingTimeout = boatman(ws);
+  };
 
   ws.on("message", (message) => {
     const messageData = message.toString();
-    console.log("messageData", messageData);
+    // console.log("messageData", messageData);
 
     const { type, payload } = JSON.parse(messageData);
 
@@ -93,6 +128,10 @@ websocketServer.on("connection", (ws, request) => {
     }
   });
 
+  ws.on("error", console.error);
+  ws.on("close", close(ws));
+  ws.on("pong", pong);
+
   ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
 });
 
@@ -104,12 +143,12 @@ const notifyClients = ({ message, communityId }) => {
     if (isTargeted) {
       const clientIsTargeted = communityId == client.targetCommunityId;
       if (clientIsTargeted) {
-        console.log("replying to client", client.targetCommunityId, message);
+        // console.log("replying to client", client.targetCommunityId, message);
         client.send(JSON.stringify(message));
       }
     } else {
       if (!client.targetCommunityId) {
-        console.log("replying to all clients", message);
+        // console.log("replying to all clients", message);
         client.send(JSON.stringify(message));
       }
     }
@@ -245,12 +284,17 @@ const handleSubmitVote = async (payload) => {
     communityId,
     userId,
     vote,
-
   });
 
   const reply = {
     type: "submit-vote-reply",
-    payload: { community: result, username, userId, userColor, doubleVote: result?.doubleVote, },
+    payload: {
+      community: result,
+      username,
+      userId,
+      userColor,
+      doubleVote: result?.doubleVote,
+    },
   };
 
   notifyClients({ message: reply, communityId });
@@ -324,10 +368,10 @@ setInterval(() => {
       "total connections:",
       websocketServer.clients.size
     );
+    console.log("alive?", client.id, client.isAlive);
     client.ping();
-    // client.send(JSON.stringify({ hey: "friend" }));
   });
-}, 30000);
+}, 5000);
 
 server.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);
