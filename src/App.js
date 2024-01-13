@@ -40,9 +40,6 @@ const useStyles = makeStyles({
 
 // todo: logged in voting member toggle
 // todo: fix moon / fireworks css explosion
-// todo: keep client from disconnecting
-// todo: full postgres URL
-// todo: dev/prod socket URL
 // todo: same vote synergy animation / sound
 // todo: add sound to reveal
 

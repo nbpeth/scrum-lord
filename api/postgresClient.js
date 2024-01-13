@@ -1,12 +1,10 @@
 const { Pool } = require("pg");
 const uuid = require("uuid");
 
+const DB_CONNECTION_STRING = process.env.DATABASE_URL;
+
 const dbConnectionProperties = {
-  host: process.env.DB_HOST ?? "localhost",
-  port: process.env.DB_PORT ?? 5432,
-  database: process.env.DB_DATABASE ?? "postgres",
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  connectionString: DB_CONNECTION_STRING,
   ...(process.env.ENV === "production"
     ? { ssl: { rejectUnauthorized: false } }
     : { ssl: false }),
@@ -151,7 +149,6 @@ const resetCommunity = async ({ communityId }) => {
 };
 
 const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
-
   const query = `
       WITH to_update AS (
         SELECT jsonb_array_elements(data::jsonb->'citizens') ->> 'userId' AS citizen_userId, generate_series(0, jsonb_array_length(data::jsonb->'citizens')) AS index
