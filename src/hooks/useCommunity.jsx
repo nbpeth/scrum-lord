@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
+import { getSocketBaseUrl } from "../util/config";
 
 export default function useCommunity() {
   const params = useParams();
@@ -18,17 +19,9 @@ export default function useCommunity() {
 
   // configure the socket url to target the community id
   useEffect(() => {
-    const host = document.location.host;
-    const wsProtocol = document.location.protocol === "https:" ? "wss" : "ws";
-    let baseUrl = `${wsProtocol}://${host}/socket`;
-    const env = process.env.ENVIRONMENT;
+    const baseUrl = `${getSocketBaseUrl()}/socket`;
 
-    // const socketUrl =
-    //   env === "prod"
-    //     ? `${baseUrl}?communityId=${communityId}`
-    //     : `ws://localhost:8080/socket?communityId=${communityId}`;
     setSocketUrl(`${baseUrl}?communityId=${communityId}`);
-    // setSocketUrl(socketUrl);
   }, [communityId]);
 
   // get community data on mount

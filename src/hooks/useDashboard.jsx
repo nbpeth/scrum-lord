@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
+import { getSocketBaseUrl } from "../util/config";
 
 // probably move to separate hooks for dash and session
 export default function useDashboard() {
@@ -9,16 +10,9 @@ export default function useDashboard() {
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
 
   useEffect(() => {
-    const host = document.location.host;
-    const wsProtocol = document.location.protocol === "https:" ? "wss" : "ws";
-    let baseUrl = `${wsProtocol}://${host}/socket`;
-    const env = process.env.ENVIRONMENT;
+    const baseUrl = `${getSocketBaseUrl()}/socket`;
 
-    // const socketUrl =
-    //   env === "prod" ? `${baseUrl}` : `ws://localhost:8080/socket`;
-
-    setSocketUrl(baseUrl);
-    // setSocketUrl(socketUrl);
+    setSocketUrl(`${baseUrl}`);
   }, []);
 
   useEffect(() => {
