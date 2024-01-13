@@ -19,33 +19,48 @@ const darkTheme = createTheme({
 });
 
 const useStyles = makeStyles({
-  animatedBackground: {
-    // position: "fixed",
-    zIndex: -100,
-    background:
-      "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png) no-repeat",
-    backgroundSize: "200px 200px",
-    animation: "$move-background-angle 60s linear infinite",
+  image: {
+    position: "absolute",
+    height: "300px",
+    width: "300px",
+    zIndex: -2,
+    animation: "$move-image 10s linear infinite",
+    // '&:hover': {
+   
+      
+      // transform: 'scale(2)', // Example: scale the image up on hover
+    // },
   },
-  "@keyframes move-background-angle": {
+
+  "@keyframes move-image": {
     "0%": {
-      backgroundPosition: "0 0",
+      transform: "rotate(0deg)",
+      left: "30vw",
+      bottom: "-35vh",
+    },
+    "25%": {
+      transform: "rotate(180deg)",
+    },
+    "50%": {
+      transform: "rotate(360deg)",
+    },
+    "75%": {
+      transform: "rotate(540deg)",
     },
     "100%": {
-      backgroundPosition: "100% 100%",
+      transform: "rotate(720deg)",
+      left: "85vw",
+      bottom: "115vh",
     },
   },
 });
 
-
 // todo: logged in voting member toggle
-// todo: fix moon / fireworks css explosion
-// todo: same vote synergy animation / sound
 // todo: add sound to reveal
 
 const App = () => {
   return (
-    <div className="App">
+    <div className="App" style={{ height: "calc(100vh)" }}>
       <AppContent />
     </div>
   );
@@ -66,8 +81,6 @@ const AppContent = () => {
     setIsCelebrating(value);
   };
 
-  useMemo(() => {}, [isCelebrating]);
-
   const router = createBrowserRouter([
     {
       path: "/",
@@ -81,8 +94,16 @@ const AppContent = () => {
     {
       path: "/communities/:communityId",
       element: (
-        // <div>
-        <div className={communityBackgroundIsAnimated && classes.animatedBackground}>
+        <div>
+          {communityBackgroundIsAnimated && (
+            <div>
+              <img
+                id="moon-image"
+                className={classes.image}
+                src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png"
+              />
+            </div>
+          )}
           <Community
             handleCelebrationChange={handleCelebrationChange}
             handleCommunityBackgroundAnimationChange={
@@ -90,19 +111,20 @@ const AppContent = () => {
             }
           />
           {communityBackgroundIsAnimated && <Stars />}
-          {false && <Fireworks />}
+          {isCelebrating && <Fireworks />}
         </div>
       ),
     },
   ]);
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <div style={{ height: "100%" }}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </div>
   );
 };
-
 
 export default App;

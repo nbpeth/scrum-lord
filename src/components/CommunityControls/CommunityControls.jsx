@@ -19,13 +19,12 @@ export const CommunityControls = ({
   const handleVoteChange = (event) => {
     setSelectedVote(event.target.value);
   };
-  
+
   const onVoteSubmit = () => {
     submitVote({
       communityId,
       ...iAmCitizen,
       vote: selectedVote,
-      
     });
   };
 

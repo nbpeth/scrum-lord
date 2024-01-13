@@ -46,15 +46,11 @@ export function Stars(props) {
       color: {
         value: "#BBFFFF",
       },
+      number: { value: 50, density: { enable: true, value_area: 100 } },
       size: {
-        value: 5, // Increase this value to increase the speed
+        value: 3,
       },
-      // life: {
-      //   count: 0,
-      //   duration: {
-      //     value: 0,
-      //   },
-      // },
+ 
     },
   };
 
@@ -67,5 +63,5 @@ const StyledParticles = styled(Particles)`
   position: fixed;
   width: 100%;
   height: 100%;
-  z-index: -1;
+  z-index: -3;
 `;

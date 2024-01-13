@@ -2,13 +2,14 @@ import { List, ListItem, Typography, useTheme } from "@mui/material";
 
 export const MessageBoard = ({ messageHistory, communityId }) => {
   const messages = messageHistory
+    // all messages are passed in, but we only want to show the ones for the current community
     ?.filter((x) => x.communityId === communityId)
     .reverse()
     .slice(0, 100);
 
   const theme = useTheme();
   return (
-    <div>
+    <div id="community-message-board">
       <List
         sx={{
           padding: "10px",

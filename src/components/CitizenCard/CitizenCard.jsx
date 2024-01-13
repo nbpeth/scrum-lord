@@ -73,7 +73,6 @@ export const CitizenCard = ({
   }, [position, revealed]);
 
   const getBackgroundColor = () => {
-    console.log(hasVoted, doubleVote)
     if(hasVoted && doubleVote) {
       return alpha(theme.palette.warning.dark, 0.8)
     } else if(hasVoted && !doubleVote) {

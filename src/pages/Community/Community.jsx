@@ -102,7 +102,7 @@ export const Community = ({
       handleCelebrationChange(true);
       setTimeout(() => {
         // const audio = new Audio("path_to_your_sound_file.mp3");
-        handleCelebrationChange(true);
+        handleCelebrationChange(false);
       }, 5000);
     }
   }, [currentCommunity]);
@@ -342,11 +342,6 @@ export const Community = ({
           xs={fullsizeScreen ? 3 : 12}
           xl={fullsizeScreen ? 2 : 12}
         >
-          {/* <Grid item>
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <img src={logoUrl} height="250" width="250" />
-            </Link>
-          </Grid> */}
           <Grid item xs={12}>
             <CommunityControls
               controlsList={controlsList}
@@ -365,7 +360,7 @@ export const Community = ({
             xs={12}
             sx={{
               backgroundColor: controlsList?.partyModeEngaged
-                ? "#000"
+                ? "none"
                 : theme.palette.background.paper,
             }}
           >
