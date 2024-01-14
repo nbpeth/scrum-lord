@@ -120,7 +120,8 @@ export const CitizenCard = ({
             >
               <Grid item>
                 <Typography
-                  variant="body2"
+                  variant="body"
+                  fontWeight="bold"
                   color={userColor ?? theme.palette.grey[100]}
                 >
                   {username}

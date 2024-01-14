@@ -1,4 +1,5 @@
 const postgresClient = require("./postgresClient");
+const datefns = require("date-fns");
 
 const communities = {};
 
@@ -14,14 +15,19 @@ const getCommunitiesAsArray = async () => {
     return [];
   }
 
-  return result.map(({ id, data }) => {
-    return {
-      id,
-      name: data.name,
-      description: data.description,
-      citizens: data.citizens.length,
-    };
-  });
+  return result
+    .map(({ id, data }) => {
+      if (!data) {
+        return null;
+      }
+      return {
+        id,
+        name: data.name,
+        description: data.description,
+        citizens: data.citizens.length,
+      };
+    })
+    .filter((x) => !!x);
 };
 
 const getCommunityBy = async (id) => {
@@ -86,6 +92,36 @@ const editPointScheme = async ({ communityId, scheme }) => {
 
   return data;
 };
+
+const startTimer = async ({ communityId, timerLength, enabled }) => {
+  const timerEnd = datefns.addSeconds(new Date(), timerLength);
+  const result = await postgresClient.startTimer({
+    communityId,
+    timerLength,
+    enabled,
+    timerEnd,
+  });
+
+  const { data } = result[0];
+
+  return data;
+};
+
+const stopTimer = async ({ communityId }) => {
+  const result = await postgresClient.stopTimer({ communityId });
+
+  const { data } = result[0];
+
+  return data;
+}
+
+const cancelTimer = async ({ communityId }) => {
+  const result = await postgresClient.cancelTimer({ communityId });
+
+  const { data } = result[0];
+
+  return data;
+}
 
 const leaveCommunity = async ({ communityId, username, userId }) => {
   const result = await postgresClient.leaveCommunity({
@@ -159,6 +195,7 @@ const deleteCommunity = async ({ community, userId, username }) => {
 
 module.exports = {
   addCommunity,
+  cancelTimer,
   communitiesSummary,
   deleteCommunity,
   editPointScheme,
@@ -169,5 +206,7 @@ module.exports = {
   leaveCommunity,
   reveal,
   reset,
+  startTimer,
+  stopTimer,
   submitVote,
 };

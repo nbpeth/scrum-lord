@@ -163,6 +163,48 @@ export default function useCommunity() {
     ]);
   };
 
+  const handleStartTimerReply = (payload) => {
+    const { community, username, userColor, timerLength } = payload;
+    setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      {
+        communityId,
+        text: `⏰ "${username}" started the voting timer! ${timerLength} seconds ⏰`,
+        userColor,
+      },
+    ]);
+  };
+
+  const handleTimerFinishedReply = (payload) => {
+    const { community, username, userColor, timerLength } = payload;
+    setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      {
+        communityId,
+        text: "⏰ Time's up! ⏰",
+        userColor,
+      },
+    ]);
+  };
+
+  const handleCancelTimerReply = (payload) => {
+    const { community, username, userColor, timerLength } = payload;
+    setCommunity(community);
+
+    setMessageHistory([
+      ...messageHistory,
+      {
+        communityId,
+        text: `⏰ "${username}" cancelled the timer ⏰`,
+        userColor,
+      },
+    ]);
+  };
+
   useEffect(() => {
     try {
       const messageData = JSON.parse(lastMessage?.data);
@@ -213,6 +255,18 @@ export default function useCommunity() {
 
           break;
 
+        case "start-timer-reply":
+          handleStartTimerReply(payload);
+          break;
+
+        case "timer-finished-reply":
+          handleTimerFinishedReply(payload);
+          break;
+
+        case "cancel-timer-reply":
+          handleCancelTimerReply(payload);
+          break;
+
         default:
           console.log("unknown message type", type);
       }
@@ -252,6 +306,35 @@ export default function useCommunity() {
     sendMessage(
       JSON.stringify({
         type: "reset",
+        payload: {
+          community: { id: communityId },
+          username,
+          userId,
+          userColor,
+        },
+      })
+    );
+  };
+
+  const startTimer = ({ timerLength, username, userId, userColor }) => {
+    sendMessage(
+      JSON.stringify({
+        type: "start-timer",
+        payload: {
+          community: { id: communityId },
+          timerLength: timerLength ?? 5,
+          username,
+          userId,
+          userColor,
+        },
+      })
+    );
+  };
+
+  const cancelTimer = ({ username, userId, userColor }) => {
+    sendMessage(
+      JSON.stringify({
+        type: "cancel-timer",
         payload: {
           community: { id: communityId },
           username,
@@ -365,6 +448,7 @@ export default function useCommunity() {
 
   return {
     alertMessage,
+    cancelTimer,
     clearAlertMessage,
     community,
     communityReaction,
@@ -376,6 +460,7 @@ export default function useCommunity() {
     leaveCommunity,
     readyState,
     roomEvents,
+    startTimer,
     submitVote,
     messageHistory,
   };

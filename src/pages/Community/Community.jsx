@@ -44,6 +44,7 @@ export const Community = ({
 
   const {
     alertMessage,
+    cancelTimer,
     clearAlertMessage,
     joinCommunity,
     editPointScheme,
@@ -57,6 +58,7 @@ export const Community = ({
     readyState,
     communityReaction,
     messageHistory,
+    startTimer,
   } = useCommunity();
 
   const theme = useTheme();
@@ -153,6 +155,23 @@ export const Community = ({
     userStateObj[communityId] = userId;
 
     localStorage.setItem("userstate", JSON.stringify(userStateObj));
+  };
+
+  const handleTimerClicked = ({communityId, timerValue}) => {
+    if (currentCommunity?.timer?.running) {
+      cancelTimer({
+        username: iAmCitizen.username,
+        userId: iAmCitizen.userId,
+        userColor: iAmCitizen.userColor,
+      });
+    } else {
+      startTimer({
+        timerLength: timerValue,
+        username: iAmCitizen.username,
+        userId: iAmCitizen.userId,
+        userColor: iAmCitizen.userColor,
+      });
+    }
   };
 
   const handleDeleteUser = (citizen) => {
@@ -344,6 +363,7 @@ export const Community = ({
         >
           <Grid item xs={12}>
             <CommunityControls
+              handleTimerClicked={handleTimerClicked}
               controlsList={controlsList}
               setControlsList={setControlsList}
               community={currentCommunity}

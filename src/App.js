@@ -19,17 +19,18 @@ const darkTheme = createTheme({
 });
 
 const useStyles = makeStyles({
+  imageContainer: {
+    
+  },
   image: {
     position: "absolute",
     height: "300px",
     width: "300px",
     zIndex: -2,
     animation: "$move-image 60s linear infinite",
-    // '&:hover': {
-   
-      
-      // transform: 'scale(2)', // Example: scale the image up on hover
-    // },
+    '&:hover': {
+      transform: 'scale(2)', // Example: scale the image up on hover
+    },
   },
 
   "@keyframes move-image": {

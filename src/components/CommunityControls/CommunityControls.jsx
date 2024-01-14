@@ -1,12 +1,23 @@
-import { Button, Divider, Grid, List, MenuItem, Select } from "@mui/material";
+import {
+  Button,
+  Divider,
+  Grid,
+  List,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 
 import * as React from "react";
 import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
+import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 
 export const CommunityControls = ({
   handleReveal,
   handleReset,
+  handleTimerClicked,
   iAmCitizen,
   communityId,
   submitVote,
@@ -165,8 +176,93 @@ export const CommunityControls = ({
               </Button>
             )}
           </Grid>
+
+          <Grid item xs={12}>
+            <TimerControl {...{ community, handleTimerClicked }} />
+          </Grid>
+          <Grid item xs={12}>
+            <List>
+              <Divider />
+            </List>
+          </Grid>
         </Grid>
       )}
     </>
+  );
+};
+
+export const TimerControl = ({ community, handleTimerClicked }) => {
+  const [timerValue, setTimerValue] = useState(60);
+  const [error, setError] = useState(undefined);
+
+  const onTimerValueChanged = (event) => {
+    event.preventDefault();
+    const cleanseValue = event.target.value.replace(/\D/g, "");
+
+    if (cleanseValue > 600) {
+      // setTimerValue(0);
+      setError("Max timer value is 600 seconds");
+
+      // return;
+    } else if (error) {
+      setError(undefined);
+    }
+
+    setTimerValue(cleanseValue);
+  };
+
+  const onTimerClicked = () => {
+    handleTimerClicked({
+      timerValue: timerValue || 60,
+      communityId: community.id,
+    });
+  };
+
+  return (
+    <Grid
+      container
+      xs={12}
+      justifyContent="space-between"
+      alignItems="center"
+      spacing={2}
+    >
+      <Grid item xs={8}>
+        <Button
+          disabled={timerValue > 600}
+          fullWidth
+          variant="contained"
+          color="secondary"
+          onClick={onTimerClicked}
+        >
+          {community?.timer?.running ? "Cancel Timer " : "Start Timer"}
+        </Button>
+      </Grid>
+      <Grid item xs={3}>
+        <TextField
+          type="number"
+          error={error}
+          inputProps={{ style: { textAlign: "center" } }}
+          disabled={community?.timer?.running}
+          variant="standard"
+          value={timerValue}
+          onChange={onTimerValueChanged}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              onTimerClicked();
+            }
+          }}
+        />
+      </Grid>
+      <Grid item xs={1}>
+        <TimerDisplay community={community} />
+      </Grid>
+      {error && (
+        <Grid item xs={12}>
+          <Typography variant="caption" color="error">
+            {error}
+          </Typography>
+        </Grid>
+      )}
+    </Grid>
   );
 };

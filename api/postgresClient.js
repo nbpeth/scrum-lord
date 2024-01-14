@@ -178,7 +178,12 @@ const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
       WHERE id = $1
       RETURNING *;
     `;
-  const values = [communityId, userId, JSON.stringify(vote), doubleVote];
+  const values = [
+    communityId,
+    userId,
+    JSON.stringify(vote),
+    doubleVote ?? false,
+  ];
 
   const result = await executeQuery({ query, values });
 
@@ -213,8 +218,60 @@ const editPointScheme = async ({ communityId, scheme }) => {
   return result;
 };
 
+const startTimer = async ({ communityId, timerLength, timerEnd }) => {
+  const query = `
+        UPDATE communities
+        SET data = jsonb_set(data::jsonb, '{timer}', $1::jsonb)
+        WHERE id = $2
+        RETURNING *;
+    `;
+  const values = [
+    JSON.stringify({ running: true, value: timerLength, timerEnd }),
+    communityId,
+  ];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+};
+
+const stopTimer = async ({ communityId, timerLength }) => {
+  const query = `
+        UPDATE communities
+        SET data = jsonb_set(jsonb_set(data::jsonb, '{timer}', $1::jsonb), '{revealed}', 'true')
+        WHERE id = $2
+        RETURNING *;
+    `;
+  const values = [
+    JSON.stringify({ running: false, value: undefined }),
+    communityId,
+  ];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+};
+
+const cancelTimer = async ({ communityId, timerLength }) => {
+  const query = `
+        UPDATE communities
+        SET data = jsonb_set(data::jsonb, '{timer}', $1::jsonb)
+        WHERE id = $2
+        RETURNING *;
+    `;
+  const values = [
+    JSON.stringify({ running: false, value: undefined }),
+    communityId,
+  ];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+};
+
 module.exports = {
   addCommunity,
+  cancelTimer,
   deleteCommunity,
   editPointScheme,
   getCommunities,
@@ -223,5 +280,7 @@ module.exports = {
   leaveCommunity,
   resetCommunity,
   revealCommunity,
+  startTimer,
+  stopTimer,
   submitVote,
 };

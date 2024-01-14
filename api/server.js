@@ -2,11 +2,15 @@ const WebSocketServer = require("ws").Server;
 const server = require("http").createServer();
 const app = require("./http-server");
 const url = require("url");
-
 const uuid = require("uuid");
-
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
+
+const state = {
+  timers: {
+    // communityId: { timer, timeout, timerEndDate }
+  },
+};
 
 const setTargetSessionOn = (ws, request) => {
   const queryParams = url.parse(request.url, { parseQueryString: true }).query;
@@ -119,6 +123,14 @@ websocketServer.on("connection", (ws, request) => {
 
       case "edit-point-scheme":
         handleEditPointScheme(payload);
+        break;
+
+      case "start-timer":
+        handleStartTimer(payload, ws);
+        break;
+
+      case "cancel-timer":
+        handleCancelTimer(payload, ws);
         break;
 
       default:
@@ -315,7 +327,13 @@ const handleReveal = async (payload) => {
       // don't count votes for lurkers
       .filter((citizen) => citizen.votingMember)
       .map((citizen) => citizen.vote)
-      .every((vote) => vote === result.citizens[0].vote);
+      .every(
+        (vote) =>
+          // all votes are the same and all votes were cast
+          vote === result.citizens[0].vote &&
+          vote !== null &&
+          vote !== undefined
+      );
 
   const reply = {
     type: "reveal-reply",
@@ -359,15 +377,87 @@ const handleEditPointScheme = async (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
+// set the timer to running for the community, notify everyone it has started then wait the duration of the timer to notify them it's over and set the timer to not running
+// timer ending naturally causes a reveal
+// timer being cancelled does not reveal and should have its own message
+const handleStartTimer = async (payload, ws) => {
+  const { community, username, userId, userColor, timerLength } = payload;
+  const { id: communityId } = community;
+  const communityState = await communityClient.getCommunityBy(communityId);
+  const { timerRunning } = communityState;
+
+  if (timerRunning) {
+    ws.send(
+      JSON.stringify({
+        type: "start-timer-reply",
+        payload: {
+          community: communityState,
+          username,
+          userColor,
+          timerLength,
+          error: "Timer already running",
+        },
+      })
+    );
+    return;
+  }
+
+  const result = await communityClient.startTimer({
+    communityId,
+    timerLength,
+  });
+
+  const reply = {
+    type: "start-timer-reply",
+    payload: { community: result, username, userColor, timerLength },
+  };
+
+  notifyClients({ message: reply, communityId });
+
+  // we've started the timer, wait the timer length and then send a message to all clients - hopefully it all lines up
+  const timerFunction = async () => {
+    const result = await communityClient.stopTimer({ communityId });
+
+    const timerFinishedReply = {
+      type: "timer-finished-reply",
+      payload: { community: result, username, userColor, timerLength },
+    };
+
+    notifyClients({ message: timerFinishedReply, communityId });
+    // adding a little time for latency
+  };
+
+  // assign it so we can cancel it
+  const timer = setTimeout(timerFunction, timerLength * 1000 + 150);
+  state.timers[communityId] = { timer };
+};
+
+const handleCancelTimer = async (payload, ws) => {
+  const { community, username, userId, userColor, timerLength } = payload;
+  const { id: communityId } = community;
+  const timer = state.timers[communityId]?.timer;
+  if (!timer) {
+    console.warn("no timer to cancel", JSON.stringify(payload), ws.id);
+    return;
+  }
+
+  clearTimeout(timer);
+
+  const result = await communityClient.cancelTimer({
+    communityId: payload.community.id,
+  });
+
+  const timerFinishedReply = {
+    type: "cancel-timer-reply",
+    payload: { community: result, username, userColor },
+  };
+
+  notifyClients({ message: timerFinishedReply, communityId });
+};
+
+// ping-pong: send a ping to all clients every 30 seconds
 setInterval(() => {
   websocketServer.clients.forEach((client) => {
-    // console.log(
-    //   "pinging client",
-    //   client.targetCommunityId,
-    //   "total connections:",
-    //   websocketServer.clients.size
-    // );
-    // console.log("alive?", client.id, client.isAlive);
     client.ping();
   });
 }, 30000);
