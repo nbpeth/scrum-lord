@@ -9,10 +9,19 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-
+// import { makeStyles } from "@mui/styles";
 import * as React from "react";
 import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
+
+// const useStyles = makeStyles((theme) => ({
+//   reactionButton: {
+//     "&:hover": {},
+//     backgroundColor: theme.palette.primary.main,
+
+//   }
+// })
+// )
 
 export const CommunityControls = ({
   handleReveal,
@@ -23,9 +32,11 @@ export const CommunityControls = ({
   submitVote,
   community,
   communityReaction,
+  settings,
 }) => {
   const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
+  // const classes = useStyles();
 
   const handleVoteChange = (event) => {
     setSelectedVote(event.target.value);
@@ -67,56 +78,57 @@ export const CommunityControls = ({
           spacing={3}
           sx={{ padding: "15px" }}
         >
-          <Grid
-            container
-            item
-            spacing={1}
-            xs={6}
-            justifyContent="space-between"
-          >
-            <Grid item>
-              <Button
-                variant="outlined"
-                onClick={() => onReaction({ event: "lightning" })}
-              >
-                ⚡
-              </Button>
+          {settings?.reactionsVisible && (
+            <Grid
+              container
+              item
+              spacing={1}
+              xs={6}
+              justifyContent="space-between"
+            >
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "lightning" })}
+                >
+                  ⚡
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "party" })}
+                >
+                  🎉
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "thinking" })}
+                >
+                  🤔
+                </Button>
+                {/* nonplussed */}
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "upvote" })}
+                >
+                  👍
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "downvote" })}
+                >
+                  👎
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                onClick={() => onReaction({ event: "party" })}
-              >
-                🎉
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                onClick={() => onReaction({ event: "thinking" })}
-              >
-                🤔
-              </Button>
-              {/* nonplussed */}
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                onClick={() => onReaction({ event: "upvote" })}
-              >
-                👍
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                onClick={() => onReaction({ event: "downvote" })}
-              >
-                👎
-              </Button>
-            </Grid>
-          </Grid>
-
+          )}
           <Grid item xs={12}>
             <List>
               <Divider />
@@ -200,10 +212,7 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
     const cleanseValue = event.target.value.replace(/\D/g, "");
 
     if (cleanseValue > 600) {
-      // setTimerValue(0);
       setError("Max timer value is 600 seconds");
-
-      // return;
     } else if (error) {
       setError(undefined);
     }

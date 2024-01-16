@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
 
-import { Home } from "@mui/icons-material";
+import { Celebration, Home, ModeComment } from "@mui/icons-material";
 import * as React from "react";
 import { CommunityCitizens } from "../../components/CommunityCitizens/CommunityCitizens";
 import { CommunityControls } from "../../components/CommunityControls/CommunityControls";
@@ -32,6 +32,8 @@ import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/
 import { EditPointSchemeModal } from "../../components/EditPointSchemeModal/EditPointSchemeModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
+// import { PointChart } from "../../components/PointChart/PointChart";
+import { useSettings } from "../../hooks/useSettings";
 
 export const Community = ({
   handleCommunityBackgroundAnimationChange,
@@ -61,6 +63,13 @@ export const Community = ({
     startTimer,
   } = useCommunity();
 
+  const {
+    settings,
+    toggleCommunityAnimation,
+    toggleMessageBoard,
+    toggleReactions,
+  } = useSettings();
+
   const theme = useTheme();
   // handle external room events
   useEffect(() => {
@@ -72,9 +81,13 @@ export const Community = ({
       roomEvents.communityDeleted[communityId] &&
       roomEvents.communityDeleted[communityId].deleted === true
     ) {
-      navigate("/?error=9000", {
-        state: { alertMessage: "Community deleted" },
-      });
+      // delay the redirect so the user can see the alert message
+      // todo: need an alert message
+      setTimeout(() => {
+        navigate("/?error=9000", {
+          state: { alertMessage: "Community deleted" },
+        });
+      }, 2000);
     }
   }, [roomEvents, currentCommunity]);
 
@@ -87,15 +100,10 @@ export const Community = ({
   const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
     useState(false);
 
-  const [controlsList, setControlsList] = useState({
-    partyModeEngaged: false,
-  });
-
+  console.log(settings);
   useEffect(() => {
-    handleCommunityBackgroundAnimationChange(controlsList.partyModeEngaged);
-  }, [controlsList.partyModeEngaged]);
-
-  // todo: delete causing some wild re-renders, cycling through users
+    handleCommunityBackgroundAnimationChange(settings?.communityAnimation);
+  }, [settings]);
 
   useEffect(() => {
     recoverUserFromStorage();
@@ -157,7 +165,7 @@ export const Community = ({
     localStorage.setItem("userstate", JSON.stringify(userStateObj));
   };
 
-  const handleTimerClicked = ({communityId, timerValue}) => {
+  const handleTimerClicked = ({ communityId, timerValue }) => {
     if (currentCommunity?.timer?.running) {
       cancelTimer({
         username: iAmCitizen.username,
@@ -226,7 +234,6 @@ export const Community = ({
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        {/* {controlsList?.partyModeEngaged && <Stars />} */}
         <JoinCommunityModal
           open={joinCommunityModalOpen}
           handleClose={handleJoinCommunityModalClose}
@@ -305,44 +312,69 @@ export const Community = ({
                   </MenuItem>
                   <Divider />
                   {iAmCitizen && (
-                    <MenuItem>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="success"
-                        onClick={() => setEditPointSchemeModalOpen(true)}
-                      >
-                        Edit Point Scheme
-                      </Button>
-                    </MenuItem>
-                  )}
-                  <MenuItem>
-                    <ListItemIcon>
-                      <ModeNightIcon />
-                    </ListItemIcon>
-                    <ListItemText secondary="Stars" />
+                    <>
+                      <MenuItem>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="success"
+                          onClick={() => setEditPointSchemeModalOpen(true)}
+                        >
+                          Edit Point Scheme
+                        </Button>
+                      </MenuItem>
+                      <MenuItem>
+                        <ListItemIcon>
+                          <ModeNightIcon />
+                        </ListItemIcon>
+                        <ListItemText secondary="Stars" />
 
-                    <Switch
-                      checked={!!controlsList?.partyModeEngaged}
-                      onChange={(e) => {
-                        setControlsList({
-                          ...controlsList,
-                          partyModeEngaged: !controlsList.partyModeEngaged,
-                        });
-                      }}
-                    />
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      color="error"
-                      onClick={handleDeleteCommunity}
-                    >
-                      Delete Room
-                    </Button>
-                  </MenuItem>
+                        <Switch
+                          checked={settings?.communityAnimation}
+                          onChange={(e) => {
+                            toggleCommunityAnimation(e.target.checked);
+                          }}
+                        />
+                      </MenuItem>
+                      <MenuItem>
+                        <ListItemIcon>
+                          <ModeComment />
+                        </ListItemIcon>
+                        <ListItemText secondary="Activity" />
+
+                        <Switch
+                          checked={settings?.messageBoardVisible}
+                          onChange={(e) => {
+                            toggleMessageBoard(e.target.checked);
+                          }}
+                        />
+                      </MenuItem>
+                      <MenuItem>
+                        <ListItemIcon>
+                          <Celebration />
+                        </ListItemIcon>
+                        <ListItemText secondary="Reaction Panel" />
+
+                        <Switch
+                          checked={settings?.reactionsVisible}
+                          onChange={(e) => {
+                            toggleReactions(e.target.checked);
+                          }}
+                        />
+                      </MenuItem>
+                      <Divider />
+                      <MenuItem>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="error"
+                          onClick={handleDeleteCommunity}
+                        >
+                          Delete Room
+                        </Button>
+                      </MenuItem>{" "}
+                    </>
+                  )}
                 </MenuList>
               </Paper>
             </ScrumLordMenu>
@@ -361,11 +393,12 @@ export const Community = ({
           xs={fullsizeScreen ? 3 : 12}
           xl={fullsizeScreen ? 2 : 12}
         >
+          {/* <Grid item>
+            <PointChart community={currentCommunity} />
+          </Grid> */}
           <Grid item xs={12}>
             <CommunityControls
               handleTimerClicked={handleTimerClicked}
-              controlsList={controlsList}
-              setControlsList={setControlsList}
               community={currentCommunity}
               handleReveal={handleReveal}
               handleReset={handleReset}
@@ -373,21 +406,24 @@ export const Community = ({
               communityId={communityId}
               submitVote={submitVote}
               communityReaction={communityReaction}
+              settings={settings}
             />
           </Grid>
           <Grid
             item
             xs={12}
             sx={{
-              backgroundColor: controlsList?.partyModeEngaged
+              backgroundColor: settings?.communityAnimationEnabled
                 ? "none"
                 : theme.palette.background.paper,
             }}
           >
-            <MessageBoard
-              messageHistory={messageHistory}
-              communityId={communityId}
-            />
+            {settings?.messageBoardVisible && (
+              <MessageBoard
+                messageHistory={messageHistory}
+                communityId={communityId}
+              />
+            )}
           </Grid>
         </Grid>
 
