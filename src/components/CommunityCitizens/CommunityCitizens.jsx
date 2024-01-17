@@ -24,7 +24,14 @@ export const CommunityCitizens = ({
             .filter((c) => c.votingMember)
             .map((citizen, i) => {
               return (
-                <Grid item xs={6} md={2} lg={2} key={citizen.userId}>
+                <Grid
+                  item
+                  xs={6}
+                  md={2}
+                  lg={2}
+                  key={citizen.userId}
+                  sx={{ minWidth: "175px" }}
+                >
                   <CitizenCard
                     position={i}
                     currentCommunity={currentCommunity}

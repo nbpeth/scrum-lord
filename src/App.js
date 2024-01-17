@@ -56,6 +56,9 @@ const useStyles = makeStyles({
   },
 });
 
+// todo: timer should cancel after voting
+// todo: identify users that are or are not present
+// todo: chat?
 // todo: logged in voting member toggle
 // todo: add sound to reveal
 // todo: server: daemon to clean up old sessions and clear old timers (incase they were never cancelled)

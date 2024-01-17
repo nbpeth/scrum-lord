@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useEffect, useState } from "react";
+import logoUrl from "../../scrumlord-logo-1.jpg";
 
 const useStyles = makeStyles({
   cardReveal: {
@@ -20,7 +21,20 @@ const useStyles = makeStyles({
     "100%": { transform: "perspective(200px) rotateY(180deg)" },
   },
   contentHide: {
-    visibility: "hidden",
+    backgroundImage: `url(${logoUrl})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    "&::after": {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    "& > *": {
+      visibility: 'hidden',
+    },
   },
 
   contentShow: {
@@ -54,7 +68,6 @@ export const CitizenCard = ({
 
     // initial 'reveal' trigger from the server, we should display the card values
     if (revealed) {
-
       // initiate the animation which hides the content of the card, so you can't see the values while it's "flipping"
       setCardAnimationInitiated(true);
 
@@ -67,19 +80,33 @@ export const CitizenCard = ({
           setCardAnimating(false);
           setCardAnimationInitiated(false);
         }, 2000);
-
       }, position * 250);
     }
   }, [position, revealed]);
 
   const getBackgroundColor = () => {
-    if(hasVoted && doubleVote) {
-      return alpha(theme.palette.warning.dark, 0.8)
-    } else if(hasVoted && !doubleVote) {
-      return alpha(theme.palette.primary.dark, 0.8)
+    if (hasVoted && doubleVote) {
+      return alpha(theme.palette.warning.dark, 0.8);
+    } else if (hasVoted && !doubleVote) {
+      return alpha(theme.palette.primary.dark, 0.8);
     }
 
-    return "none"
+    return "none";
+  };
+
+  const getCardClasses = () => {
+    const classes = [];
+    if(cardAnimating) {
+      classes.push(classes.cardReveal);
+    }
+
+    if(cardAnimationInitiated) {
+      classes.push(classes.contentHide);
+    } else {
+      classes.push(classes.contentShow);  
+    }
+
+    return classes
   }
 
   return (
@@ -87,12 +114,20 @@ export const CitizenCard = ({
       className={cardAnimating ? classes.cardReveal : null}
       key={citizen.id}
       sx={{
+        whiteSpace: "nowrap",
+        // minHeight: "175px",
+        // minWidth: "500px",
+        // maxHeight: "175px",
         padding: "10px",
         minWidth: "100px",
         border: isMyCard
+        
           ? `1px solid ${theme.palette.primary.dark}`
           : `1px solid ${theme.palette.grey[800]}`,
         backgroundColor: getBackgroundColor(),
+    //     backgroundImage: hasVoted ? `url(${logoUrl})`: "none",
+    //     backgroundSize: 'cover',
+    // backgroundPosition: 'center',
         cursor: "pointer",
         transition: "background .5s ease-in-out",
         "&:hover": {
@@ -101,11 +136,11 @@ export const CitizenCard = ({
       }}
     >
       <span
-        className={
-          cardAnimationInitiated ? classes.contentHide : classes.contentShow
-        }
+        
       >
-        <div>
+        <div className={
+          cardAnimationInitiated ? classes.contentHide : classes.contentShow
+        }>
           <CardContent
             sx={{
               padding: "5px",
@@ -150,12 +185,17 @@ export const CitizenVote = ({ isMyCard, revealed, vote }) => {
     if (revealed || isMyCard) {
       return vote ?? "-";
     }
-    return "?";
+    return "SL";
   };
 
-  return (
-    <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-      {getValue()}
-    </Typography>
-  );
+  const getTemplate = () => {
+
+    return (
+      <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+        {getValue()}
+      </Typography>
+    );
+  };
+
+  return <>{getTemplate()}</>;
 };
