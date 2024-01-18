@@ -1,0 +1,14 @@
+FROM node:14
+
+WORKDIR /usr/src/app
+
+COPY ./package.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 8080
+
+# Set the command to run your application
+CMD [ "npm", "run", "start:api:docker" ]
