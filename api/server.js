@@ -5,6 +5,7 @@ const url = require("url");
 const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
+const { get } = require("http");
 
 const state = {
   timers: {
@@ -50,6 +51,22 @@ const heartbeat = (ws) => {
   if (ws.isAlive) {
     ws.terminate();
   }
+};
+
+const resetCommunityTimer = async (timer, communityId) => {
+  clearTimeout(timer);
+
+  const result = await communityClient.cancelTimer({
+    communityId,
+  });
+
+  return result;
+};
+
+const getTimerForCommunityBy = (communityId) => {
+  const timer = state?.timers[communityId]?.timer;
+
+  return timer;
 };
 
 // the boatman ferries wayward connections to the other side
@@ -311,15 +328,9 @@ const handleSubmitVote = async (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-// technically you can see points by inspecting the ws messages, but that'll be our little secret for now
-const handleReveal = async (payload) => {
-  const { community, username, userId, userColor } = payload;
-  const { id: communityId } = community;
-
-  const result = await communityClient.reveal({ communityId });
-
-  // if all votes are the same for at least two people, let's party
-  const isSynergized =
+// if all votes are the same for at least two people, let's party
+const verifySynergy = (result) => {
+  return (
     result &&
     result.citizens &&
     result.citizens.length > 1 &&
@@ -333,7 +344,23 @@ const handleReveal = async (payload) => {
           vote === result.citizens[0].vote &&
           vote !== null &&
           vote !== undefined
-      );
+      )
+  );
+};
+
+// technically you can see points by inspecting the ws messages, but that'll be our little secret for now
+const handleReveal = async (payload) => {
+  const { community, username, userId, userColor } = payload;
+  const { id: communityId } = community;
+
+  const timer = getTimerForCommunityBy(communityId);
+  if (timer) {
+    resetCommunityTimer(timer, communityId);
+  }
+
+  const result = await communityClient.reveal({ communityId });
+
+  const isSynergized = verifySynergy(result);
 
   const reply = {
     type: "reveal-reply",
@@ -435,17 +462,14 @@ const handleStartTimer = async (payload, ws) => {
 const handleCancelTimer = async (payload, ws) => {
   const { community, username, userId, userColor, timerLength } = payload;
   const { id: communityId } = community;
-  const timer = state.timers[communityId]?.timer;
+  const timer = getTimerForCommunityBy(communityId);
+
   if (!timer) {
     console.warn("no timer to cancel", JSON.stringify(payload), ws.id);
     return;
   }
 
-  clearTimeout(timer);
-
-  const result = await communityClient.cancelTimer({
-    communityId: payload.community.id,
-  });
+  const result = await resetCommunityTimer(timer, communityId);
 
   const timerFinishedReply = {
     type: "cancel-timer-reply",
