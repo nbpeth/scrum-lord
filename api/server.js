@@ -69,6 +69,15 @@ const getTimerForCommunityBy = (communityId) => {
   return timer;
 };
 
+const killTimerIfExists = async (communityId) => {
+  // if there is still a timer active on reveal, clear it
+  const timer = getTimerForCommunityBy(communityId);
+  if (timer) {
+    await resetCommunityTimer(timer, communityId);
+  }
+}
+
+
 // the boatman ferries wayward connections to the other side
 const boatman = (ws) => setTimeout(() => heartbeat(ws), 40000);
 
@@ -348,20 +357,17 @@ const verifySynergy = (result) => {
   );
 };
 
+
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
 const handleReveal = async (payload) => {
   const { community, username, userId, userColor } = payload;
   const { id: communityId } = community;
 
-  const timer = getTimerForCommunityBy(communityId);
-  if (timer) {
-    resetCommunityTimer(timer, communityId);
-  }
+  await killTimerIfExists(communityId);
 
   const result = await communityClient.reveal({ communityId });
 
   const isSynergized = verifySynergy(result);
-
   const reply = {
     type: "reveal-reply",
     payload: {
@@ -379,6 +385,8 @@ const handleReveal = async (payload) => {
 const handleReset = async (payload) => {
   const { community, username, userId, userColor } = payload;
   const { id: communityId } = community;
+
+  await killTimerIfExists(communityId);
 
   const result = await communityClient.reset({ communityId });
 
