@@ -15,8 +15,10 @@ const getCommunitiesAsArray = async () => {
     return [];
   }
 
+  console.log("!", result)
+
   return result
-    .map(({ id, data }) => {
+    .map(({ id, data, last_modified }) => {
       if (!data) {
         return null;
       }
@@ -25,6 +27,7 @@ const getCommunitiesAsArray = async () => {
         name: data.name,
         description: data.description,
         citizens: data.citizens.length,
+        lastModified: last_modified,
       };
     })
     .filter((x) => !!x);

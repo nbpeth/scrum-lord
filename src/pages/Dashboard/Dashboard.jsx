@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
+import { format } from "date-fns";
 
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
@@ -55,10 +56,6 @@ export const Dashboard = () => {
 
     setCreateRoomModalOpen(false);
   };
-
-  // todo: idle time counter and self delete
-
-  //  todo: last modified date on community: different color, label for idle?
 
   return (
     <div>
@@ -126,14 +123,31 @@ export const CommunityCard = ({ community }) => {
       }}
     >
       <CardContent>
-        <Typography variant="h5" color={theme.palette.grey[100]}>
-          <NavLink
-            to={`/communities/${community.id}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            {community.name}
-          </NavLink>
-        </Typography>
+        <Grid
+          container
+          justifyContent="space-between"
+          spacing={3}
+          direction="column"
+        >
+          <Grid item>
+            <Typography variant="h5" color={theme.palette.grey[100]}>
+              <NavLink
+                to={`/communities/${community.id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {community.name}
+              </NavLink>
+            </Typography>
+          </Grid>
+          {community?.lastModified && (
+            <Grid item>
+              <Typography variant="body2" color={theme.palette.grey[300]}>
+                Last Activity{" "}
+                {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
       </CardContent>
     </Card>
   );

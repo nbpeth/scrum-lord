@@ -57,7 +57,6 @@ const useStyles = makeStyles({
 });
 
 
-// todo: timer should cancel after reveal (if active)
 // todo: connect button: if disconnected should allow the user to reconnect
 //       should the app attempt to reconnect automatically?
 // todo: identify users that are or are not present
@@ -65,7 +64,10 @@ const useStyles = makeStyles({
 // todo: logged in voting member toggle
 // todo: add sound to reveal
 // todo: server: daemon to clean up old sessions and clear old timers (incase they were never cancelled)
-// todo: set timeout for room delete
+// todo: max sessions error
+// todo: last modified date on dash
+// todo: track synergy
+// todo: set timeout for room delete, last 
 
 
 
