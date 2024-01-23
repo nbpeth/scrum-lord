@@ -60,6 +60,7 @@ const useStyles = makeStyles({
 // todo: connect button: if disconnected should allow the user to reconnect
 //       should the app attempt to reconnect automatically?
 // todo: identify users that are or are not present
+// todo: show lurkers
 // todo: chat?
 // todo: logged in voting member toggle
 // todo: add sound to reveal

@@ -134,7 +134,7 @@ export const CommunityCard = ({ community }) => {
       variant="outlined"
       sx={{
         backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
-        cursor: "pointer",
+        // cursor: "pointer",
         transition: "background .5s ease-in-out",
         "&:hover": {
           backgroundColor: alpha(theme.palette.secondary.dark, 1),
