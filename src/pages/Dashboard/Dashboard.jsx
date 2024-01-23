@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   Grid,
+  LinearProgress,
   Toolbar,
   Typography,
   alpha,
@@ -56,6 +57,8 @@ export const Dashboard = () => {
 
     setCreateRoomModalOpen(false);
   };
+
+  // console.log(communities)
 
   return (
     <div>
@@ -110,6 +113,22 @@ export const Dashboard = () => {
 
 export const CommunityCard = ({ community }) => {
   const theme = useTheme();
+
+  const getSynergyBarColor = (synergy) => {
+    if (synergy >= 0.75) {
+      return "success";
+    } else if (synergy >= 0.5) {
+      return "primary";
+    } else if (synergy >= 0.25) {
+      return "secondary";
+    } else if (synergy >= 0.15) {
+      return "warning";
+    } else {
+      return "error";
+    }
+  };
+
+  console.log(community);
   return (
     <Card
       variant="outlined"
@@ -122,33 +141,50 @@ export const CommunityCard = ({ community }) => {
         },
       }}
     >
-      <CardContent>
-        <Grid
-          container
-          justifyContent="space-between"
-          spacing={3}
-          direction="column"
-        >
-          <Grid item>
-            <Typography variant="h5" color={theme.palette.grey[100]}>
-              <NavLink
-                to={`/communities/${community.id}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                {community.name}
-              </NavLink>
-            </Typography>
-          </Grid>
-          {community?.lastModified && (
-            <Grid item>
-              <Typography variant="body2" color={theme.palette.grey[300]}>
-                Last Activity{" "}
-                {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
-              </Typography>
+      <Grid container xs={12} justifyContent="space-between">
+        <Grid item xs={10}>
+          <CardContent>
+            <Grid
+              container
+              justifyContent="space-between"
+              spacing={3}
+              direction="column"
+            >
+              <Grid item>
+                <Typography variant="h5" color={theme.palette.grey[100]}>
+                  <NavLink
+                    to={`/communities/${community.id}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    {community.name}
+                  </NavLink>
+                </Typography>
+              </Grid>
+              {community?.lastModified && (
+                <Grid item>
+                  <Typography variant="body2" color={theme.palette.grey[300]}>
+                    Last Activity{" "}
+                    {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
-          )}
+          </CardContent>
         </Grid>
-      </CardContent>
+        <Grid item xs={2} sx={{ borderLeft: "1px solid #ddd" }}>
+          <LinearProgress
+            color={getSynergyBarColor(community?.synergy?.value)}
+            id="synergy-bar"
+            variant="determinate"
+            value={community?.synergy?.value * 100}
+            style={{
+              height: "100%",
+              width: "100%",
+              // transform: `translateY(${25}%)`,
+            }}
+          />
+        </Grid>
+      </Grid>
     </Card>
   );
 };

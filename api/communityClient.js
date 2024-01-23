@@ -1,3 +1,4 @@
+const { post } = require("./http-server");
 const postgresClient = require("./postgresClient");
 const datefns = require("date-fns");
 
@@ -15,8 +16,6 @@ const getCommunitiesAsArray = async () => {
     return [];
   }
 
-  console.log("!", result)
-
   return result
     .map(({ id, data, last_modified }) => {
       if (!data) {
@@ -28,6 +27,7 @@ const getCommunitiesAsArray = async () => {
         description: data.description,
         citizens: data.citizens.length,
         lastModified: last_modified,
+        synergy: data.synergy,
       };
     })
     .filter((x) => !!x);
@@ -46,7 +46,7 @@ const getCommunityBy = async (id) => {
 
 const addCommunity = async (community) => {
   const result = await postgresClient.addCommunity({
-    community: { ...community, citizens: [] },
+    community: { ...community, citizens: [], synergy: { } },
   });
 
   return result.map(({ id, data }) => {
@@ -116,7 +116,7 @@ const stopTimer = async ({ communityId }) => {
   const { data } = result[0];
 
   return data;
-}
+};
 
 const cancelTimer = async ({ communityId }) => {
   const result = await postgresClient.cancelTimer({ communityId });
@@ -124,7 +124,7 @@ const cancelTimer = async ({ communityId }) => {
   const { data } = result[0];
 
   return data;
-}
+};
 
 const leaveCommunity = async ({ communityId, username, userId }) => {
   const result = await postgresClient.leaveCommunity({
@@ -158,12 +158,38 @@ const submitVote = async ({ communityId, userId, vote }) => {
   return { ...data, doubleVote };
 };
 
+// if all votes are the same for at least two people, let's party
+const verifySynergy = (result) => {
+  return (
+    result &&
+    result.citizens &&
+    result.citizens.length > 1 &&
+    result.citizens
+      // don't count votes for lurkers
+      .filter((citizen) => citizen.votingMember)
+      .map((citizen) => citizen.vote)
+      .every(
+        (vote) => {
+          // all votes are the same and all votes were cast
+          return vote === result.citizens[0].vote &&
+          vote !== null &&
+          vote !== undefined
+        }
+      )
+  );
+};
+
 const reveal = async ({ communityId }) => {
   const result = await postgresClient.revealCommunity({ communityId });
-
   const { data } = result[0];
 
-  return data;
+  const isSynergized = verifySynergy(data);
+  if(isSynergized) {
+     const synergyResult = await postgresClient.synergizeCommunity({ communityId });
+     return { ...synergyResult, isSynergized }
+  }
+
+  return { ...data, isSynergized };
 };
 
 const reset = async ({ communityId }) => {

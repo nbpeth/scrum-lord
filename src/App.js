@@ -63,12 +63,8 @@ const useStyles = makeStyles({
 // todo: chat?
 // todo: logged in voting member toggle
 // todo: add sound to reveal
-// todo: server: daemon to clean up old sessions and clear old timers (incase they were never cancelled)
 // todo: max sessions error
-// todo: last modified date on dash
-// todo: track synergy
-// todo: set timeout for room delete, last 
-
+// todo: redirect to community after it is created
 
 
 const App = () => {

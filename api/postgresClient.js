@@ -24,6 +24,7 @@ try {
 const executeQuery = async ({ query, values }) => {
   try {
     const client = await pool.connect();
+    
     const result = await client.query(query, values);
     client.release();
 
@@ -46,6 +47,7 @@ const addCommunity = async ({ community }) => {
 
 const getCommunities = async () => {
   const query = "SELECT * FROM communities";
+
   const result = await executeQuery({ query });
 
   return result;
@@ -191,12 +193,21 @@ const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
 };
 
 const revealCommunity = async ({ communityId }) => {
+  // show all votes and increment synergy total votes
   const query = `
-        UPDATE communities
-        SET data = jsonb_set(data::jsonb, '{revealed}', 'true')
-        WHERE id = $1
-        RETURNING *;
-    `;
+    UPDATE communities
+    SET data = jsonb_set(
+                jsonb_set(
+                        data::jsonb,
+                        '{synergy, total}',
+                        ((COALESCE((data -> 'synergy' ->> 'total')::integer, 0) + 1)::text)::jsonb
+                ),
+                '{revealed}',
+                'true'
+              )
+    WHERE id = $1
+    RETURNING *;
+  `;
   const values = [communityId];
 
   const result = await executeQuery({ query, values });
@@ -269,6 +280,26 @@ const cancelTimer = async ({ communityId, timerLength }) => {
   return result;
 };
 
+const synergizeCommunity = async ({ communityId }) => {
+  // increment synergy hits
+  const query = `
+    UPDATE communities
+    SET data =
+            jsonb_set(
+                    data::jsonb,
+                    '{synergy, hits}',
+                    ((COALESCE((data -> 'synergy' ->> 'hits')::integer, 0) + 1)::text)::jsonb)
+    
+    WHERE id = $1
+    RETURNING *;
+`;
+  const values = [communityId];
+
+  const result = await executeQuery({ query, values });
+
+  return result;
+};
+
 module.exports = {
   addCommunity,
   cancelTimer,
@@ -283,4 +314,5 @@ module.exports = {
   startTimer,
   stopTimer,
   submitVote,
+  synergizeCommunity,
 };

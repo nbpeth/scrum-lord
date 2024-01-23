@@ -5,7 +5,6 @@ const url = require("url");
 const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
-const { get } = require("http");
 
 const state = {
   timers: {
@@ -337,27 +336,6 @@ const handleSubmitVote = async (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-// if all votes are the same for at least two people, let's party
-const verifySynergy = (result) => {
-  return (
-    result &&
-    result.citizens &&
-    result.citizens.length > 1 &&
-    result.citizens
-      // don't count votes for lurkers
-      .filter((citizen) => citizen.votingMember)
-      .map((citizen) => citizen.vote)
-      .every(
-        (vote) =>
-          // all votes are the same and all votes were cast
-          vote === result.citizens[0].vote &&
-          vote !== null &&
-          vote !== undefined
-      )
-  );
-};
-
-
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
 const handleReveal = async (payload) => {
   const { community, username, userId, userColor } = payload;
@@ -366,16 +344,18 @@ const handleReveal = async (payload) => {
   await killTimerIfExists(communityId);
 
   const result = await communityClient.reveal({ communityId });
+  // const isSynergized = verifySynergy(result);
+  console.log("reveal", result)
 
-  const isSynergized = verifySynergy(result);
+
   const reply = {
     type: "reveal-reply",
     payload: {
-      community: { ...result, isSynergized },
+      community: { ...result },
       username,
       userId,
       userColor,
-      isSynergized,
+      isSynergized: result?.isSynergized,
     },
   };
 
@@ -493,6 +473,11 @@ setInterval(() => {
     client.ping();
   });
 }, 30000);
+
+// check for orphaned timers once daily
+// setInterval(() => {
+  
+// }, 86400000);
 
 server.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);

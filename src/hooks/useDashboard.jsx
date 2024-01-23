@@ -24,7 +24,17 @@ export default function useDashboard() {
         case "list-communities-reply":
           const { communities: fetchedCommunities } = payload;
 
-          setCommunities(fetchedCommunities);
+          setCommunities(
+            fetchedCommunities.map((c) => ({
+              ...c,
+              synergy: {
+                ...c.synergy,
+                value: c.synergy?.total
+                  ? c.synergy?.hits / c.synergy?.total
+                  : 0,
+              },
+            }))
+          );
 
           break;
         case "community-created-reply":
