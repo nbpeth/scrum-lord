@@ -6,6 +6,7 @@ import {
   Grid,
   LinearProgress,
   Toolbar,
+  Tooltip,
   Typography,
   alpha,
   useTheme,
@@ -14,11 +15,12 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
-import { format } from "date-fns";
+import { format, differenceInDays, parseISO } from "date-fns";
 
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import logoUrl from "../../scrumlord-logo-2.png";
+import { Schedule } from "@mui/icons-material";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities, readyState } =
@@ -128,16 +130,21 @@ export const CommunityCard = ({ community }) => {
     }
   };
 
-  console.log(community);
+  const idle = differenceInDays(new Date(), parseISO(community?.lastModified));
+
   return (
     <Card
       variant="outlined"
       sx={{
-        backgroundColor: alpha(theme.palette.secondary.dark, 0.5),
-        // cursor: "pointer",
+        backgroundColor: idle
+          ? alpha(theme.palette.grey[900], 0.5)
+          : alpha(theme.palette.secondary.dark, 0.5),
+
         transition: "background .5s ease-in-out",
         "&:hover": {
-          backgroundColor: alpha(theme.palette.secondary.dark, 1),
+          backgroundColor: idle
+            ? alpha(theme.palette.grey[500], 0.5)
+            : alpha(theme.palette.secondary.dark, 1),
         },
       }}
     >
@@ -150,15 +157,26 @@ export const CommunityCard = ({ community }) => {
               spacing={3}
               direction="column"
             >
-              <Grid item>
-                <Typography variant="h5" color={theme.palette.grey[100]}>
-                  <NavLink
-                    to={`/communities/${community.id}`}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {community.name}
-                  </NavLink>
-                </Typography>
+              <Grid container item xs={12} alignItems="center">
+                <Grid item>
+                  {Boolean(idle) && (
+                    <Tooltip placement="top-end" arrow title="Idle">
+                      <Schedule
+                        sx={{ fontSize: "medium", marginRight: "10px" }}
+                      />
+                    </Tooltip>
+                  )}
+                </Grid>
+                <Grid item>
+                  <Typography variant="h5" color={theme.palette.grey[100]}>
+                    <NavLink
+                      to={`/communities/${community.id}`}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      {community.name}
+                    </NavLink>
+                  </Typography>
+                </Grid>
               </Grid>
               {community?.lastModified && (
                 <Grid item>

@@ -71,6 +71,28 @@ export const Community = ({
   } = useSettings();
 
   const theme = useTheme();
+
+  const citizens = currentCommunity?.citizens || [];
+  const [iAmCitizen, setIAmCitizen] = useState(null);
+  const [error, setError] = useState(null);
+  const [joinCommunityModalOpen, setJoinCommunityModalOpen] = useState(false);
+  const [editPointSchemeModalOpen, setEditPointSchemeModalOpen] =
+    useState(false);
+  const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
+    useState(false);
+
+  useEffect(() => {
+    recoverUserFromStorage();
+
+    if (currentCommunity?.isSynergized) {
+      handleCelebrationChange(true);
+      setTimeout(() => {
+        // const audio = new Audio("path_to_your_sound_file.mp3");
+        handleCelebrationChange(false);
+      }, 5000);
+    }
+  }, [currentCommunity]);
+
   // handle external room events
   useEffect(() => {
     if (!roomEvents) {
@@ -91,31 +113,9 @@ export const Community = ({
     }
   }, [roomEvents, currentCommunity]);
 
-  const citizens = currentCommunity?.citizens || [];
-  const [iAmCitizen, setIAmCitizen] = useState(null);
-  const [error, setError] = useState(null);
-  const [joinCommunityModalOpen, setJoinCommunityModalOpen] = useState(false);
-  const [editPointSchemeModalOpen, setEditPointSchemeModalOpen] =
-    useState(false);
-  const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
-    useState(false);
-
-  console.log(settings);
   useEffect(() => {
     handleCommunityBackgroundAnimationChange(settings?.communityAnimation);
   }, [settings]);
-
-  useEffect(() => {
-    recoverUserFromStorage();
-
-    if (currentCommunity?.isSynergized) {
-      handleCelebrationChange(true);
-      setTimeout(() => {
-        // const audio = new Audio("path_to_your_sound_file.mp3");
-        handleCelebrationChange(false);
-      }, 5000);
-    }
-  }, [currentCommunity]);
 
   const handleJoin = () => {
     setJoinCommunityModalOpen(true);

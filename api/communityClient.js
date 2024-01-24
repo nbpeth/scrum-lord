@@ -1,4 +1,3 @@
-const { post } = require("./http-server");
 const postgresClient = require("./postgresClient");
 const datefns = require("date-fns");
 
