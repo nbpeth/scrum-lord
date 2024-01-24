@@ -157,7 +157,7 @@ export const CommunityCard = ({ community }) => {
               spacing={3}
               direction="column"
             >
-              <Grid container item xs={12} alignItems="center">
+              <Grid container item xs={12} alignItems="center" justifyContent="center">
                 <Grid item>
                   {Boolean(idle) && (
                     <Tooltip placement="top-end" arrow title="Idle">
