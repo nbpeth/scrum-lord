@@ -1,6 +1,6 @@
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 import {
-  Alert,
   AppBar,
   Box,
   Button,
@@ -11,9 +11,9 @@ import {
   MenuItem,
   MenuList,
   Paper,
-  Snackbar,
   Switch,
   Toolbar,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
@@ -22,7 +22,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
 
-import { Celebration, Home, ModeComment } from "@mui/icons-material";
+import {
+  Celebration,
+  Home,
+  ModeComment,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import * as React from "react";
 import { CommunityCitizens } from "../../components/CommunityCitizens/CommunityCitizens";
 import { CommunityControls } from "../../components/CommunityControls/CommunityControls";
@@ -68,6 +74,7 @@ export const Community = ({
     toggleCommunityAnimation,
     toggleMessageBoard,
     toggleReactions,
+    toggleLurkerBox,
   } = useSettings();
 
   const theme = useTheme();
@@ -231,6 +238,9 @@ export const Community = ({
     setDeleteCommunityModalOpen(false);
   };
 
+  const lurkers =
+    currentCommunity?.citizens.filter((c) => !c?.votingMember) || [];
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -257,7 +267,7 @@ export const Community = ({
         <AppBar position="static">
           <Toolbar>
             <ScrumLordMenu>
-              <Paper sx={{ width: 250, maxWidth: "100%" }}>
+              <Paper sx={{ width: 300, maxWidth: "100%" }}>
                 <MenuList>
                   <MenuItem
                     onClick={() => {
@@ -338,6 +348,19 @@ export const Community = ({
                       </MenuItem>
                       <MenuItem>
                         <ListItemIcon>
+                          <Visibility />
+                        </ListItemIcon>
+                        <ListItemText secondary="Non-Voting Members" />
+
+                        <Switch
+                          checked={settings?.lurkerBoxVisible}
+                          onChange={(e) => {
+                            toggleLurkerBox(e.target.checked);
+                          }}
+                        />
+                      </MenuItem>
+                      <MenuItem>
+                        <ListItemIcon>
                           <ModeComment />
                         </ListItemIcon>
                         <ListItemText secondary="Activity" />
@@ -409,52 +432,109 @@ export const Community = ({
               settings={settings}
             />
           </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              backgroundColor: settings?.communityAnimationEnabled
-                ? "none"
-                : theme.palette.background.paper,
-            }}
-          >
-            {settings?.messageBoardVisible && (
+          {settings?.lurkerBoxVisible && (
+            <Grid item xs={12}>
+              <LurkerBox
+                lurkers={lurkers}
+                handleDeleteUser={handleDeleteUser}
+              />
+            </Grid>
+          )}
+          {settings?.messageBoardVisible && (
+            <Grid
+              item
+              xs={12}
+              sx={{
+                backgroundColor: settings?.communityAnimationEnabled
+                  ? "none"
+                  : theme.palette.background.paper,
+              }}
+            >
               <MessageBoard
                 messageHistory={messageHistory}
                 communityId={communityId}
               />
-            )}
-          </Grid>
+            </Grid>
+          )}
         </Grid>
 
         <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
           {currentCommunity ? (
-            <>
-              <Snackbar
-                open={Boolean(alertMessage)}
-                autoHideDuration={6000}
-                onClose={handleAlertClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-              >
-                <Alert
-                  // onClose={handleAlertClose}
-                  severity={alertMessage?.severity ?? "info"}
-                  sx={{ width: "100%" }}
-                >
-                  {alertMessage?.message}
-                </Alert>
-              </Snackbar>
-
-              <CommunityCitizens
-                citizens={citizens}
-                iAmCitizen={iAmCitizen}
-                handleDeleteUser={handleDeleteUser}
-                currentCommunity={currentCommunity}
-              />
-            </>
+            <Grid container item xs={12} justifyContent="space-between">
+              <Grid item justifyContent="center" xs={12}>
+                <CommunityCitizens
+                  citizens={citizens}
+                  iAmCitizen={iAmCitizen}
+                  handleDeleteUser={handleDeleteUser}
+                  currentCommunity={currentCommunity}
+                />
+              </Grid>
+            </Grid>
           ) : null}
         </Grid>
       </Grid>
     </>
+  );
+};
+
+export const LurkerBox = ({ lurkers, handleDeleteUser }) => {
+  const theme = useTheme();
+  // const fullsizeScreen = useMediaQuery("(min-width:800px)");
+
+  return (
+    <div>
+      <Grid
+        id="lurker-box"
+        container
+        direction="column"
+        sx={{ paddingLeft: "15px" }}
+        alignContent="flex-start"
+        alignItems="flex-start"
+      >
+        <Grid item>
+          <Tooltip
+            title={`Non-voting members: ${lurkers.length} present`}
+            arrow
+            placement="top-end"
+          >
+            {lurkers.length > 0 ? (
+              <Visibility color="warning" />
+            ) : (
+              <VisibilityOff color="info" />
+            )}
+          </Tooltip>
+        </Grid>
+        <div
+        // style={{ height: "50px", overflow: "hidden", overflowY: "scroll" }}
+        >
+          <Grid id="lurker-box-list" container item direction="column">
+            {lurkers.map((lurker) => {
+              return (
+                <Grid container id="lurker-box-list-item" key={lurker.userId}>
+                  <Grid item>
+                    <DeleteTwoToneIcon
+                      fontSize="small"
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => handleDeleteUser(lurker)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography
+                      sx={{ whiteSpace: "nowrap" }}
+                      variant="subtitle2"
+                      fontSize="small"
+                      color={theme.palette.grey[500]}
+                      key={lurker.userId}
+                    >
+                      {lurker.username}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </div>
+      </Grid>
+    </div>
   );
 };

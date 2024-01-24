@@ -17,6 +17,7 @@ export const useSettings = () => {
         communityAnimation: false,
         messageBoardVisible: true,
         reactionsVisible: true,
+        lurkerBoxVisible: false,
       });
     }
   }, []);
@@ -40,6 +41,10 @@ export const useSettings = () => {
 
   const toggleReactions = (enabled) => {
     setSettings({ ...settings, reactionsVisible: enabled });
+  };
+
+  const toggleLurkerBox = (enabled) => {
+    setSettings({ ...settings, lurkerBoxVisible: enabled });
   };
 
   //   const recoverUserFromStorage = () => {
@@ -70,5 +75,6 @@ export const useSettings = () => {
     toggleCommunityAnimation,
     toggleMessageBoard,
     toggleReactions,
+    toggleLurkerBox,
   };
 };

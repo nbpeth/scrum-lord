@@ -15,7 +15,8 @@ export const MessageBoard = ({ messageHistory, communityId }) => {
           padding: "10px",
           overflow: "hidden",
           overflowY: "scroll",
-          height: "300px",
+          minHeight: "50px",
+          maxHeight: "300px",
         }}
       >
         {messages?.map((message) => {
