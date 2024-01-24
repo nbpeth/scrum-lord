@@ -156,6 +156,7 @@ export const Community = ({
     const citizens = currentCommunity?.citizens || [];
 
     if (cachedUserIdForCommunity && citizens.length) {
+      // todo: this could be the place where we clear an "idle" status on a user - they've logged back in and reclaimed their user
       const user = citizens.find(
         (citizen) => citizen.userId === cachedUserIdForCommunity
       );
@@ -333,6 +334,16 @@ export const Community = ({
                           Edit Point Scheme
                         </Button>
                       </MenuItem>
+                      {/* <MenuItem> */}
+                      <Divider />
+                      {/* </MenuItem> */}
+                      {/* <MenuItem>
+                        <div>
+                          <Typography variant="body2" color={"gray"}>
+                            Options
+                          </Typography>
+                        </div>
+                      </MenuItem> */}
                       <MenuItem>
                         <ListItemIcon>
                           <ModeNightIcon />
@@ -432,14 +443,7 @@ export const Community = ({
               settings={settings}
             />
           </Grid>
-          {settings?.lurkerBoxVisible && (
-            <Grid item xs={12}>
-              <LurkerBox
-                lurkers={lurkers}
-                handleDeleteUser={handleDeleteUser}
-              />
-            </Grid>
-          )}
+
           {settings?.messageBoardVisible && (
             <Grid
               item
@@ -461,7 +465,15 @@ export const Community = ({
         <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
           {currentCommunity ? (
             <Grid container item xs={12} justifyContent="space-between">
-              <Grid item justifyContent="center" xs={12}>
+              {settings?.lurkerBoxVisible && (
+                <Grid item xs={2} sx={{paddingTop: "10px"}}>
+                  <LurkerBox
+                    lurkers={lurkers}
+                    handleDeleteUser={handleDeleteUser}
+                  />
+                </Grid>
+              )}
+              <Grid item justifyContent="center" xs={settings?.lurkerBoxVisible ? 10 : 12}>
                 <CommunityCitizens
                   citizens={citizens}
                   iAmCitizen={iAmCitizen}
