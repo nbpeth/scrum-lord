@@ -195,8 +195,8 @@ export const CommunityCard = ({ community }) => {
         },
       }}
     >
-      <Grid container xs={12} justifyContent="space-between">
-        <Grid item xs={10}>
+      <Grid container xs={12} direction="column" justifyContent="space-between">
+        <Grid item>
           <CardContent>
             <Grid
               container
@@ -242,15 +242,15 @@ export const CommunityCard = ({ community }) => {
             </Grid>
           </CardContent>
         </Grid>
-        <Grid item xs={2} sx={{ borderLeft: "1px solid #ddd" }}>
+        <Grid item>
           <LinearProgress
             color={getSynergyBarColor(community?.synergy?.value)}
             id="synergy-bar"
             variant="determinate"
             value={community?.synergy?.value * 100}
             style={{
-              height: "100%",
-              width: "100%",
+              height: "10px",
+              // width: "100%",
               // transform: `translateY(${25}%)`,
             }}
           />
