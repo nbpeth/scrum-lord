@@ -73,7 +73,7 @@ export const Dashboard = () => {
       setFilteredCommunities(communities);
     } else {
       setFilteredCommunities(
-        communities.filter((c) => c.name.includes(e.target.value))
+        communities.filter((c) => c.name?.toLowerCase().includes(e.target.value.toLowerCase()))
       );
     }
   };
