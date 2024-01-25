@@ -18,6 +18,7 @@ export const useSettings = () => {
         messageBoardVisible: true,
         reactionsVisible: true,
         lurkerBoxVisible: false,
+        timerVisible: false,
       });
     }
   }, []);
@@ -45,6 +46,10 @@ export const useSettings = () => {
 
   const toggleLurkerBox = (enabled) => {
     setSettings({ ...settings, lurkerBoxVisible: enabled });
+  };
+
+  const toggleTimerVisible = (enabled) => {
+    setSettings({ ...settings, timerVisible: enabled });
   };
 
   //   const recoverUserFromStorage = () => {
@@ -76,5 +81,6 @@ export const useSettings = () => {
     toggleMessageBoard,
     toggleReactions,
     toggleLurkerBox,
+    toggleTimerVisible
   };
 };
