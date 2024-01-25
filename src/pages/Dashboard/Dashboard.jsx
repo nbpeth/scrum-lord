@@ -21,6 +21,7 @@ import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionSt
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import logoUrl from "../../scrumlord-logo-2.png";
 import { Schedule } from "@mui/icons-material";
+import { SearchInput } from "../../components/SearchInput/SearchInput";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities, readyState } =
@@ -29,6 +30,7 @@ export const Dashboard = () => {
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
+  const [filteredCommunities, setFilteredCommunities] = useState(communityList);
   const theme = useTheme();
 
   // get the list of communities on mount
@@ -40,6 +42,10 @@ export const Dashboard = () => {
   useEffect(() => {
     setCommunities(communityList);
   }, [communityList]);
+
+  useEffect(() => {
+    setFilteredCommunities(communities);
+  }, [communities]);
 
   const createRoomClicked = () => {
     setCreateRoomModalOpen(true);
@@ -60,6 +66,17 @@ export const Dashboard = () => {
     setCreateRoomModalOpen(false);
   };
 
+  const searchValueChanged = (e) => {
+    e.preventDefault();
+    if (e.target.value === "") {
+      setFilteredCommunities(communities);
+    } else {
+      setFilteredCommunities(
+        communities.filter((c) => c.name.includes(e.target.value))
+      );
+    }
+  };
+
   // console.log(communities)
 
   return (
@@ -72,6 +89,7 @@ export const Dashboard = () => {
               spacing={2}
               justifyContent="space-between"
               alignItems="center"
+              xs={12}
             >
               <Grid item>
                 <DashboardTitleMenu createRoomClicked={createRoomClicked} />
@@ -88,28 +106,57 @@ export const Dashboard = () => {
         handleClose={createRoomModalClosed}
         onBlur={createRoomModalClosed}
       />
-      <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
+      <Grid
+        container
+        xs={12}
+        justifyContent="center"
+        alignItems="center"
+        alignContent="center"
+        spacing={2}
+      >
+        <Grid item xs={12}>
+          <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
+        </Grid>
 
-      <Grid container spacing={2} direction="column">
-        <Grid item></Grid>
-        {error && (
+        <Grid container item xs={10}>
+          <Grid item>
+            <SearchInput onChange={searchValueChanged} />
+          </Grid>
+        </Grid>
+
+        <Grid
+          item
+          container
+          spacing={2}
+          xs={10}
+          direction="column"
+          id="dashboard-tiles-container"
+        >
+          {/* {error && (
           <Grid item xs={12}>
             <Typography variant="h3">{error}</Typography>
           </Grid>
-        )}
-
-        {/* communities component */}
-        <Grid container item spacing={2} xs={12} justifyContent="center">
-          {communities?.map((community) => {
-            return (
-              <Grid item xs={3} key={community.id}>
-                <CommunityCard community={community} />
-              </Grid>
-            );
-          })}
+        )} */}
+          <Grid item xs>
+            <DashboardCommunities communities={filteredCommunities} />
+          </Grid>
         </Grid>
       </Grid>
     </div>
+  );
+};
+
+export const DashboardCommunities = ({ communities }) => {
+  return (
+    <Grid container item spacing={2} xs={12} justifyContent="center">
+      {communities?.map((community) => {
+        return (
+          <Grid item xs={12} md={6} key={community.id}>
+            <CommunityCard community={community} />
+          </Grid>
+        );
+      })}
+    </Grid>
   );
 };
 
@@ -148,8 +195,8 @@ export const CommunityCard = ({ community }) => {
         },
       }}
     >
-      <Grid container xs={12} justifyContent="space-between">
-        <Grid item xs={10}>
+      <Grid container xs={12} direction="column" justifyContent="space-between">
+        <Grid item>
           <CardContent>
             <Grid
               container
@@ -157,7 +204,13 @@ export const CommunityCard = ({ community }) => {
               spacing={3}
               direction="column"
             >
-              <Grid container item xs={12} alignItems="center" justifyContent="center">
+              <Grid
+                container
+                item
+                xs={12}
+                alignItems="center"
+                justifyContent="center"
+              >
                 <Grid item>
                   {Boolean(idle) && (
                     <Tooltip placement="top-end" arrow title="Idle">
@@ -189,15 +242,15 @@ export const CommunityCard = ({ community }) => {
             </Grid>
           </CardContent>
         </Grid>
-        <Grid item xs={2} sx={{ borderLeft: "1px solid #ddd" }}>
+        <Grid item>
           <LinearProgress
             color={getSynergyBarColor(community?.synergy?.value)}
             id="synergy-bar"
             variant="determinate"
             value={community?.synergy?.value * 100}
             style={{
-              height: "100%",
-              width: "100%",
+              height: "10px",
+              // width: "100%",
               // transform: `translateY(${25}%)`,
             }}
           />

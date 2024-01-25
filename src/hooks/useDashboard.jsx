@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { getSocketBaseUrl } from "../util/config";
 
-// probably move to separate hooks for dash and session
 export default function useDashboard() {
   const [_communities, setCommunities] = useState([]);
   const [socketUrl, setSocketUrl] = useState(null);
@@ -29,9 +28,7 @@ export default function useDashboard() {
               ...c,
               synergy: {
                 ...c.synergy,
-                value: c.synergy?.total
-                  ? c.synergy?.hits / c.synergy?.total
-                  : 0,
+                value: c.synergy?.hits ?? 0 / c.synergy?.total ?? 1,
               },
             }))
           );
