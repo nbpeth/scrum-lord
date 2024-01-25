@@ -51,7 +51,7 @@ export default function useDashboard() {
 
   const addCommunity = async (community) => {
     if (_communities.length >= 10) {
-      throw new Error("Too many communities");
+      throw new Error("Community limit reached");
     }
 
     sendMessage(

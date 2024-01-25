@@ -1,4 +1,5 @@
 import {
+  Alert,
   AppBar,
   Box,
   Card,
@@ -51,10 +52,10 @@ export const Dashboard = () => {
     setCreateRoomModalOpen(true);
   };
 
-  const createRoomModalClosed = (newCommunity) => {
+  const createRoomModalClosed = async (newCommunity) => {
     if (newCommunity) {
       try {
-        addCommunity(newCommunity);
+        await addCommunity(newCommunity);
         // navigate when the community is created
       } catch (e) {
         setError(e.message);
@@ -76,8 +77,6 @@ export const Dashboard = () => {
       );
     }
   };
-
-  // console.log(communities)
 
   return (
     <div>
@@ -119,8 +118,11 @@ export const Dashboard = () => {
         </Grid>
 
         <Grid container item xs={10}>
-          <Grid item>
+          <Grid item xs={3}>
             <SearchInput onChange={searchValueChanged} />
+          </Grid>
+          <Grid item xs={9}>
+            {error && <Alert severity="error">{error}</Alert>}
           </Grid>
         </Grid>
 
