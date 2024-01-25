@@ -78,8 +78,6 @@ export const Dashboard = () => {
     }
   };
 
-  // console.log("error", error)
-
   return (
     <div>
       <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
