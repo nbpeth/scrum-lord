@@ -75,6 +75,7 @@ export const Community = ({
     toggleMessageBoard,
     toggleReactions,
     toggleLurkerBox,
+    toggleTimerVisible
   } = useSettings();
 
   const theme = useTheme();
@@ -346,6 +347,19 @@ export const Community = ({
                       </MenuItem> */}
                       <MenuItem>
                         <ListItemIcon>
+                          <Celebration />
+                        </ListItemIcon>
+                        <ListItemText secondary="Reaction Panel" />
+
+                        <Switch
+                          checked={settings?.reactionsVisible}
+                          onChange={(e) => {
+                            toggleReactions(e.target.checked);
+                          }}
+                        />
+                      </MenuItem>
+                      <MenuItem>
+                        <ListItemIcon>
                           <ModeNightIcon />
                         </ListItemIcon>
                         <ListItemText secondary="Stars" />
@@ -387,15 +401,16 @@ export const Community = ({
                         <ListItemIcon>
                           <Celebration />
                         </ListItemIcon>
-                        <ListItemText secondary="Reaction Panel" />
+                        <ListItemText secondary="Timer" />
 
                         <Switch
-                          checked={settings?.reactionsVisible}
+                          checked={settings?.timerVisible}
                           onChange={(e) => {
-                            toggleReactions(e.target.checked);
+                            toggleTimerVisible(e.target.checked);
                           }}
                         />
                       </MenuItem>
+                      
                       <Divider />
                       <MenuItem>
                         <Button

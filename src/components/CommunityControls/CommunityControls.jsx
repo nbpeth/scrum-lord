@@ -137,11 +137,6 @@ export const CommunityControls = ({
           {iAmCitizen && iAmCitizen.votingMember && (
             <Grid container item spacing={2}>
               <Grid item xs={12}>
-                <Button fullWidth variant="contained" onClick={onVoteSubmit}>
-                  Vote
-                </Button>
-              </Grid>
-              <Grid item xs={12}>
                 <Select
                   fullWidth
                   labelId="vote-selector-label"
@@ -161,12 +156,31 @@ export const CommunityControls = ({
                 </Select>
               </Grid>
               <Grid item xs={12}>
+                <Button fullWidth variant="contained" onClick={onVoteSubmit}>
+                  Vote
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
                 <List>
                   <Divider />
                 </List>
               </Grid>
             </Grid>
           )}
+
+          {settings?.timerVisible && (
+            <>
+            <Grid item xs={12}>
+              <TimerControl {...{ community, handleTimerClicked }} />
+            </Grid>
+               <Grid item xs={12}>
+               <List>
+                 <Divider />
+               </List>
+             </Grid>
+             </>
+          )}
+       
           <Grid item xs={12}>
             {community && community.revealed ? (
               <Button
@@ -187,10 +201,6 @@ export const CommunityControls = ({
                 Reveal
               </Button>
             )}
-          </Grid>
-
-          <Grid item xs={12}>
-            <TimerControl {...{ community, handleTimerClicked }} />
           </Grid>
           <Grid item xs={12}>
             <List>
