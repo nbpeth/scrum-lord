@@ -31,7 +31,7 @@ export const PointChart = ({ community }) => {
     //     name: option,
     //     data: [voteCounts[option] || 0],
     //   }));
-    console.log("op", options?.filter(x => voteCounts[x]))
+    // console.log("op", options?.filter(x => voteCounts[x]))
 
     setChartData({
       series: lineChartData,

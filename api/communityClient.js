@@ -29,7 +29,7 @@ const getCommunitiesAsArray = async () => {
         synergy: data.synergy,
       };
     })
-    .filter((x) => !!x);
+    ?.filter((x) => !!x);
 };
 
 const getCommunityBy = async (id) => {
@@ -162,10 +162,10 @@ const verifySynergy = (result) => {
   return (
     result &&
     result.citizens &&
-    result.citizens.length > 1 &&
+    result.citizens?.length > 1 &&
     result.citizens
       // don't count votes for lurkers
-      .filter((citizen) => citizen.votingMember)
+      ?.filter((citizen) => citizen.votingMember)
       .map((citizen) => citizen.vote)
       .every(
         (vote) => {

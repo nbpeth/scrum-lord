@@ -21,7 +21,7 @@ export const CommunityCitizens = ({
       <Grid container item spacing={1} xs={12} justifyContent="center">
         {citizens.length ? (
           citizens
-            .filter((c) => c.votingMember)
+            ?.filter((c) => c.votingMember)
             .map((citizen, i) => {
               return (
                 <Grid item xs={6} md={3} lg={2} key={citizen.userId}>

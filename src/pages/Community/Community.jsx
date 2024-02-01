@@ -241,7 +241,7 @@ export const Community = ({
   };
 
   const lurkers =
-    currentCommunity?.citizens.filter((c) => !c?.votingMember) || [];
+    currentCommunity?.citizens?.filter((c) => !c?.votingMember) || [];
 
   return (
     <>
