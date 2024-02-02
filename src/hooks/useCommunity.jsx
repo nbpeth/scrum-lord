@@ -3,12 +3,39 @@ import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
 import { getSocketBaseUrl } from "../util/config";
+import { Web } from "@mui/icons-material";
+import { WebSocketReadyState } from "../util/websocketUtils";
 
 export default function useCommunity() {
   const params = useParams();
   const communityId = params.communityId;
   const [socketUrl, setSocketUrl] = useState(null);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+
+  const [reconnection, setReconnection] = useState({attempts: 15, interval: 5, reconnecting: false});
+
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    onOpen: () => {
+      setReconnection({ reconnecting: false });
+    },
+    shouldReconnect: (closeEvent) => {
+      // these should be graceful exits like an unmount
+      if (
+        closeEvent.code === WebSocketReadyState.CLOSED ||
+        closeEvent.code === WebSocketReadyState.ABNORMAL_CLOSURE
+      ) {
+        setReconnection({ reconnecting: false });
+        return false;
+      }
+
+      // setInterval(() => {
+      //   const attempts = reconnection.attempts;
+      //   setReconnection({ reconnecting: true, attempts: attempts - 1, interval: 5 });
+      // }, 1000)
+      return true;
+    },
+    reconnectInterval: 5000,
+    reconnectAttempts: 15,
+  });
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
   const [messageHistory, setMessageHistory] = useState([]);
@@ -459,6 +486,7 @@ export default function useCommunity() {
     handleReset,
     leaveCommunity,
     readyState,
+    reconnection,
     roomEvents,
     startTimer,
     submitVote,

@@ -1,37 +1,28 @@
 import { Alert, useMediaQuery } from "@mui/material";
+import { WebSocketReadyState } from "../../util/websocketUtils";
 
-export const ConnectionStatus = ({ readyState }) => {
+export const ConnectionStatus = ({ readyState, reconnection }) => {
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
-
-  /*
-  console.log("ready?", readyState);
-  if it's closed, tell them to refresh or click a button or something
-
-   0 = CONNECTING
-   1 = OPEN
-   2 = CLOSING
-   3 = CLOSED
-  */
 
   const getSeverity = (readyState) => {
     switch (readyState) {
-      case 0:
+      case WebSocketReadyState.CONNECTING:
         return {
           severity: "info",
           message: "Connecting...",
         };
-      case 1:
+      case WebSocketReadyState.OPEN:
         return {
           severity: "success",
           message: "Connected",
         };
 
-      case 2:
+      case WebSocketReadyState.CLOSING:
         return {
           severity: "warning",
           message: "Closing...",
         };
-      case 3:
+      case WebSocketReadyState.CLOSED:
         return {
           severity: "error",
           message: "Disconnected",
@@ -44,7 +35,15 @@ export const ConnectionStatus = ({ readyState }) => {
     }
   };
 
+  // show a reconnecting in...
+  // if disconnected, show a button to reconnect
+
   const { severity, message } = getSeverity(readyState);
 
-  return <Alert severity={severity}>{fullsizeScreen ? message : null}</Alert>;
+  return (
+    <Alert severity={severity}>
+      {/* {JSON.stringify(reconnection)} */}
+      {fullsizeScreen ? message : null}
+    </Alert>
+  );
 };

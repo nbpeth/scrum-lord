@@ -51,7 +51,7 @@ export const Community = ({
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
 
   const {
-    alertMessage,
+    // alertMessage,
     cancelTimer,
     clearAlertMessage,
     joinCommunity,
@@ -64,6 +64,7 @@ export const Community = ({
     deleteCommunity,
     roomEvents,
     readyState,
+    reconnection,
     communityReaction,
     messageHistory,
     startTimer,
@@ -75,7 +76,7 @@ export const Community = ({
     toggleMessageBoard,
     toggleReactions,
     toggleLurkerBox,
-    toggleTimerVisible
+    toggleTimerVisible,
   } = useSettings();
 
   const theme = useTheme();
@@ -410,7 +411,6 @@ export const Community = ({
                           }}
                         />
                       </MenuItem>
-                      
                       <Divider />
                       <MenuItem>
                         <Button
@@ -431,7 +431,10 @@ export const Community = ({
             <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
               {currentCommunity && currentCommunity.name}
             </Typography>
-            <ConnectionStatus readyState={readyState} />
+            <ConnectionStatus
+              reconnection={reconnection}
+              readyState={readyState}
+            />
           </Toolbar>
         </AppBar>
       </Box>
@@ -481,14 +484,18 @@ export const Community = ({
           {currentCommunity ? (
             <Grid container item xs={12} justifyContent="space-between">
               {settings?.lurkerBoxVisible && (
-                <Grid item xs={2} sx={{paddingTop: "10px"}}>
+                <Grid item xs={2} sx={{ paddingTop: "10px" }}>
                   <LurkerBox
                     lurkers={lurkers}
                     handleDeleteUser={handleDeleteUser}
                   />
                 </Grid>
               )}
-              <Grid item justifyContent="center" xs={settings?.lurkerBoxVisible ? 10 : 12}>
+              <Grid
+                item
+                justifyContent="center"
+                xs={settings?.lurkerBoxVisible ? 10 : 12}
+              >
                 <CommunityCitizens
                   citizens={citizens}
                   iAmCitizen={iAmCitizen}
