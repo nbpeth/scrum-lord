@@ -19,17 +19,15 @@ const darkTheme = createTheme({
 });
 
 const useStyles = makeStyles({
-  imageContainer: {
-    
-  },
+  imageContainer: {},
   image: {
     position: "absolute",
     height: "300px",
     width: "300px",
     zIndex: -2,
     animation: "$move-image 60s linear infinite",
-    '&:hover': {
-      transform: 'scale(2)', // Example: scale the image up on hover
+    "&:hover": {
+      transform: "scale(2)", // Example: scale the image up on hover
     },
   },
 
@@ -56,16 +54,13 @@ const useStyles = makeStyles({
   },
 });
 
-// todo: sort dash by active
 // todo: connect button: if disconnected should allow the user to reconnect
 //       should the app attempt to reconnect automatically?
 // todo: identify users that are or are not present
 // todo: chat?
 // todo: logged in voting member toggle
 // todo: add sound to reveal
-// todo: max sessions error
 // todo: redirect to community after it is created
-
 
 const App = () => {
   return (

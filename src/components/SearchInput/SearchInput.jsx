@@ -8,7 +8,7 @@ export const SearchInput = ({ onChange }) => {
   return (
     <Paper
       component="form"
-      sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: 300 }}
+      sx={{ p: "2px 4px", display: "flex", alignItems: "center"  }}
     >
       <InputBase
         onChange={onChange}

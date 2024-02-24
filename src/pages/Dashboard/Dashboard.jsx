@@ -2,6 +2,7 @@ import {
   Alert,
   AppBar,
   Box,
+  Button,
   Card,
   CardContent,
   Grid,
@@ -12,17 +13,17 @@ import {
   alpha,
   useTheme,
 } from "@mui/material";
+import { differenceInDays, format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
-import { format, differenceInDays, parseISO } from "date-fns";
 
+import { Schedule } from "@mui/icons-material";
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
-import logoUrl from "../../scrumlord-logo-2.png";
-import { Schedule } from "@mui/icons-material";
 import { SearchInput } from "../../components/SearchInput/SearchInput";
+import logoUrl from "../../scrumlord-logo-2.png";
 
 export const Dashboard = () => {
   const { listCommunities, addCommunity, fetchCommunities, readyState } =
@@ -73,10 +74,22 @@ export const Dashboard = () => {
       setFilteredCommunities(communities);
     } else {
       setFilteredCommunities(
-        communities?.filter((c) => c.name?.toLowerCase().includes(e.target.value.toLowerCase())) || []
+        communities?.filter((c) =>
+          c.name?.toLowerCase().includes(e.target.value.toLowerCase())
+        ) || []
       );
     }
   };
+
+  const communitLimitReached = communities?.length >= 10;
+
+  useEffect(() => {
+    if (communitLimitReached) {
+      setError(communitLimitReached ? "Community limit reached" : null);
+    } else {
+      setError(null);
+    }
+  }, [communitLimitReached]);
 
   return (
     <div>
@@ -88,11 +101,19 @@ export const Dashboard = () => {
               spacing={2}
               justifyContent="space-between"
               alignItems="center"
+              direction="row"
               xs={12}
             >
-              <Grid item>
-                <DashboardTitleMenu createRoomClicked={createRoomClicked} />
+              <Grid container item xs={3} spacing={3}>
+                <Grid item>
+                  <DashboardTitleMenu createRoomClicked={createRoomClicked} />
+                </Grid>
+
+                {/* <Grid item>
+                  <GitHubIcon />
+                </Grid> */}
               </Grid>
+
               <Grid item>
                 <ConnectionStatus readyState={readyState} />
               </Grid>
@@ -110,19 +131,28 @@ export const Dashboard = () => {
         xs={12}
         justifyContent="center"
         alignItems="center"
-        alignContent="center"
         spacing={2}
       >
         <Grid item xs={12}>
           <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
         </Grid>
 
-        <Grid container item xs={10}>
-          <Grid item xs={3}>
+        <Grid container item xs={10} spacing={2} justifyContent="space-between" alignItems="center">
+          <Grid item xs={6} md={3}>
             <SearchInput onChange={searchValueChanged} />
           </Grid>
-          <Grid item xs={9}>
+
+          <Grid item xs={12} md={7}>
             {error && <Alert severity="error">{error}</Alert>}
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Button
+              onClick={createRoomClicked}
+              variant="contained"
+              disabled={communitLimitReached}
+            >
+              Create Room{" "}
+            </Button>
           </Grid>
         </Grid>
 
@@ -151,13 +181,24 @@ export const Dashboard = () => {
 export const DashboardCommunities = ({ communities }) => {
   return (
     <Grid container item spacing={2} xs={12} justifyContent="center">
-      {communities?.map((community) => {
-        return (
-          <Grid item xs={12} md={6} key={community.id}>
-            <CommunityCard community={community} />
-          </Grid>
-        );
-      })}
+      {communities
+        ?.sort((a, b) => b.synergy?.value - a.synergy?.value)
+        .map((community) => {
+          const idle = differenceInDays(
+            new Date(),
+            parseISO(community?.lastModified)
+          );
+
+          return { ...community, idle };
+        })
+        .sort((a, b) => a.idle - b.idle)
+        .map((community) => {
+          return (
+            <Grid item xs={12} md={6} key={community.id}>
+              <CommunityCard community={community} />
+            </Grid>
+          );
+        })}
     </Grid>
   );
 };
@@ -179,7 +220,7 @@ export const CommunityCard = ({ community }) => {
     }
   };
 
-  const idle = differenceInDays(new Date(), parseISO(community?.lastModified));
+  const { idle } = community;
 
   return (
     <Card
