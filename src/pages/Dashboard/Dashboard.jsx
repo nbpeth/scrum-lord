@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { differenceInDays, format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
 
@@ -42,6 +42,7 @@ export const Dashboard = () => {
   // const theme = useTheme();
 
   const communitLimitReached = communities?.length >= 10;
+  const navigate = useNavigate();
 
   console.log("privateRoomCreatedComplete", privateRoomCreatedComplete);
 
@@ -69,7 +70,8 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (privateRoomCreatedComplete) {
-      setPrivateCommunityCallbackModalOpen(privateRoomCreatedComplete);
+      navigate(`/communities/${privateRoomCreatedComplete.id}`);
+      // setPrivateCommunityCallbackModalOpen(!!privateRoomCreatedComplete);
     }
   }, [privateRoomCreatedComplete]);
 
@@ -141,12 +143,12 @@ export const Dashboard = () => {
           </Toolbar>
         </AppBar>
       </Box>
-      <PrivateCommunityCallbackModal
+      {/* <PrivateCommunityCallbackModal
         data={privateRoomCreatedComplete}
         open={privateCommunityCallbackModalOpen}
         handleClose={closePrivateCommunityCallbackModal}
         onBlur={closePrivateCommunityCallbackModal}
-      />
+      /> */}
       <CreateRoomModal
         open={createRoomModalOpen}
         handleClose={createRoomModalClosed}
