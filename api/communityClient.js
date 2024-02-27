@@ -27,9 +27,10 @@ const getCommunitiesAsArray = async () => {
         citizens: data.citizens.length,
         lastModified: last_modified,
         synergy: data.synergy,
+        isPrivate: data.isPrivate,
       };
     })
-    ?.filter((x) => !!x);
+    ?.filter((x) => !!x && !x.isPrivate);
 };
 
 const getCommunityBy = async (id) => {
@@ -45,12 +46,13 @@ const getCommunityBy = async (id) => {
 
 const addCommunity = async (community) => {
   const result = await postgresClient.addCommunity({
-    community: { ...community, citizens: [], synergy: { } },
+    community: { ...community, citizens: [], synergy: {} },
   });
 
   return result.map(({ id, data }) => {
     return {
       id,
+      isPrivate: data.isPrivate,
       name: data.name,
       description: data.description,
       citizens: data.citizens.length,
@@ -167,14 +169,14 @@ const verifySynergy = (result) => {
       // don't count votes for lurkers
       ?.filter((citizen) => citizen.votingMember)
       .map((citizen) => citizen.vote)
-      .every(
-        (vote) => {
-          // all votes are the same and all votes were cast
-          return vote === result.citizens[0].vote &&
+      .every((vote) => {
+        // all votes are the same and all votes were cast
+        return (
+          vote === result.citizens[0].vote &&
           vote !== null &&
           vote !== undefined
-        }
-      )
+        );
+      })
   );
 };
 
@@ -183,9 +185,11 @@ const reveal = async ({ communityId }) => {
   const { data } = result[0];
 
   const isSynergized = verifySynergy(data);
-  if(isSynergized) {
-     const synergyResult = await postgresClient.synergizeCommunity({ communityId });
-     return { ...synergyResult, isSynergized }
+  if (isSynergized) {
+    const synergyResult = await postgresClient.synergizeCommunity({
+      communityId,
+    });
+    return { ...synergyResult, isSynergized };
   }
 
   return { ...data, isSynergized };

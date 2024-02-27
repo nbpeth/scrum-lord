@@ -24,16 +24,26 @@ import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionSt
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { SearchInput } from "../../components/SearchInput/SearchInput";
 import logoUrl from "../../scrumlord-logo-2.png";
+import { PrivateCommunityCallbackModal } from "../../components/PrivateCommunityCallbackModal/PrivateCommunityCallbackModal.jsx";
 
 export const Dashboard = () => {
-  const { listCommunities, addCommunity, fetchCommunities, readyState } =
-    useDashboard();
+  const {
+    listCommunities,
+    addCommunity,
+    fetchCommunities,
+    privateRoomCreatedComplete,
+    readyState,
+  } = useDashboard();
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
   const [filteredCommunities, setFilteredCommunities] = useState(communityList);
-  const theme = useTheme();
+  // const theme = useTheme();
+
+  const communitLimitReached = communities?.length >= 10;
+
+  console.log("privateRoomCreatedComplete", privateRoomCreatedComplete);
 
   // get the list of communities on mount
   useEffect(() => {
@@ -48,6 +58,24 @@ export const Dashboard = () => {
   useEffect(() => {
     setFilteredCommunities(communities);
   }, [communities]);
+
+  useEffect(() => {
+    if (communitLimitReached) {
+      setError(communitLimitReached ? "Community limit reached" : null);
+    } else {
+      setError(null);
+    }
+  }, [communitLimitReached]);
+
+  useEffect(() => {
+    if (privateRoomCreatedComplete) {
+      setPrivateCommunityCallbackModalOpen(privateRoomCreatedComplete);
+    }
+  }, [privateRoomCreatedComplete]);
+
+  const closePrivateCommunityCallbackModal = () => {
+    setPrivateCommunityCallbackModalOpen(false);
+  };
 
   const createRoomClicked = () => {
     setCreateRoomModalOpen(true);
@@ -81,15 +109,12 @@ export const Dashboard = () => {
     }
   };
 
-  const communitLimitReached = communities?.length >= 10;
+  const [
+    privateCommunityCallbackModalOpen,
+    setPrivateCommunityCallbackModalOpen,
+  ] = useState(false);
 
-  useEffect(() => {
-    if (communitLimitReached) {
-      setError(communitLimitReached ? "Community limit reached" : null);
-    } else {
-      setError(null);
-    }
-  }, [communitLimitReached]);
+  
 
   return (
     <div>
@@ -108,12 +133,7 @@ export const Dashboard = () => {
                 <Grid item>
                   <DashboardTitleMenu createRoomClicked={createRoomClicked} />
                 </Grid>
-
-                {/* <Grid item>
-                  <GitHubIcon />
-                </Grid> */}
               </Grid>
-
               <Grid item>
                 <ConnectionStatus readyState={readyState} />
               </Grid>
@@ -121,6 +141,12 @@ export const Dashboard = () => {
           </Toolbar>
         </AppBar>
       </Box>
+      <PrivateCommunityCallbackModal
+        data={privateRoomCreatedComplete}
+        open={privateCommunityCallbackModalOpen}
+        handleClose={closePrivateCommunityCallbackModal}
+        onBlur={closePrivateCommunityCallbackModal}
+      />
       <CreateRoomModal
         open={createRoomModalOpen}
         handleClose={createRoomModalClosed}
@@ -137,7 +163,14 @@ export const Dashboard = () => {
           <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
         </Grid>
 
-        <Grid container item xs={10} spacing={2} justifyContent="space-between" alignItems="center">
+        <Grid
+          container
+          item
+          xs={10}
+          spacing={2}
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Grid item xs={6} md={3}>
             <SearchInput onChange={searchValueChanged} />
           </Grid>

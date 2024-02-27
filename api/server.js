@@ -74,8 +74,7 @@ const killTimerIfExists = async (communityId) => {
   if (timer) {
     await resetCommunityTimer(timer, communityId);
   }
-}
-
+};
 
 // the boatman ferries wayward connections to the other side
 const boatman = (ws) => setTimeout(() => heartbeat(ws), 40000);
@@ -107,7 +106,7 @@ websocketServer.on("connection", (ws, request) => {
 
     switch (type) {
       case "create-community":
-        handleCreateCommunity(payload);
+        handleCreateCommunity(payload, ws);
         break;
 
       case "join-community":
@@ -171,6 +170,10 @@ websocketServer.on("connection", (ws, request) => {
   ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
 });
 
+const notifyCaller = (ws, message) => {
+  ws.send(JSON.stringify(message));
+};
+
 const notifyClients = ({ message, communityId }) => {
   websocketServer.clients.forEach((client) => {
     const isTargeted = communityId !== undefined;
@@ -203,10 +206,16 @@ const handleCommunityReaction = (payload) => {
   notifyClients({ message: reply, communityId });
 };
 
-const handleCreateCommunity = async (payload) => {
+const handleCreateCommunity = async (payload, ws) => {
   const { community } = payload;
+
   const result = await communityClient.addCommunity(community);
-  // result is the created item
+  if (community.isPrivate) {
+    notifyCaller(ws, {
+      type: "private-community-created-reply",
+      payload: { result },
+    });
+  }
 
   const communities = await communityClient.getCommunitiesAsArray();
 
@@ -345,8 +354,7 @@ const handleReveal = async (payload) => {
 
   const result = await communityClient.reveal({ communityId });
   // const isSynergized = verifySynergy(result);
-  console.log("reveal", result)
-
+  console.log("reveal", result);
 
   const reply = {
     type: "reveal-reply",
@@ -476,7 +484,7 @@ setInterval(() => {
 
 // check for orphaned timers once daily
 // setInterval(() => {
-  
+
 // }, 86400000);
 
 server.listen(process.env.PORT || 8080, () => {
