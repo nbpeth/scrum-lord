@@ -24,6 +24,7 @@ import useCommunity from "../../hooks/useCommunity";
 
 import {
   Celebration,
+  ContentCopy,
   Home,
   ModeComment,
   Visibility,
@@ -272,6 +273,7 @@ export const Community = ({
             <ScrumLordMenu>
               <Paper sx={{ width: 300, maxWidth: "100%" }}>
                 <MenuList>
+                  {/* <Divider /> */}
                   <MenuItem
                     onClick={() => {
                       navigate("/");
@@ -286,6 +288,16 @@ export const Community = ({
                       component="div"
                       sx={{ flexGrow: 1 }}
                     ></Typography>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <ContentCopy />
+                    </ListItemIcon>
+                    <ListItemText secondary="Copy Room URL" />
                   </MenuItem>
 
                   <Divider />
@@ -421,9 +433,10 @@ export const Community = ({
                         >
                           Delete Room
                         </Button>
-                      </MenuItem>{" "}
+                      </MenuItem>
                     </>
                   )}
+                 
                 </MenuList>
               </Paper>
             </ScrumLordMenu>

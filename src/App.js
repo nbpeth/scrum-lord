@@ -54,6 +54,11 @@ const useStyles = makeStyles({
   },
 });
 
+// remove "community" from app and replace with "room" or "space"
+// clean up ephemeral rooms
+// copy room link button in community menu
+// show "your rooms" (you've created) from local storage
+// delineate betwen public and private rooms
 // todo: connect button: if disconnected should allow the user to reconnect
 //       should the app attempt to reconnect automatically?
 // todo: identify users that are or are not present
