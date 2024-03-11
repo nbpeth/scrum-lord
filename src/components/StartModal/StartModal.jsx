@@ -4,8 +4,14 @@ import { Link } from "react-router-dom";
 import { DashboardCommunities } from "../DashboardCommunities/DashboardCommunities";
 import { SearchInput } from "../SearchInput/SearchInput";
 import { useEffect, useState } from "react";
+import { Close } from "@mui/icons-material";
 
-export const StartModal = ({ open, handleClose, communities, setCreateRoomModalOpen }) => {
+export const StartModal = ({
+  open,
+  handleClose,
+  communities,
+  setCreateRoomModalOpen,
+}) => {
   const style = {
     position: "relative",
     top: "50%",
@@ -49,12 +55,28 @@ export const StartModal = ({ open, handleClose, communities, setCreateRoomModalO
     >
       <Box sx={style}>
         <Grid container item xs={12} spacing={2} justifyContent="center">
-          <Grid container item xs={12} spacing={2} alignItems="center" justifyContent="flex-end">
+          <Grid item xs={12} textAlign="right">
+            <Close sx={{cursor: "pointer"}} onClick={handleClose} />
+          </Grid>
+          <Grid
+            container
+            item
+            xs={12}
+            spacing={2}
+            alignItems="center"
+            justifyContent="flex-end"
+          >
             <Grid item xs={8}>
               <SearchInput onChange={searchValueChanged} />
             </Grid>
             <Grid item xs={4}>
-              <Button fullWidth variant="contained" onClick={setCreateRoomModalOpen}>New</Button>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={setCreateRoomModalOpen}
+              >
+                New
+              </Button>
             </Grid>
           </Grid>
           <Grid item>

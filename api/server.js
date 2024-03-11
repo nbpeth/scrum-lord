@@ -208,11 +208,11 @@ const handleCommunityReaction = (payload) => {
 
 const handleCreateCommunity = async (payload, ws) => {
   const { community } = payload;
-
+  
   const result = await communityClient.addCommunity(community);
   if (community.isPrivate) {
     notifyCaller(ws, {
-      type: "private-community-created-reply",
+      type: "community-created-complete-reply",
       payload: { result },
     });
   }

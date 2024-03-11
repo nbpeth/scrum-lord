@@ -14,7 +14,8 @@ export const Dashboard = () => {
     listCommunities,
     addCommunity,
     fetchCommunities,
-    privateRoomCreatedComplete,
+    communityCreatedComplete,
+    // privateRoomCreatedComplete,
     readyState,
   } = useDashboard();
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
@@ -22,9 +23,8 @@ export const Dashboard = () => {
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
-  // const [filteredCommunities, setFilteredCommunities] = useState(communityList);
-  // const theme = useTheme();
-  // const classes = useStyles();
+  /*
+*/
   const communitLimitReached = communities?.length >= 10;
   const navigate = useNavigate();
 
@@ -47,11 +47,10 @@ export const Dashboard = () => {
   }, [communitLimitReached]);
 
   useEffect(() => {
-    debugger
-    if (privateRoomCreatedComplete) {
-      navigate(`/communities/${privateRoomCreatedComplete.id}`);
+    if (communityCreatedComplete && communityCreatedComplete.id) {
+      navigate(`/communities/${communityCreatedComplete.id}`);
     }
-  }, [privateRoomCreatedComplete]);
+  }, [communityCreatedComplete]);
 
   const createRoomClicked = () => {
     setCreateRoomModalOpen(true);
@@ -62,13 +61,11 @@ export const Dashboard = () => {
   };
 
   const createRoomModalClosed = async (newCommunity) => {
-    
     if (newCommunity) {
       try {
         await addCommunity(newCommunity);
         // navigate when the community is created
       } catch (e) {
-        
         setError(e.message);
         setCreateRoomModalOpen(false);
         return;
