@@ -15,9 +15,16 @@ const useStyles = makeStyles({
   cardReveal: {
     animation: "$reveal-card 2s ease-in-out",
   },
+  cardRevealMobile: {
+    animation: "$reveal-card-mobile 2s ease-in-out",
+  },
   "@keyframes reveal-card": {
     "0%": { transform: "perspective(200px) rotateY(0deg)" },
     "100%": { transform: "perspective(200px) rotateY(180deg)" },
+  },
+  "@keyframes reveal-card-mobile": {
+    "0%": { transform: "perspective(200px) rotateX(0deg)" },
+    "100%": { transform: "perspective(200px) rotateX(180deg)" },
   },
   contentHide: {
     visibility: "hidden",
@@ -203,7 +210,7 @@ export const CitizenCardMobile = ({
   const { vote, hasVoted, username, userColor, doubleVote } = citizen;
   return (
     <Card
-      className={cardAnimating ? classes.cardReveal : null}
+      className={cardAnimating ? classes.cardRevealMobile : null}
       key={citizen.id}
       sx={{
         padding: "10px",
