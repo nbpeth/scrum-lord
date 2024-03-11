@@ -1,26 +1,12 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  LinearProgress,
-  Toolbar,
-  Tooltip,
-  Typography,
-  alpha,
-  useTheme,
-} from "@mui/material";
-import { differenceInDays, format, parseISO } from "date-fns";
+import { AppBar, Box, Button, Grid, Toolbar, alpha } from "@mui/material";
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
 
-import { Schedule } from "@mui/icons-material";
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
+import { StartModal } from "../../components/StartModal/StartModal";
 import logoUrl from "../../scrum-lord.png";
 
 export const Dashboard = () => {
@@ -32,16 +18,15 @@ export const Dashboard = () => {
     readyState,
   } = useDashboard();
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
+  const [startModalOpen, setStartModalOpen] = useState(false);
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
-  const [filteredCommunities, setFilteredCommunities] = useState(communityList);
+  // const [filteredCommunities, setFilteredCommunities] = useState(communityList);
   // const theme = useTheme();
   // const classes = useStyles();
   const communitLimitReached = communities?.length >= 10;
   const navigate = useNavigate();
-
-  // console.log("privateRoomCreatedComplete", privateRoomCreatedComplete);
 
   // get the list of communities on mount
   useEffect(() => {
@@ -54,10 +39,6 @@ export const Dashboard = () => {
   }, [communityList]);
 
   useEffect(() => {
-    setFilteredCommunities(communities);
-  }, [communities]);
-
-  useEffect(() => {
     if (communitLimitReached) {
       setError(communitLimitReached ? "Community limit reached" : null);
     } else {
@@ -66,26 +47,28 @@ export const Dashboard = () => {
   }, [communitLimitReached]);
 
   useEffect(() => {
+    debugger
     if (privateRoomCreatedComplete) {
       navigate(`/communities/${privateRoomCreatedComplete.id}`);
-      // setPrivateCommunityCallbackModalOpen(!!privateRoomCreatedComplete);
     }
   }, [privateRoomCreatedComplete]);
-
-  const closePrivateCommunityCallbackModal = () => {
-    setPrivateCommunityCallbackModalOpen(false);
-  };
 
   const createRoomClicked = () => {
     setCreateRoomModalOpen(true);
   };
 
+  const startModalClicked = () => {
+    setStartModalOpen(true);
+  };
+
   const createRoomModalClosed = async (newCommunity) => {
+    
     if (newCommunity) {
       try {
         await addCommunity(newCommunity);
         // navigate when the community is created
       } catch (e) {
+        
         setError(e.message);
         setCreateRoomModalOpen(false);
         return;
@@ -94,24 +77,6 @@ export const Dashboard = () => {
 
     setCreateRoomModalOpen(false);
   };
-
-  const searchValueChanged = (e) => {
-    e.preventDefault();
-    if (e.target.value === "") {
-      setFilteredCommunities(communities);
-    } else {
-      setFilteredCommunities(
-        communities?.filter((c) =>
-          c.name?.toLowerCase().includes(e.target.value.toLowerCase())
-        ) || []
-      );
-    }
-  };
-
-  const [
-    privateCommunityCallbackModalOpen,
-    setPrivateCommunityCallbackModalOpen,
-  ] = useState(false);
 
   return (
     <div>
@@ -138,43 +103,20 @@ export const Dashboard = () => {
           </Toolbar>
         </AppBar>
       </Box>
-      {/* <PrivateCommunityCallbackModal
-        data={privateRoomCreatedComplete}
-        open={privateCommunityCallbackModalOpen}
-        handleClose={closePrivateCommunityCallbackModal}
-        onBlur={closePrivateCommunityCallbackModal}
-      /> */}
+
       <CreateRoomModal
         open={createRoomModalOpen}
         handleClose={createRoomModalClosed}
         onBlur={createRoomModalClosed}
       />
-      {/* <Grid
-        container
-        xs={12}
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-      >
-        <Grid
-          container
-          item
-          xs={10}
-          spacing={2}
-          justifyContent="center"
-          alignItems="center"
-        > */}
-      {/* <Grid item xs={6} md={12} sx={{ zIndex: 3 }}>
-            <img height="25%" width="50%" src={logoUrl} alt="Scrum lord" />
-          </Grid> */}
-      {/* <Grid item xs={6} md={3}>
-            <SearchInput onChange={searchValueChanged} />
-          </Grid> */}
+      <StartModal
+        open={startModalOpen}
+        handleClose={() => setStartModalOpen(false)}
+        onBlur={() => setStartModalOpen(false)}
+        communities={communities}
+        setCreateRoomModalOpen={setCreateRoomModalOpen}
+      />
 
-      {/* <Grid item xs={12} md={7}>
-            {error && <Alert severity="error">{error}</Alert>}
-          </Grid> */}
-      {/* <Grid item xs={6} md={12}> */}
       <Box
         sx={{
           display: "flex",
@@ -184,7 +126,6 @@ export const Dashboard = () => {
         }}
       >
         <Button
-          // sx={{ zIndex:2, width: "200px", height: "200px", borderRadius: "50%", boxShadow: "0px 5px 300px 100px royalblue" }}
           sx={{
             fontFamily: "monospace",
             fontSize: ".8em",
@@ -201,11 +142,9 @@ export const Dashboard = () => {
               width: "45vh",
             },
           }}
-          // className={classes.button}
-
-          onClick={createRoomClicked}
+          onClick={startModalClicked}
+          // onClick={createRoomClicked}
           variant="outline"
-          disabled={communitLimitReached}
         >
           <img
             src={logoUrl}
@@ -213,161 +152,15 @@ export const Dashboard = () => {
             style={{
               height: "20vh",
               width: "20vw",
-              // transition: "width 1.5s ease-in-out, height 1.5s ease-in-out",
-              // "&:hover": {
-              //   height: "35vh",
-              //   width: "35vh",
-              // },
+              transition: "width 1.5s ease-in-out, height 1.5s ease-in-out",
+              "&:hover": {
+                height: "35vh",
+                width: "35vh",
+              },
             }}
           />
         </Button>
       </Box>
-      {/* </Grid>
-        </Grid> */}
-
-      {/* <Grid
-          item
-          container
-          spacing={2}
-          xs={10}
-          direction="column"
-          id="dashboard-tiles-container"
-        > */}
-      {/* {error && (
-          <Grid item xs={12}>
-            <Typography variant="h3">{error}</Typography>
-          </Grid>
-        )} */}
-      {/* <Grid item xs> */}
-      {/* <DashboardCommunities communities={filteredCommunities} /> */}
-      {/* </Grid> */}
-      {/* </Grid> */}
-      {/* // </Grid> */}
     </div>
-  );
-};
-
-export const DashboardCommunities = ({ communities }) => {
-  return (
-    <Grid container item spacing={2} xs={12} justifyContent="center">
-      {communities
-        ?.sort((a, b) => b.synergy?.value - a.synergy?.value)
-        .map((community) => {
-          const idle = differenceInDays(
-            new Date(),
-            parseISO(community?.lastModified)
-          );
-
-          return { ...community, idle };
-        })
-        .sort((a, b) => a.idle - b.idle)
-        .map((community) => {
-          return (
-            <Grid item xs={12} md={6} key={community.id}>
-              <CommunityCard community={community} />
-            </Grid>
-          );
-        })}
-    </Grid>
-  );
-};
-
-export const CommunityCard = ({ community }) => {
-  const theme = useTheme();
-
-  const getSynergyBarColor = (synergy) => {
-    if (synergy >= 0.75) {
-      return "success";
-    } else if (synergy >= 0.5) {
-      return "primary";
-    } else if (synergy >= 0.25) {
-      return "secondary";
-    } else if (synergy >= 0.15) {
-      return "warning";
-    } else {
-      return "error";
-    }
-  };
-
-  const { idle } = community;
-
-  return (
-    <Card
-      variant="outlined"
-      sx={{
-        backgroundColor: idle
-          ? alpha(theme.palette.grey[900], 0.5)
-          : alpha(theme.palette.secondary.dark, 0.5),
-
-        transition: "background .5s ease-in-out",
-        "&:hover": {
-          backgroundColor: idle
-            ? alpha(theme.palette.grey[500], 0.5)
-            : alpha(theme.palette.secondary.dark, 1),
-        },
-      }}
-    >
-      <Grid container xs={12} direction="column" justifyContent="space-between">
-        <Grid item>
-          <CardContent>
-            <Grid
-              container
-              justifyContent="space-between"
-              spacing={3}
-              direction="column"
-            >
-              <Grid
-                container
-                item
-                xs={12}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Grid item>
-                  {Boolean(idle) && (
-                    <Tooltip placement="top-end" arrow title="Idle">
-                      <Schedule
-                        sx={{ fontSize: "medium", marginRight: "10px" }}
-                      />
-                    </Tooltip>
-                  )}
-                </Grid>
-                <Grid item>
-                  <Typography variant="h5" color={theme.palette.grey[100]}>
-                    <NavLink
-                      to={`/communities/${community.id}`}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                    >
-                      {community.name}
-                    </NavLink>
-                  </Typography>
-                </Grid>
-              </Grid>
-              {community?.lastModified && (
-                <Grid item>
-                  <Typography variant="body2" color={theme.palette.grey[300]}>
-                    Last Activity{" "}
-                    {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
-                  </Typography>
-                </Grid>
-              )}
-            </Grid>
-          </CardContent>
-        </Grid>
-        <Grid item>
-          <LinearProgress
-            color={getSynergyBarColor(community?.synergy?.value)}
-            id="synergy-bar"
-            variant="determinate"
-            value={community?.synergy?.value * 100}
-            style={{
-              height: "10px",
-              // width: "100%",
-              // transform: `translateY(${25}%)`,
-            }}
-          />
-        </Grid>
-      </Grid>
-    </Card>
   );
 };
