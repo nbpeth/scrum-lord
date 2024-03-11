@@ -4,6 +4,8 @@ import { getSocketBaseUrl } from "../util/config";
 
 export default function useDashboard() {
   const [_communities, setCommunities] = useState([]);
+  const [privateRoomCreatedComplete, setPrivateRoomCreatedComplete] =
+    useState();
   const [socketUrl, setSocketUrl] = useState(null);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -18,6 +20,11 @@ export default function useDashboard() {
     try {
       const messageData = JSON.parse(lastMessage?.data);
       const { type, payload } = messageData;
+      console.log(
+        type === "private-community-created-reply",
+        "messageData",
+        messageData
+      );
 
       switch (type) {
         case "list-communities-reply":
@@ -38,6 +45,22 @@ export default function useDashboard() {
           const { communities } = payload;
 
           setCommunities(communities);
+
+          break;
+
+        case "private-community-created-reply":
+          const { result } = payload;
+
+          if (result?.length > 0) {
+            setPrivateRoomCreatedComplete(result[0]);
+          }
+          /*
+            id: 'f6f5d00b-ce4f-417d-9e2e-94677e4a6283',
+            isPrivate: true,
+            name: 'x',
+            description: undefined,
+            citizens: 0
+          */
 
           break;
 
@@ -73,11 +96,14 @@ export default function useDashboard() {
     return _communities.find((c) => c.id === id);
   };
 
+  console.log("?", privateRoomCreatedComplete);
+
   return {
     addCommunity,
     fetchCommunities,
     listCommunities,
     readyState,
     removeCommunity,
+    privateRoomCreatedComplete,
   };
 }

@@ -1,5 +1,4 @@
 import {
-  Alert,
   AppBar,
   Box,
   Button,
@@ -15,25 +14,34 @@ import {
 } from "@mui/material";
 import { differenceInDays, format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
 
 import { Schedule } from "@mui/icons-material";
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
-import { SearchInput } from "../../components/SearchInput/SearchInput";
-import logoUrl from "../../scrumlord-logo-2.png";
+import logoUrl from "../../scrum-lord.png";
 
 export const Dashboard = () => {
-  const { listCommunities, addCommunity, fetchCommunities, readyState } =
-    useDashboard();
+  const {
+    listCommunities,
+    addCommunity,
+    fetchCommunities,
+    privateRoomCreatedComplete,
+    readyState,
+  } = useDashboard();
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
   const [filteredCommunities, setFilteredCommunities] = useState(communityList);
-  const theme = useTheme();
+  // const theme = useTheme();
+  // const classes = useStyles();
+  const communitLimitReached = communities?.length >= 10;
+  const navigate = useNavigate();
+
+  // console.log("privateRoomCreatedComplete", privateRoomCreatedComplete);
 
   // get the list of communities on mount
   useEffect(() => {
@@ -48,6 +56,25 @@ export const Dashboard = () => {
   useEffect(() => {
     setFilteredCommunities(communities);
   }, [communities]);
+
+  useEffect(() => {
+    if (communitLimitReached) {
+      setError(communitLimitReached ? "Community limit reached" : null);
+    } else {
+      setError(null);
+    }
+  }, [communitLimitReached]);
+
+  useEffect(() => {
+    if (privateRoomCreatedComplete) {
+      navigate(`/communities/${privateRoomCreatedComplete.id}`);
+      // setPrivateCommunityCallbackModalOpen(!!privateRoomCreatedComplete);
+    }
+  }, [privateRoomCreatedComplete]);
+
+  const closePrivateCommunityCallbackModal = () => {
+    setPrivateCommunityCallbackModalOpen(false);
+  };
 
   const createRoomClicked = () => {
     setCreateRoomModalOpen(true);
@@ -81,15 +108,10 @@ export const Dashboard = () => {
     }
   };
 
-  const communitLimitReached = communities?.length >= 10;
-
-  useEffect(() => {
-    if (communitLimitReached) {
-      setError(communitLimitReached ? "Community limit reached" : null);
-    } else {
-      setError(null);
-    }
-  }, [communitLimitReached]);
+  const [
+    privateCommunityCallbackModalOpen,
+    setPrivateCommunityCallbackModalOpen,
+  ] = useState(false);
 
   return (
     <div>
@@ -108,12 +130,7 @@ export const Dashboard = () => {
                 <Grid item>
                   <DashboardTitleMenu createRoomClicked={createRoomClicked} />
                 </Grid>
-
-                {/* <Grid item>
-                  <GitHubIcon />
-                </Grid> */}
               </Grid>
-
               <Grid item>
                 <ConnectionStatus readyState={readyState} />
               </Grid>
@@ -121,59 +138,111 @@ export const Dashboard = () => {
           </Toolbar>
         </AppBar>
       </Box>
+      {/* <PrivateCommunityCallbackModal
+        data={privateRoomCreatedComplete}
+        open={privateCommunityCallbackModalOpen}
+        handleClose={closePrivateCommunityCallbackModal}
+        onBlur={closePrivateCommunityCallbackModal}
+      /> */}
       <CreateRoomModal
         open={createRoomModalOpen}
         handleClose={createRoomModalClosed}
         onBlur={createRoomModalClosed}
       />
-      <Grid
+      {/* <Grid
         container
         xs={12}
         justifyContent="center"
         alignItems="center"
         spacing={2}
       >
-        <Grid item xs={12}>
-          <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
-        </Grid>
-
-        <Grid container item xs={10} spacing={2} justifyContent="space-between" alignItems="center">
-          <Grid item xs={6} md={3}>
-            <SearchInput onChange={searchValueChanged} />
-          </Grid>
-
-          <Grid item xs={12} md={7}>
-            {error && <Alert severity="error">{error}</Alert>}
-          </Grid>
-          <Grid item xs={6} md={2}>
-            <Button
-              onClick={createRoomClicked}
-              variant="contained"
-              disabled={communitLimitReached}
-            >
-              Create Room{" "}
-            </Button>
-          </Grid>
-        </Grid>
-
         <Grid
+          container
+          item
+          xs={10}
+          spacing={2}
+          justifyContent="center"
+          alignItems="center"
+        > */}
+      {/* <Grid item xs={6} md={12} sx={{ zIndex: 3 }}>
+            <img height="25%" width="50%" src={logoUrl} alt="Scrum lord" />
+          </Grid> */}
+      {/* <Grid item xs={6} md={3}>
+            <SearchInput onChange={searchValueChanged} />
+          </Grid> */}
+
+      {/* <Grid item xs={12} md={7}>
+            {error && <Alert severity="error">{error}</Alert>}
+          </Grid> */}
+      {/* <Grid item xs={6} md={12}> */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "80vh",
+        }}
+      >
+        <Button
+          // sx={{ zIndex:2, width: "200px", height: "200px", borderRadius: "50%", boxShadow: "0px 5px 300px 100px royalblue" }}
+          sx={{
+            fontFamily: "monospace",
+            fontSize: ".8em",
+            width: "35vh",
+            height: "35vh",
+            borderRadius: "50%",
+            boxShadow: `0px 5px 25vh 15vh ${alpha("rgb(65, 105, 225)", 0.5)}`,
+            transition:
+              "box-shadow 1.5s ease-in-out, font-size 1.5s ease-in-out, width 1.5s ease-in-out, height 1.5s ease-in-out",
+            "&:hover": {
+              boxShadow: "0px 5px 50px 10px rgb(100, 200, 255)",
+              fontSize: "1.5em",
+              height: "45vh",
+              width: "45vh",
+            },
+          }}
+          // className={classes.button}
+
+          onClick={createRoomClicked}
+          variant="outline"
+          disabled={communitLimitReached}
+        >
+          <img
+            src={logoUrl}
+            alt="Scrum lord"
+            style={{
+              height: "20vh",
+              width: "20vw",
+              // transition: "width 1.5s ease-in-out, height 1.5s ease-in-out",
+              // "&:hover": {
+              //   height: "35vh",
+              //   width: "35vh",
+              // },
+            }}
+          />
+        </Button>
+      </Box>
+      {/* </Grid>
+        </Grid> */}
+
+      {/* <Grid
           item
           container
           spacing={2}
           xs={10}
           direction="column"
           id="dashboard-tiles-container"
-        >
-          {/* {error && (
+        > */}
+      {/* {error && (
           <Grid item xs={12}>
             <Typography variant="h3">{error}</Typography>
           </Grid>
         )} */}
-          <Grid item xs>
-            <DashboardCommunities communities={filteredCommunities} />
-          </Grid>
-        </Grid>
-      </Grid>
+      {/* <Grid item xs> */}
+      {/* <DashboardCommunities communities={filteredCommunities} /> */}
+      {/* </Grid> */}
+      {/* </Grid> */}
+      {/* // </Grid> */}
     </div>
   );
 };

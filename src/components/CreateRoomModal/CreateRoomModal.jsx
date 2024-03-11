@@ -1,4 +1,15 @@
-import { Box, Button, Grid, Modal, TextField, Typography } from "@mui/material";
+import { WarningAmber } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Grid,
+  Modal,
+  TextField,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  Tooltip,
+} from "@mui/material";
 import { generate } from "random-words";
 import { useState } from "react";
 
@@ -51,6 +62,8 @@ export const CreateRoomModal = ({ open, handleClose }) => {
     handleClose(c);
   };
 
+  const [isPrivate, setIsPrivate] = useState(true);
+
   return (
     <Modal
       open={open}
@@ -85,9 +98,36 @@ export const CreateRoomModal = ({ open, handleClose }) => {
               id="name"
             />
           </Grid>
+          <Grid item container alignItems="center" spacing={1}>
+            <Grid item>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isPrivate}
+                    onChange={(e) => {
+                      setIsPrivate(e.target.checked);
+                    }}
+                  />
+                }
+                label="Private"
+              />
+            </Grid>
+            <Grid item>
+              {!isPrivate && (
+                <Tooltip title="Public communities are visible to all users on the dashboard">
+                  <WarningAmber color="warning" />
+                </Tooltip>
+              )}
+            </Grid>
+          </Grid>
+
           <Grid container item xs={12} justifyContent="space-between">
             <Grid item>
-              <Button onClick={() => close(getCommunityName())}>Create</Button>
+              <Button
+                onClick={() => close({ ...getCommunityName(), isPrivate })}
+              >
+                Create
+              </Button>
             </Grid>
             <Grid item>
               <Button color="error" onClick={() => close()}>
