@@ -225,47 +225,40 @@ export const CitizenCardMobile = ({
         }
       >
         <div>
-          {/* <CardContent
-            sx={{
-              padding: "5px",
-              textAlign: "center",
-            }}
-          > */}
-            <Grid
-              container
-              spacing={2}
-              justifyContent="space-between"
-              alignItems="center"
-              xs={12}
-              direction="row"
-            >
-              <Grid item xs={8}>
-                <Typography
-                  variant="body"
-                  fontWeight="bold"
-                  color={userColor ?? theme.palette.grey[100]}
-                >
-                  {username}
-                </Typography>
-              </Grid>
-              <Grid item xs={2}>
-                <CitizenVote
-                  isMyCard={isMyCard}
-                  vote={vote}
-                  revealed={revealed}
-                />
-              </Grid>
-              <Grid item xs={2}>
-                {!isMyCard && (
-                  <DeleteTwoToneIcon
-                    fontSize="x-small"
-                    sx={{ cursor: "pointer" }}
-                    onClick={() => handleDeleteUser(citizen)}
-                  />
-                )}
-              </Grid>
+          <Grid
+            container
+            spacing={2}
+            justifyContent="space-between"
+            alignItems="center"
+            xs={12}
+            direction="row"
+          >
+            <Grid item xs={8}>
+              <Typography
+                variant="body"
+                fontWeight="bold"
+                color={userColor ?? theme.palette.grey[100]}
+              >
+                {username}
+              </Typography>
             </Grid>
-          {/* </CardContent> */}
+            <Grid item xs={2}>
+              <CitizenVote
+                isMyCard={isMyCard}
+                vote={vote}
+                revealed={revealed}
+              />
+            </Grid>
+            <Grid item xs={2}>
+              {!isMyCard && (
+                <DeleteTwoToneIcon
+                  fontSize="x-small"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => handleDeleteUser(citizen)}
+                />
+              )}
+            </Grid>
+          </Grid>
         </div>
       </span>
     </Card>

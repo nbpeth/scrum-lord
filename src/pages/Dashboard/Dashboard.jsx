@@ -148,7 +148,7 @@ export const Dashboard = () => {
             alt="Scrum lord"
             style={{
               height: "20vh",
-              width: "20vw",
+              width: "20vh",
               transition: "width 1.5s ease-in-out, height 1.5s ease-in-out",
               "&:hover": {
                 height: "35vh",
