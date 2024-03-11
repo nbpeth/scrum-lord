@@ -54,7 +54,6 @@ export const CitizenCard = ({
 
     // initial 'reveal' trigger from the server, we should display the card values
     if (revealed) {
-
       // initiate the animation which hides the content of the card, so you can't see the values while it's "flipping"
       setCardAnimationInitiated(true);
 
@@ -67,20 +66,19 @@ export const CitizenCard = ({
           setCardAnimating(false);
           setCardAnimationInitiated(false);
         }, 2000);
-
       }, position * 250);
     }
   }, [position, revealed]);
 
   const getBackgroundColor = () => {
-    if(hasVoted && doubleVote) {
-      return alpha(theme.palette.warning.dark, 0.8)
-    } else if(hasVoted && !doubleVote) {
-      return alpha(theme.palette.primary.dark, 0.8)
+    if (hasVoted && doubleVote) {
+      return alpha(theme.palette.warning.dark, 0.8);
+    } else if (hasVoted && !doubleVote) {
+      return alpha(theme.palette.primary.dark, 0.8);
     }
 
-    return "none"
-  }
+    return "none";
+  };
 
   return (
     <Card
@@ -133,11 +131,13 @@ export const CitizenCard = ({
           </CardContent>
 
           <CardActions>
-            <DeleteTwoToneIcon
-              fontSize="x-small"
-              sx={{ cursor: "pointer" }}
-              onClick={() => handleDeleteUser(citizen)}
-            />
+            {!isMyCard && (
+              <DeleteTwoToneIcon
+                fontSize="x-small"
+                sx={{ cursor: "pointer" }}
+                onClick={() => handleDeleteUser(citizen)}
+              />
+            )}
           </CardActions>
         </div>
       </span>
