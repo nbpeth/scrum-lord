@@ -54,9 +54,13 @@ const useStyles = makeStyles({
   },
 });
 
+// don't show delete icon for self card
+// buy me coffee app
+// operational cost / metrics on site
+// max number of rooms v idle/active rooms (waiting room?)
 // remove "community" from app and replace with "room" or "space"
 // clean up ephemeral rooms
-// copy room link button in community menu
+// 
 // show "your rooms" (you've created) from local storage
 // delineate betwen public and private rooms
 // todo: connect button: if disconnected should allow the user to reconnect

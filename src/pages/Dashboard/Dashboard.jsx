@@ -1,5 +1,4 @@
 import {
-  Alert,
   AppBar,
   Box,
   Button,
@@ -22,9 +21,7 @@ import useDashboard from "../../hooks/useDashboard";
 import { Schedule } from "@mui/icons-material";
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
-import { SearchInput } from "../../components/SearchInput/SearchInput";
-import logoUrl from "../../scrumlord-logo-2.png";
-import { PrivateCommunityCallbackModal } from "../../components/PrivateCommunityCallbackModal/PrivateCommunityCallbackModal.jsx";
+import logoUrl from "../../scrum-lord.png";
 
 export const Dashboard = () => {
   const {
@@ -40,11 +37,11 @@ export const Dashboard = () => {
   const [communities, setCommunities] = useState(communityList);
   const [filteredCommunities, setFilteredCommunities] = useState(communityList);
   // const theme = useTheme();
-
+  // const classes = useStyles();
   const communitLimitReached = communities?.length >= 10;
   const navigate = useNavigate();
 
-  console.log("privateRoomCreatedComplete", privateRoomCreatedComplete);
+  // console.log("privateRoomCreatedComplete", privateRoomCreatedComplete);
 
   // get the list of communities on mount
   useEffect(() => {
@@ -116,8 +113,6 @@ export const Dashboard = () => {
     setPrivateCommunityCallbackModalOpen,
   ] = useState(false);
 
-  
-
   return (
     <div>
       <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
@@ -154,61 +149,100 @@ export const Dashboard = () => {
         handleClose={createRoomModalClosed}
         onBlur={createRoomModalClosed}
       />
-      <Grid
+      {/* <Grid
         container
         xs={12}
         justifyContent="center"
         alignItems="center"
         spacing={2}
       >
-        <Grid item xs={12}>
-          <img height="50%" width="50%" src={logoUrl} alt="Scrum lord" />
-        </Grid>
-
         <Grid
           container
           item
           xs={10}
           spacing={2}
-          justifyContent="space-between"
+          justifyContent="center"
           alignItems="center"
-        >
-          <Grid item xs={6} md={3}>
+        > */}
+      {/* <Grid item xs={6} md={12} sx={{ zIndex: 3 }}>
+            <img height="25%" width="50%" src={logoUrl} alt="Scrum lord" />
+          </Grid> */}
+      {/* <Grid item xs={6} md={3}>
             <SearchInput onChange={searchValueChanged} />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={7}>
+      {/* <Grid item xs={12} md={7}>
             {error && <Alert severity="error">{error}</Alert>}
-          </Grid>
-          <Grid item xs={6} md={2}>
-            <Button
-              onClick={createRoomClicked}
-              variant="contained"
-              disabled={communitLimitReached}
-            >
-              Create Room{" "}
-            </Button>
-          </Grid>
-        </Grid>
+          </Grid> */}
+      {/* <Grid item xs={6} md={12}> */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "80vh",
+        }}
+      >
+        <Button
+          // sx={{ zIndex:2, width: "200px", height: "200px", borderRadius: "50%", boxShadow: "0px 5px 300px 100px royalblue" }}
+          sx={{
+            fontFamily: "monospace",
+            fontSize: ".8em",
+            width: "35vh",
+            height: "35vh",
+            borderRadius: "50%",
+            boxShadow: `0px 5px 25vh 15vh ${alpha("rgb(65, 105, 225)", 0.5)}`,
+            transition:
+              "box-shadow 1.5s ease-in-out, font-size 1.5s ease-in-out, width 1.5s ease-in-out, height 1.5s ease-in-out",
+            "&:hover": {
+              boxShadow: "0px 5px 50px 10px rgb(100, 200, 255)",
+              fontSize: "1.5em",
+              height: "45vh",
+              width: "45vh",
+            },
+          }}
+          // className={classes.button}
 
-        <Grid
+          onClick={createRoomClicked}
+          variant="outline"
+          disabled={communitLimitReached}
+        >
+          <img
+            src={logoUrl}
+            alt="Scrum lord"
+            style={{
+              height: "20vh",
+              width: "20vw",
+              // transition: "width 1.5s ease-in-out, height 1.5s ease-in-out",
+              // "&:hover": {
+              //   height: "35vh",
+              //   width: "35vh",
+              // },
+            }}
+          />
+        </Button>
+      </Box>
+      {/* </Grid>
+        </Grid> */}
+
+      {/* <Grid
           item
           container
           spacing={2}
           xs={10}
           direction="column"
           id="dashboard-tiles-container"
-        >
-          {/* {error && (
+        > */}
+      {/* {error && (
           <Grid item xs={12}>
             <Typography variant="h3">{error}</Typography>
           </Grid>
         )} */}
-          <Grid item xs>
-            <DashboardCommunities communities={filteredCommunities} />
-          </Grid>
-        </Grid>
-      </Grid>
+      {/* <Grid item xs> */}
+      {/* <DashboardCommunities communities={filteredCommunities} /> */}
+      {/* </Grid> */}
+      {/* </Grid> */}
+      {/* // </Grid> */}
     </div>
   );
 };
