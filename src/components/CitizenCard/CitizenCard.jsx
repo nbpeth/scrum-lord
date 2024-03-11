@@ -38,6 +38,7 @@ export const CitizenCard = ({
   handleDeleteUser,
   iAmCitizen,
   position,
+  fullsizeScreen,
 }) => {
   const classes = useStyles();
 
@@ -80,6 +81,49 @@ export const CitizenCard = ({
     return "none";
   };
 
+  if (fullsizeScreen) {
+    return (
+      <CitizenCardDesktop
+        theme={theme}
+        revealed={revealed}
+        cardAnimationInitiated={cardAnimationInitiated}
+        handleDeleteUser={handleDeleteUser}
+        citizen={citizen}
+        getBackgroundColor={getBackgroundColor}
+        isMyCard={isMyCard}
+        classes={classes}
+        cardAnimating={cardAnimating}
+      />
+    );
+  }
+
+  return (
+    <CitizenCardMobile
+      theme={theme}
+      revealed={revealed}
+      cardAnimationInitiated={cardAnimationInitiated}
+      handleDeleteUser={handleDeleteUser}
+      citizen={citizen}
+      getBackgroundColor={getBackgroundColor}
+      isMyCard={isMyCard}
+      classes={classes}
+      cardAnimating={cardAnimating}
+    />
+  );
+};
+
+export const CitizenCardDesktop = ({
+  handleDeleteUser,
+  cardAnimationInitiated,
+  citizen,
+  getBackgroundColor,
+  isMyCard,
+  classes,
+  revealed,
+  cardAnimating,
+  theme,
+}) => {
+  const { vote, hasVoted, username, userColor, doubleVote } = citizen;
   return (
     <Card
       className={cardAnimating ? classes.cardReveal : null}
@@ -139,6 +183,89 @@ export const CitizenCard = ({
               />
             )}
           </CardActions>
+        </div>
+      </span>
+    </Card>
+  );
+};
+
+export const CitizenCardMobile = ({
+  handleDeleteUser,
+  cardAnimationInitiated,
+  citizen,
+  getBackgroundColor,
+  isMyCard,
+  classes,
+  revealed,
+  cardAnimating,
+  theme,
+}) => {
+  const { vote, hasVoted, username, userColor, doubleVote } = citizen;
+  return (
+    <Card
+      className={cardAnimating ? classes.cardReveal : null}
+      key={citizen.id}
+      sx={{
+        padding: "10px",
+        minWidth: "100px",
+        border: isMyCard
+          ? `1px solid ${theme.palette.primary.dark}`
+          : `1px solid ${theme.palette.grey[800]}`,
+        backgroundColor: getBackgroundColor(),
+        cursor: "pointer",
+        transition: "background .5s ease-in-out",
+        "&:hover": {
+          backgroundColor: alpha(theme.palette.grey[800], 1),
+        },
+      }}
+    >
+      <span
+        className={
+          cardAnimationInitiated ? classes.contentHide : classes.contentShow
+        }
+      >
+        <div>
+          {/* <CardContent
+            sx={{
+              padding: "5px",
+              textAlign: "center",
+            }}
+          > */}
+            <Grid
+              container
+              spacing={2}
+              justifyContent="space-between"
+              alignItems="center"
+              xs={12}
+              direction="row"
+            >
+              <Grid item xs={8}>
+                <Typography
+                  variant="body"
+                  fontWeight="bold"
+                  color={userColor ?? theme.palette.grey[100]}
+                >
+                  {username}
+                </Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <CitizenVote
+                  isMyCard={isMyCard}
+                  vote={vote}
+                  revealed={revealed}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                {!isMyCard && (
+                  <DeleteTwoToneIcon
+                    fontSize="x-small"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => handleDeleteUser(citizen)}
+                  />
+                )}
+              </Grid>
+            </Grid>
+          {/* </CardContent> */}
         </div>
       </span>
     </Card>

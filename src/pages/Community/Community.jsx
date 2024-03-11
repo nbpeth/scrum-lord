@@ -436,7 +436,6 @@ export const Community = ({
                       </MenuItem>
                     </>
                   )}
-                 
                 </MenuList>
               </Paper>
             </ScrumLordMenu>
@@ -452,73 +451,135 @@ export const Community = ({
         </AppBar>
       </Box>
       <Grid container xs={12} spacing={3}>
-        <Grid
-          container
-          item
-          xs={fullsizeScreen ? 3 : 12}
-          xl={fullsizeScreen ? 2 : 12}
-        >
-          {/* <Grid item>
-            <PointChart community={currentCommunity} />
-          </Grid> */}
-          <Grid item xs={12}>
-            <CommunityControls
-              handleTimerClicked={handleTimerClicked}
-              community={currentCommunity}
-              handleReveal={handleReveal}
-              handleReset={handleReset}
-              iAmCitizen={iAmCitizen}
-              communityId={communityId}
-              submitVote={submitVote}
-              communityReaction={communityReaction}
-              settings={settings}
-            />
-          </Grid>
-
-          {settings?.messageBoardVisible && (
-            <Grid
-              item
-              xs={12}
-              sx={{
-                backgroundColor: settings?.communityAnimationEnabled
-                  ? "none"
-                  : theme.palette.background.paper,
-              }}
-            >
-              <MessageBoard
-                messageHistory={messageHistory}
-                communityId={communityId}
-              />
+        {/* desktop component */}
+        {fullsizeScreen && (
+          <>
+            <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
+              {currentCommunity ? (
+                <Grid container item xs={12} justifyContent="space-between">
+                  {settings?.lurkerBoxVisible && (
+                    <Grid item xs={2} sx={{ paddingTop: "10px" }}>
+                      <LurkerBox
+                        lurkers={lurkers}
+                        handleDeleteUser={handleDeleteUser}
+                      />
+                    </Grid>
+                  )}
+                  <Grid
+                    item
+                    justifyContent="center"
+                    xs={settings?.lurkerBoxVisible ? 10 : 12}
+                  >
+                    <CommunityCitizens
+                      citizens={citizens}
+                      iAmCitizen={iAmCitizen}
+                      handleDeleteUser={handleDeleteUser}
+                      currentCommunity={currentCommunity}
+                    />
+                  </Grid>
+                </Grid>
+              ) : null}
             </Grid>
-          )}
-        </Grid>
+            <Grid container item xs={3}>
+              {/* <Grid item>
+              <PointChart community={currentCommunity} />
+            </Grid> */}
+              <Grid item xs={12}>
+                <CommunityControls
+                  handleTimerClicked={handleTimerClicked}
+                  community={currentCommunity}
+                  handleReveal={handleReveal}
+                  handleReset={handleReset}
+                  iAmCitizen={iAmCitizen}
+                  communityId={communityId}
+                  submitVote={submitVote}
+                  communityReaction={communityReaction}
+                  settings={settings}
+                />
+              </Grid>
 
-        <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
-          {currentCommunity ? (
-            <Grid container item xs={12} justifyContent="space-between">
-              {settings?.lurkerBoxVisible && (
-                <Grid item xs={2} sx={{ paddingTop: "10px" }}>
-                  <LurkerBox
-                    lurkers={lurkers}
-                    handleDeleteUser={handleDeleteUser}
+              {settings?.messageBoardVisible && (
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    backgroundColor: settings?.communityAnimationEnabled
+                      ? "none"
+                      : theme.palette.background.paper,
+                  }}
+                >
+                  <MessageBoard
+                    messageHistory={messageHistory}
+                    communityId={communityId}
                   />
                 </Grid>
               )}
-              <Grid
-                item
-                justifyContent="center"
-                xs={settings?.lurkerBoxVisible ? 10 : 12}
-              >
-                <CommunityCitizens
-                  citizens={citizens}
+            </Grid>
+          </>
+        )}
+        {/* mobile component */}
+        {!fullsizeScreen && (
+          <>
+            <Grid container item xs={12}>
+              <Grid item xs={12}>
+                <CommunityControls
+                  handleTimerClicked={handleTimerClicked}
+                  community={currentCommunity}
+                  handleReveal={handleReveal}
+                  handleReset={handleReset}
                   iAmCitizen={iAmCitizen}
-                  handleDeleteUser={handleDeleteUser}
-                  currentCommunity={currentCommunity}
+                  communityId={communityId}
+                  submitVote={submitVote}
+                  communityReaction={communityReaction}
+                  settings={settings}
                 />
               </Grid>
+
+              {settings?.messageBoardVisible && (
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    backgroundColor: settings?.communityAnimationEnabled
+                      ? "none"
+                      : theme.palette.background.paper,
+                  }}
+                >
+                  <MessageBoard
+                    messageHistory={messageHistory}
+                    communityId={communityId}
+                  />
+                </Grid>
+              )}
             </Grid>
-          ) : null}
-        </Grid>
+            <Grid item xs={12} sx={{ paddingTop: 10 }}>
+              {currentCommunity ? (
+                <Grid container item xs={12} justifyContent="space-between">
+                  {settings?.lurkerBoxVisible && (
+                    <Grid item xs={2} sx={{ paddingTop: "10px" }}>
+                      <LurkerBox
+                        lurkers={lurkers}
+                        handleDeleteUser={handleDeleteUser}
+                      />
+                    </Grid>
+                  )}
+                  <Grid
+                    item
+                    justifyContent="center"
+                    xs={settings?.lurkerBoxVisible ? 10 : 12}
+                  >
+                    <CommunityCitizens
+                      citizens={citizens}
+                      iAmCitizen={iAmCitizen}
+                      handleDeleteUser={handleDeleteUser}
+                      currentCommunity={currentCommunity}
+                    />
+                  </Grid>
+                </Grid>
+              ) : null}
+            </Grid>
+          </>
+        )}
       </Grid>
     </>
   );

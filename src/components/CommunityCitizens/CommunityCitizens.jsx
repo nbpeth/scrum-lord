@@ -1,4 +1,4 @@
-import { Grid, Typography, useTheme } from "@mui/material";
+import { Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { CitizenCard } from "../../components/CitizenCard/CitizenCard";
 
 import * as React from "react";
@@ -10,6 +10,8 @@ export const CommunityCitizens = ({
   currentCommunity,
 }) => {
   const theme = useTheme();
+  const fullsizeScreen = useMediaQuery("(min-width:800px)");
+
   return (
     <Grid
       container
@@ -24,8 +26,15 @@ export const CommunityCitizens = ({
             ?.filter((c) => c.votingMember)
             .map((citizen, i) => {
               return (
-                <Grid item xs={6} md={3} lg={2} key={citizen.userId}>
+                <Grid
+                  item
+                  xs={fullsizeScreen ? 6 : 12}
+                  md={fullsizeScreen ? 3 : 12}
+                  lg={fullsizeScreen ? 2 : 12}
+                  key={citizen.userId}
+                >
                   <CitizenCard
+                    fullsizeScreen={fullsizeScreen}
                     position={i}
                     currentCommunity={currentCommunity}
                     handleDeleteUser={handleDeleteUser}
