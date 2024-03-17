@@ -401,6 +401,7 @@ export default function useCommunity() {
   };
 
   const leaveCommunity = ({ communityId, userId, username, userColor }) => {
+    removePrivateRoom(communityId);
     sendMessage(
       JSON.stringify({
         type: "leave-community",

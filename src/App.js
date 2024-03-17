@@ -1,16 +1,17 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
+import { useMediaQuery } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import "./App.css";
+import { Fireworks } from "./components/Particles/Fireworks";
 import { HyperSpace } from "./components/Particles/Hyperspace";
 import { Stars } from "./components/Particles/Stars";
 import { Community } from "./pages/Community/Community";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
-import { Fireworks } from "./components/Particles/Fireworks";
-import { makeStyles } from "@mui/styles";
 
 const darkTheme = createTheme({
   palette: {
@@ -61,14 +62,14 @@ const useStyles = makeStyles({
 // operational cost / metrics on site
 // remove "community" from app and replace with "room" or "space"
 // clean up ephemeral rooms
-// 
+//
 // todo: connect button: if disconnected should allow the user to reconnect
 //       should the app attempt to reconnect automatically?
 // todo: identify users that are or are not present
+// ----- ws message? last activity by user?wh
 // todo: chat?
 // todo: logged in voting member toggle
 // todo: add sound to reveal
-// todo: redirect to community after it is created
 
 const App = () => {
   return (

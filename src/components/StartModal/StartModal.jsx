@@ -20,6 +20,7 @@ export const StartModal = ({
   handleClose,
   communities,
   setCreateRoomModalOpen,
+  fullsizeScreen,
   yourPrivateRooms,
 }) => {
   const style = {
@@ -35,8 +36,10 @@ export const StartModal = ({
     p: 4,
     overflow: "auto",
   };
-  const [filteredCommunities, setFilteredCommunities] = useState(communities);
   const privateRooms = Object.values(yourPrivateRooms);
+  const [filteredCommunities, setFilteredCommunities] = useState(communities);
+  const [filteredPrivateRooms, setFilteredPrivateRooms] =
+    useState(privateRooms);
   const theme = useTheme();
 
   useEffect(() => {
@@ -47,9 +50,15 @@ export const StartModal = ({
     e.preventDefault();
     if (e.target.value === "") {
       setFilteredCommunities(communities);
+      setFilteredPrivateRooms(privateRooms);
     } else {
       setFilteredCommunities(
         communities?.filter((c) =>
+          c.name?.toLowerCase().includes(e.target.value.toLowerCase())
+        ) || []
+      );
+      setFilteredPrivateRooms(
+        privateRooms?.filter((c) =>
           c.name?.toLowerCase().includes(e.target.value.toLowerCase())
         ) || []
       );
@@ -120,13 +129,17 @@ export const StartModal = ({
           </Grid>
 
           <Grid item xs={6} sx={{ overflow: "auto", height: "50vh" }}>
-            <DashboardCommunities communities={filteredCommunities} />
+            <DashboardCommunities
+              communities={filteredCommunities}
+              fullsizeScreen={fullsizeScreen}
+            />
           </Grid>
 
           <Grid item xs={6} sx={{ overflow: "auto" }}>
             <DashboardCommunities
+              fullsizeScreen={fullsizeScreen}
               context="private"
-              communities={privateRooms}
+              communities={filteredPrivateRooms}
             />
           </Grid>
         </Grid>

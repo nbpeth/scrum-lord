@@ -78,6 +78,7 @@ export const Community = ({
     toggleReactions,
     toggleLurkerBox,
     toggleTimerVisible,
+    removePrivateRoom,
     updatePrivateRooms,
   } = useSettings();
 
@@ -94,7 +95,7 @@ export const Community = ({
 
   useEffect(() => {
     recoverUserFromStorage();
-    updatePrivateRooms(currentCommunity);
+    // updatePrivateRooms(currentCommunity);
 
     if (currentCommunity?.isSynergized) {
       handleCelebrationChange(true);
@@ -177,6 +178,8 @@ export const Community = ({
     userStateObj[communityId] = userId;
 
     localStorage.setItem("userstate", JSON.stringify(userStateObj));
+    // set the current room to the stored rooms
+    updatePrivateRooms(currentCommunity);
   };
 
   const handleTimerClicked = ({ communityId, timerValue }) => {
@@ -213,6 +216,7 @@ export const Community = ({
         userColor: iAmCitizen?.userColor,
       });
       setIAmCitizen(null);
+
     } catch (e) {
       console.error(e);
       setError(e.message);
@@ -221,13 +225,13 @@ export const Community = ({
     }
   };
 
-  const handleAlertClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  // const handleAlertClose = (event, reason) => {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
 
-    clearAlertMessage();
-  };
+  //   clearAlertMessage();
+  // };
 
   const handleDeleteCommunity = () => {
     setDeleteCommunityModalOpen(true);

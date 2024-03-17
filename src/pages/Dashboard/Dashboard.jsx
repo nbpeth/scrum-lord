@@ -6,6 +6,7 @@ import {
   Grid,
   Toolbar,
   alpha,
+  useMediaQuery,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -41,8 +42,10 @@ export const Dashboard = () => {
   const [communities, setCommunities] = useState(communityList);
   /*
    */
-  const communitLimitReached = communities?.length >= 10;
+  // const communitLimitReached = communities?.length >= 10;
   const navigate = useNavigate();
+
+  const fullsizeScreen = useMediaQuery("(min-width:800px)");
 
   // get the list of communities on mount
   useEffect(() => {
@@ -94,6 +97,7 @@ export const Dashboard = () => {
   const getErrorMessage = (error) => {
     return {
       404: "Room not found: it either has been deleted or it never was",
+      9000: "Your room was deleted while you were in it. Welcome back.",
     }[error];
   };
 
@@ -122,7 +126,7 @@ export const Dashboard = () => {
           </Toolbar>
         </AppBar>
       </Box>
-      
+
       {errorFromQuery && getErrorMessage(errorFromQuery) && (
         <Alert severity="error">{getErrorMessage(errorFromQuery)}</Alert>
       )}
@@ -139,6 +143,7 @@ export const Dashboard = () => {
         communities={communities}
         yourPrivateRooms={yourPrivateRooms}
         setCreateRoomModalOpen={setCreateRoomModalOpen}
+        fullsizeScreen={fullsizeScreen}
       />
 
       <Box

@@ -80,11 +80,11 @@ export const useSettings = () => {
   //     localStorage.setItem("userstate", JSON.stringify(userStateObj));
   //   };
 
-  const updatePrivateRooms = ( community ) => {
+  const updatePrivateRooms = (community) => {
     if (!community) {
       return;
     }
-    
+
     const updatedRooms = { ...yourPrivateRooms, [community.id]: community };
 
     setYourPrivateRooms(updatedRooms);
@@ -94,12 +94,13 @@ export const useSettings = () => {
 
   const removePrivateRoom = (communityId) => {
     const updatedRooms = { ...yourPrivateRooms };
+
     delete updatedRooms[communityId];
 
-    setYourPrivateRooms(updatedRooms);
-
     localStorage.setItem("privateRooms", JSON.stringify(updatedRooms));
-  }
+
+    setYourPrivateRooms(updatedRooms);
+  };
 
   return {
     removePrivateRoom,
