@@ -55,16 +55,13 @@ const useStyles = makeStyles({
 });
 
 // fix moon overscroll
-// show "your rooms" (you've created) from local storage
-// show "public rooms"
-// room tables should scroll/overflow independently
+// private room password
 // lock down API
 // buy me coffee app
 // operational cost / metrics on site
 // remove "community" from app and replace with "room" or "space"
 // clean up ephemeral rooms
 // 
-// delineate betwen public and private rooms
 // todo: connect button: if disconnected should allow the user to reconnect
 //       should the app attempt to reconnect automatically?
 // todo: identify users that are or are not present

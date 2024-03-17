@@ -1,14 +1,18 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import {
+  Grid,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
   MenuList,
   Paper,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import { Link } from "react-router-dom";
 
 export const DashboardTitleMenu = ({ createRoomClicked }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -62,18 +66,35 @@ export const ScrumLordMenu = ({ children }) => {
     setAnchorEl(null);
   };
 
-  return (
-    <>
-      <MenuIcon onClick={handleClick} sx={{ cursor: "pointer" }} />
+  const theme = useTheme();
 
-      <Menu
-        id="dashboard-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-      >
-        {children}
-      </Menu>
-    </>
+  return (
+    <Grid item>
+      <Grid container alignItems="center" spacing={2}>
+        <Grid item sx={{ marginTop: "5px" }}>
+          <MenuIcon onClick={handleClick} sx={{ cursor: "pointer" }} />
+          <Menu
+            id="dashboard-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+          >
+            {children}
+          </Menu>
+        </Grid>
+        <Grid item>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <Typography
+              fontFamily="monospace"
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, color: theme.palette.secondary.dark }}
+            >
+              Scrum Lord
+            </Typography>
+          </Link>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };

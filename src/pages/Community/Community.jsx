@@ -78,7 +78,7 @@ export const Community = ({
     toggleReactions,
     toggleLurkerBox,
     toggleTimerVisible,
-    updatePrivateRooms
+    updatePrivateRooms,
   } = useSettings();
 
   const theme = useTheme();
@@ -117,6 +117,7 @@ export const Community = ({
     ) {
       // delay the redirect so the user can see the alert message
       // todo: need an alert message
+      // move this to the hook to delete from storage
       setTimeout(() => {
         navigate("/?error=9000", {
           state: { alertMessage: "Community deleted" },
@@ -441,10 +442,13 @@ export const Community = ({
                 </MenuList>
               </Paper>
             </ScrumLordMenu>
-
-            <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-              {currentCommunity && currentCommunity.name}
-            </Typography>
+            <div style={{ flexGrow: 1 }}>
+              {fullsizeScreen && (
+                <Typography variant="h4" component="div">
+                  {currentCommunity && currentCommunity.name}
+                </Typography>
+              )}
+            </div>
             <ConnectionStatus
               reconnection={reconnection}
               readyState={readyState}
