@@ -5,7 +5,13 @@ const url = require("url");
 const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
+
+
+
 const apiKey = process.env.REACT_APP_API_KEY;
+const env = process.env.ENV;
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",")?.map((x) => x.trim());
+const isProd = env === "production";
 
 const state = {
   timers: {
@@ -80,17 +86,31 @@ const killTimerIfExists = async (communityId) => {
 // the boatman ferries wayward connections to the other side
 const boatman = (ws) => setTimeout(() => heartbeat(ws), 40000);
 
-const validateApiKey = (apiKey, request) => {
-  const queryParams = url.parse(request.url, { parseQueryString: true }).query;
-  const requestApiKey = queryParams.token;
+const validateRequest = (request) => {
+  // this will just have to do for now
+  if (isProd) {
+    const headers = request.headers;
+    const { origin } = headers;
 
-  return requestApiKey === process.env.REACT_APP_API_KEY;
+    const originHost = url.parse(origin, false, false);
+    const queryParams = url.parse(request.url, {
+      parseQueryString: true,
+    }).query;
+
+    const requestApiKey = queryParams.token;
+
+    return (
+      requestApiKey === apiKey && allowedOrigins?.includes(originHost?.host)
+    );
+  }
+
+  return true;
 };
 
 websocketServer.on("connection", (ws, request) => {
-  const validRequest = validateApiKey(apiKey, request);
+  const validRequest = validateRequest(request);
   if (!validRequest) {
-    console.error("invalid token, closing");
+    console.error("unauthorized");
     ws.close();
 
     return;
