@@ -5,6 +5,7 @@ import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointS
 import { getSocketBaseUrl } from "../util/config";
 // import { Web } from "@mui/icons-material";
 import { WebSocketReadyState } from "../util/websocketUtils";
+import { useSettings } from "./useSettings";
 
 export default function useCommunity() {
   const params = useParams();
@@ -15,6 +16,8 @@ export default function useCommunity() {
     interval: 5,
     reconnecting: false,
   });
+
+  const { removePrivateRoom } = useSettings();
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => {
@@ -242,11 +245,11 @@ export default function useCommunity() {
       switch (type) {
         case "get-community-reply":
           if (!payload.community) {
+            removePrivateRoom(communityId);
             navigate("/?error=404");
           } else {
             setCommunity(payload.community);
           }
-
           break;
         case "community-joined-reply":
           handleCommunityJoinedReply(payload);

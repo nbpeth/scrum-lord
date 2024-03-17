@@ -315,7 +315,7 @@ const handleGetCommunity = async (payload) => {
 
   const reply = {
     type: "get-community-reply",
-    payload: { community: result },
+    payload: { community: result, communityId },
   };
 
   notifyClients({ message: reply, communityId });

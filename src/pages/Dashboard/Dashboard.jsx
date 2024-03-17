@@ -1,6 +1,14 @@
-import { AppBar, Box, Button, Grid, Toolbar, alpha } from "@mui/material";
+import {
+  Alert,
+  AppBar,
+  Box,
+  Button,
+  Grid,
+  Toolbar,
+  alpha,
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import useDashboard from "../../hooks/useDashboard";
 
@@ -20,9 +28,15 @@ export const Dashboard = () => {
     readyState,
   } = useDashboard();
   const { yourPrivateRooms } = useSettings();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
   const [startModalOpen, setStartModalOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [errorFromQuery, setErrorFromQuery] = useState(
+    queryParams.get("error")
+  );
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
   /*
@@ -40,13 +54,13 @@ export const Dashboard = () => {
     setCommunities(communityList);
   }, [communityList]);
 
-  useEffect(() => {
-    if (communitLimitReached) {
-      setError(communitLimitReached ? "Community limit reached" : null);
-    } else {
-      setError(null);
-    }
-  }, [communitLimitReached]);
+  // useEffect(() => {
+  //   if (communitLimitReached) {
+  //     setError(communitLimitReached ? "Community limit reached" : null);
+  //   } else {
+  //     setError(null);
+  //   }
+  // }, [communitLimitReached]);
 
   useEffect(() => {
     if (communityCreatedComplete && communityCreatedComplete.id) {
@@ -77,6 +91,12 @@ export const Dashboard = () => {
     setCreateRoomModalOpen(false);
   };
 
+  const getErrorMessage = (error) => {
+    return {
+      404: "Room not found: it either has been deleted or it never was",
+    }[error];
+  };
+
   return (
     <div>
       <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
@@ -102,6 +122,10 @@ export const Dashboard = () => {
           </Toolbar>
         </AppBar>
       </Box>
+      
+      {errorFromQuery && getErrorMessage(errorFromQuery) && (
+        <Alert severity="error">{getErrorMessage(errorFromQuery)}</Alert>
+      )}
 
       <CreateRoomModal
         open={createRoomModalOpen}

@@ -10,10 +10,7 @@ import {
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
-import {
-  CommunityCard,
-  DashboardCommunities,
-} from "../DashboardCommunities/DashboardCommunities";
+import { DashboardCommunities } from "../DashboardCommunities/DashboardCommunities";
 import { SearchInput } from "../SearchInput/SearchInput";
 import { useEffect, useState } from "react";
 import { Close } from "@mui/icons-material";

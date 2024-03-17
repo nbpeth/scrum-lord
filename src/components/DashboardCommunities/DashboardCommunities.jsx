@@ -91,15 +91,15 @@ export const CommunityCard = ({ community, isPrivateContext }) => {
 
             <Grid container item xs={6}>
               <Grid container spacing={1} item xs={12} textAlign="right">
-                <Grid item>
+                <Grid item xs={10}>
                   {community?.lastModified && (
                     <Typography variant="body2" color={theme.palette.grey[300]}>
-                      Last Activity
+                      Last Activity{": "}
                       {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
                     </Typography>
                   )}
                 </Grid>
-                <Grid item>
+                <Grid item xs={2}>
                   {Boolean(idle) && (
                     <Tooltip placement="top-end" arrow title="Idle">
                       <Schedule

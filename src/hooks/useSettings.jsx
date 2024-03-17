@@ -92,7 +92,17 @@ export const useSettings = () => {
     localStorage.setItem("privateRooms", JSON.stringify(updatedRooms));
   };
 
+  const removePrivateRoom = (communityId) => {
+    const updatedRooms = { ...yourPrivateRooms };
+    delete updatedRooms[communityId];
+
+    setYourPrivateRooms(updatedRooms);
+
+    localStorage.setItem("privateRooms", JSON.stringify(updatedRooms));
+  }
+
   return {
+    removePrivateRoom,
     settings,
     toggleCommunityAnimation,
     toggleMessageBoard,
