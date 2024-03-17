@@ -169,6 +169,7 @@ export const EmptyDash = () => {
             height: "20vh",
             width: "20vh",
             borderRadius: "50%",
+            objectFit: "contain",
           }}
         />
       </Grid>
