@@ -57,18 +57,30 @@ const useStyles = makeStyles({
 
 // fix moon overscroll
 // private room password
-// lock down API
-// buy me coffee app
 // operational cost / metrics on site
 // remove "community" from app and replace with "room" or "space"
 // clean up ephemeral rooms
-//
-// todo: connect button: if disconnected should allow the user to reconnect
-//       should the app attempt to reconnect automatically?
+// rate limiting?
+/*
+  const WebSocket = require('ws');
+  const rateLimit = require('ws-rate-limit')('10 per minute');
+
+  const wss = new WebSocket.Server({ port: 8080 });
+
+  wss.on('connection', (ws, req) => {
+    const ip = req.socket.remoteAddress;
+    if (rateLimit(ip)) {
+      ws.close(1008, 'Rate limit exceeded');
+      return;
+    }
+
+    // Handle the WebSocket connection...
+  });
+*/
+
 // todo: identify users that are or are not present
-// ----- ws message? last activity by user?wh
+//    ----- ws message? last activity by user?wh
 // todo: chat?
-// todo: logged in voting member toggle
 // todo: add sound to reveal
 
 const App = () => {
@@ -94,6 +106,28 @@ const AppContent = () => {
     setIsCelebrating(value);
   };
 
+  const roomComponent = (
+    <div>
+      {communityBackgroundIsAnimated && (
+        <div>
+          <img
+            id="moon-image"
+            className={classes.image}
+            src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png"
+          />
+        </div>
+      )}
+      <Community
+        handleCelebrationChange={handleCelebrationChange}
+        handleCommunityBackgroundAnimationChange={
+          handleCommunityBackgroundAnimationChange
+        }
+      />
+      {communityBackgroundIsAnimated && <Stars />}
+      {isCelebrating && <Fireworks />}
+    </div>
+  );
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -106,28 +140,12 @@ const AppContent = () => {
     },
     {
       path: "/communities/:communityId",
-      element: (
-        <div>
-          {communityBackgroundIsAnimated && (
-            <div>
-              <img
-                id="moon-image"
-                className={classes.image}
-                src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png"
-              />
-            </div>
-          )}
-          <Community
-            handleCelebrationChange={handleCelebrationChange}
-            handleCommunityBackgroundAnimationChange={
-              handleCommunityBackgroundAnimationChange
-            }
-          />
-          {communityBackgroundIsAnimated && <Stars />}
-          {isCelebrating && <Fireworks />}
-        </div>
-      ),
+      element: roomComponent,
     },
+    // {
+    //   path: "/rooms/:roomId",
+    //   element: roomComponent,waaw
+    // },
   ]);
 
   return (
