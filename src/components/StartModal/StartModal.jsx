@@ -31,6 +31,7 @@ export const StartModal = ({
     left: "50%",
     transform: "translate(-50%, -50%)",
     maxHeight: "75vh",
+    maxWidth: "85vw",
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
