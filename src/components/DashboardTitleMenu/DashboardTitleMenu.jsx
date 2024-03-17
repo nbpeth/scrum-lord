@@ -35,8 +35,13 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
         open={open}
         onClose={handleClose}
       >
-        <Paper sx={{ background: "none", width: 150, maxWidth: "100%" }}>
+        <Paper sx={{ background: "none" }}>
           <MenuList>
+            <MenuItem>
+              <a target="_blank" href="https://www.buymeacoffee.com/nbpetha">
+                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" />
+              </a>
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 window.open("https://github.com/nbpeth/scrum-lord", "_blank");
@@ -46,7 +51,7 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
               <ListItemIcon>
                 <GitHubIcon />
               </ListItemIcon>
-              <ListItemText secondary="Support" />
+              <ListItemText secondary="Github" />
             </MenuItem>
           </MenuList>
         </Paper>
