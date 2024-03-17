@@ -1,7 +1,19 @@
-import { Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Modal,
+  Typography,
+  useTheme,
+} from "@mui/material";
 
 import { Link } from "react-router-dom";
-import { DashboardCommunities } from "../DashboardCommunities/DashboardCommunities";
+import {
+  CommunityCard,
+  DashboardCommunities,
+} from "../DashboardCommunities/DashboardCommunities";
 import { SearchInput } from "../SearchInput/SearchInput";
 import { useEffect, useState } from "react";
 import { Close } from "@mui/icons-material";
@@ -11,14 +23,14 @@ export const StartModal = ({
   handleClose,
   communities,
   setCreateRoomModalOpen,
+  yourPrivateRooms,
 }) => {
   const style = {
     position: "relative",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "75vw",
-    height: "75vh",
+    maxHeight: "75vh",
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
@@ -26,6 +38,8 @@ export const StartModal = ({
     overflow: "auto",
   };
   const [filteredCommunities, setFilteredCommunities] = useState(communities);
+  const privateRooms = Object.values(yourPrivateRooms);
+  const theme = useTheme();
 
   useEffect(() => {
     setFilteredCommunities(communities);
@@ -46,6 +60,7 @@ export const StartModal = ({
 
   return (
     <Modal
+      id="modal"
       open={open}
       onClose={(e, reason) => {
         if (reason !== "backdropClick") {
@@ -53,12 +68,17 @@ export const StartModal = ({
         }
       }}
     >
-      <Box sx={style}>
-        <Grid container item xs={12} spacing={2} justifyContent="center">
+      <Box sx={style} id="box">
+        <Grid container xs={12} spacing={2} justifyContent="center" id="top">
           <Grid item xs={12} textAlign="right">
-            <Close sx={{cursor: "pointer"}} onClick={handleClose} />
+            <Close
+              sx={{ cursor: "pointer", position: "relative" }}
+              onClick={handleClose}
+            />
           </Grid>
+
           <Grid
+            id="search-and-new"
             container
             item
             xs={12}
@@ -69,6 +89,7 @@ export const StartModal = ({
             <Grid item xs={8}>
               <SearchInput onChange={searchValueChanged} />
             </Grid>
+
             <Grid item xs={4}>
               <Button
                 fullWidth
@@ -79,8 +100,36 @@ export const StartModal = ({
               </Button>
             </Grid>
           </Grid>
-          <Grid item>
+          <Grid
+            container
+            item
+            xs={12}
+            id="rooms"
+            spacing={2}
+            justifyContent="space-between"
+            sx={{ paddingBottom: "10px" }}
+          >
+            <Grid item>
+              <Typography variant="h5" color={theme.palette.primary.dark}>
+                Public Rooms
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant="h5" color={theme.palette.secondary.light}>
+                Your Rooms
+              </Typography>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={6} sx={{ overflow: "auto", height: "50vh" }}>
             <DashboardCommunities communities={filteredCommunities} />
+          </Grid>
+
+          <Grid item xs={6} sx={{ overflow: "auto" }}>
+            <DashboardCommunities
+              context="private"
+              communities={privateRooms}
+            />
           </Grid>
         </Grid>
       </Box>

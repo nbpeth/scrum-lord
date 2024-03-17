@@ -3,15 +3,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
 import { getSocketBaseUrl } from "../util/config";
-import { Web } from "@mui/icons-material";
+// import { Web } from "@mui/icons-material";
 import { WebSocketReadyState } from "../util/websocketUtils";
 
 export default function useCommunity() {
   const params = useParams();
   const communityId = params.communityId;
   const [socketUrl, setSocketUrl] = useState(null);
-
-  const [reconnection, setReconnection] = useState({attempts: 15, interval: 5, reconnecting: false});
+  const [reconnection, setReconnection] = useState({
+    attempts: 15,
+    interval: 5,
+    reconnecting: false,
+  });
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => {
@@ -39,7 +42,6 @@ export default function useCommunity() {
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
   const [messageHistory, setMessageHistory] = useState([]);
-
   const [roomEvents, setRoomEvents] = useState({});
 
   const navigate = useNavigate();

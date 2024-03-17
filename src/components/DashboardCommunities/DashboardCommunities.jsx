@@ -10,15 +10,19 @@ import {
 } from "@mui/material";
 import { differenceInDays, format, parseISO } from "date-fns";
 import { NavLink } from "react-router-dom";
-
 import { Schedule } from "@mui/icons-material";
 
-export const DashboardCommunities = ({ communities }) => {
+export const DashboardCommunities = ({ communities, context }) => {
+  const isPrivateContext = context === "private";
+
   return (
     <Grid container item spacing={2} xs={12} justifyContent="center">
       {communities
         ?.sort((a, b) => b.synergy?.value - a.synergy?.value)
         .map((community) => {
+          if (!community?.lastModified) {
+            return community;
+          }
           const idle = differenceInDays(
             new Date(),
             parseISO(community?.lastModified)
@@ -30,7 +34,10 @@ export const DashboardCommunities = ({ communities }) => {
         .map((community) => {
           return (
             <Grid item xs={12} md={12} key={community.id}>
-              <CommunityCard community={community} />
+              <CommunityCard
+                isPrivateContext={isPrivateContext}
+                community={community}
+              />
             </Grid>
           );
         })}
@@ -38,7 +45,7 @@ export const DashboardCommunities = ({ communities }) => {
   );
 };
 
-export const CommunityCard = ({ community }) => {
+export const CommunityCard = ({ community, isPrivateContext }) => {
   const theme = useTheme();
 
   const { idle } = community;
@@ -59,7 +66,13 @@ export const CommunityCard = ({ community }) => {
         },
       }}
     >
-      <CardContent>
+      <CardContent
+        sx={{
+          backgroundColor: isPrivateContext
+            ? alpha(theme.palette.secondary.dark, 0.25)
+            : "none",
+        }}
+      >
         <NavLink
           to={`/communities/${community.id}`}
           style={{ textDecoration: "none", color: "inherit" }}
@@ -77,23 +90,27 @@ export const CommunityCard = ({ community }) => {
             </Grid>
 
             <Grid container item xs={6}>
-              <Grid item xs={11} textAlign="right">
-                {Boolean(idle) && (
-                  <Tooltip placement="top-end" arrow title="Idle">
-                    <Schedule
-                      sx={{
-                        fontSize: "medium",
-                        color: theme.palette.secondary.dark,
-                      }}
-                    />
-                  </Tooltip>
-                )}
-                {community?.lastModified && (
-                  <Typography variant="body2" color={theme.palette.grey[300]}>
-                    Last Activity{" "}
-                    {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
-                  </Typography>
-                )}
+              <Grid container spacing={1} item xs={12} textAlign="right">
+                <Grid item>
+                  {community?.lastModified && (
+                    <Typography variant="body2" color={theme.palette.grey[300]}>
+                      Last Activity
+                      {format(community?.lastModified, "MM/dd/yyyy:HH:mm")}
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid item>
+                  {Boolean(idle) && (
+                    <Tooltip placement="top-end" arrow title="Idle">
+                      <Schedule
+                        sx={{
+                          fontSize: "medium",
+                          color: theme.palette.secondary.dark,
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                </Grid>
               </Grid>
             </Grid>
           </Grid>

@@ -8,6 +8,7 @@ import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionSt
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { StartModal } from "../../components/StartModal/StartModal";
 import logoUrl from "../../scrum-lord.png";
+import { useSettings } from "../../hooks/useSettings";
 
 export const Dashboard = () => {
   const {
@@ -18,13 +19,14 @@ export const Dashboard = () => {
     // privateRoomCreatedComplete,
     readyState,
   } = useDashboard();
+  const { yourPrivateRooms } = useSettings();
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
   const [startModalOpen, setStartModalOpen] = useState(false);
   const [error, setError] = useState(null);
   const communityList = listCommunities();
   const [communities, setCommunities] = useState(communityList);
   /*
-*/
+   */
   const communitLimitReached = communities?.length >= 10;
   const navigate = useNavigate();
 
@@ -111,6 +113,7 @@ export const Dashboard = () => {
         handleClose={() => setStartModalOpen(false)}
         onBlur={() => setStartModalOpen(false)}
         communities={communities}
+        yourPrivateRooms={yourPrivateRooms}
         setCreateRoomModalOpen={setCreateRoomModalOpen}
       />
 

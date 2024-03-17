@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 
 export const useSettings = () => {
   const [settings, setSettings] = useState();
+  const [yourPrivateRooms, setYourPrivateRooms] = useState(
+    (localStorage.getItem("privateRooms") &&
+      JSON.parse(localStorage.getItem("privateRooms"))) ||
+      {}
+  );
 
   // load saved settings
   // loading settings from local storage is broken with hooks because they overwrite each other
@@ -75,12 +80,26 @@ export const useSettings = () => {
   //     localStorage.setItem("userstate", JSON.stringify(userStateObj));
   //   };
 
+  const updatePrivateRooms = ( community ) => {
+    if (!community) {
+      return;
+    }
+    
+    const updatedRooms = { ...yourPrivateRooms, [community.id]: community };
+
+    setYourPrivateRooms(updatedRooms);
+
+    localStorage.setItem("privateRooms", JSON.stringify(updatedRooms));
+  };
+
   return {
     settings,
     toggleCommunityAnimation,
     toggleMessageBoard,
     toggleReactions,
     toggleLurkerBox,
-    toggleTimerVisible
+    toggleTimerVisible,
+    yourPrivateRooms,
+    updatePrivateRooms,
   };
 };

@@ -78,6 +78,7 @@ export const Community = ({
     toggleReactions,
     toggleLurkerBox,
     toggleTimerVisible,
+    updatePrivateRooms
   } = useSettings();
 
   const theme = useTheme();
@@ -93,6 +94,7 @@ export const Community = ({
 
   useEffect(() => {
     recoverUserFromStorage();
+    updatePrivateRooms(currentCommunity);
 
     if (currentCommunity?.isSynergized) {
       handleCelebrationChange(true);
