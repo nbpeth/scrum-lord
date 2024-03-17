@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
-import { getSocketBaseUrl } from "../util/config";
+import { getSocketBaseUrl, socketOptions } from "../util/config";
 
 export default function useDashboard() {
   const [_communities, setCommunities] = useState([]);
-  const [communityCreatedComplete, setCommunityCreatedComplete] =
-    useState();
+  const [communityCreatedComplete, setCommunityCreatedComplete] = useState();
   const [socketUrl, setSocketUrl] = useState(null);
+  const [reconnection, setReconnection] = useState({
+    attempts: 15,
+    interval: 5,
+    reconnecting: false,
+  });
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    socketUrl,
+    {...socketOptions({ setReconnection })}
+  );
 
   useEffect(() => {
     const baseUrl = `${getSocketBaseUrl()}/socket`;
@@ -20,11 +27,6 @@ export default function useDashboard() {
     try {
       const messageData = JSON.parse(lastMessage?.data);
       const { type, payload } = messageData;
-      // console.log(
-      //   type === "private-community-created-reply",
-      //   "messageData",
-      //   messageData
-      // );
 
       switch (type) {
         case "list-communities-reply":
@@ -102,7 +104,7 @@ export default function useDashboard() {
     listCommunities,
     readyState,
     removeCommunity,
-    communityCreatedComplete
+    communityCreatedComplete,
     // privateRoomCreatedComplete,
   };
 }

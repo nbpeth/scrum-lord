@@ -5,6 +5,7 @@ const url = require("url");
 const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
+const apiKey = process.env.REACT_APP_API_KEY;
 
 const state = {
   timers: {
@@ -79,8 +80,24 @@ const killTimerIfExists = async (communityId) => {
 // the boatman ferries wayward connections to the other side
 const boatman = (ws) => setTimeout(() => heartbeat(ws), 40000);
 
+const validateApiKey = (apiKey, request) => {
+  const queryParams = url.parse(request.url, { parseQueryString: true }).query;
+  const requestApiKey = queryParams.token;
+
+  return requestApiKey === process.env.REACT_APP_API_KEY;
+};
+
 websocketServer.on("connection", (ws, request) => {
+  const validRequest = validateApiKey(apiKey, request);
+  if (!validRequest) {
+    console.error("invalid token, closing");
+    ws.close();
+
+    return;
+  }
+
   console.log("new client connected");
+
   setTargetSessionOn(ws, request);
   // set a unique id on the connection for science
   ws.id = uuid.v4();
@@ -208,7 +225,7 @@ const handleCommunityReaction = (payload) => {
 
 const handleCreateCommunity = async (payload, ws) => {
   const { community } = payload;
-  
+
   const result = await communityClient.addCommunity(community);
   if (community.isPrivate) {
     notifyCaller(ws, {
