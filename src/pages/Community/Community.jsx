@@ -254,6 +254,7 @@ export const Community = ({
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
+        
         <JoinCommunityModal
           open={joinCommunityModalOpen}
           handleClose={handleJoinCommunityModalClose}

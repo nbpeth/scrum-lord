@@ -30,28 +30,30 @@ const useStyles = makeStyles({
     "&:hover": {
       transform: "scale(2)", // Example: scale the image up on hover
     },
+    
   },
 
   "@keyframes move-image": {
     "0%": {
       transform: "rotate(0deg)",
-      left: "30vw",
-      bottom: "-35vh",
+      left: "0vw",
+      bottom: "-100vh",
+      
     },
-    "25%": {
-      transform: "rotate(180deg)",
-    },
-    "50%": {
-      transform: "rotate(360deg)",
-    },
-    "75%": {
-      transform: "rotate(540deg)",
-    },
-    "100%": {
-      transform: "rotate(720deg)",
-      left: "85vw",
-      bottom: "115vh",
-    },
+    // "25%": {
+    //   transform: "rotate(180deg)",
+    // },
+    // "50%": {
+    //   transform: "rotate(360deg)",
+    // },
+    // "75%": {
+    //   transform: "rotate(540deg)",
+    // },
+    // "100%": {
+    //   transform: "rotate(720deg)",
+    //   left: "100vw",
+    //   bottom: "100vh",
+    // },
   },
 });
 
@@ -107,16 +109,16 @@ const AppContent = () => {
   };
 
   const roomComponent = (
-    <div>
-      {communityBackgroundIsAnimated && (
-        <div>
+    <div style={{position: "relative"}}>
+      {/* {communityBackgroundIsAnimated && (
+        <div >
           <img
             id="moon-image"
             className={classes.image}
             src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png"
           />
         </div>
-      )}
+      )} */}
       <Community
         handleCelebrationChange={handleCelebrationChange}
         handleCommunityBackgroundAnimationChange={
