@@ -444,14 +444,14 @@ export const Community = ({
                     </>
                   )}
                    <Divider />
-                  <MenuItem>
+                  {/* <MenuItem>
                     <a
                       target="_blank"
                       href="https://www.buymeacoffee.com/nbpetha"
                     >
                       <img src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" />
                     </a>
-                  </MenuItem>
+                  </MenuItem> */}
                 </MenuList>
               </Paper>
             </ScrumLordMenu>
