@@ -1,60 +1,43 @@
 import { useEffect, useState } from "react";
 
 export const useSettings = () => {
-  const [settings, setSettings] = useState();
+  const [settings, setSettings] = useState(
+    (localStorage.getItem("settings") &&
+      JSON.parse(localStorage.getItem("settings"))) ||
+      {}
+  );
   const [yourPrivateRooms, setYourPrivateRooms] = useState(
     (localStorage.getItem("privateRooms") &&
       JSON.parse(localStorage.getItem("privateRooms"))) ||
       {}
   );
 
-  // load saved settings
-  // loading settings from local storage is broken with hooks because they overwrite each other
-  useEffect(() => {
-    try {
-      const settingsState = localStorage.getItem("settings");
-      const savedSettings = JSON.parse(settingsState);
+  const setSettingsGuard = (newSettings) => {
+    const updatedSettings = { ...settings, ...newSettings };
+    localStorage.setItem("settings", JSON.stringify(updatedSettings));
+    setSettings(updatedSettings);
+  };
 
-      setSettings(savedSettings);
-    } catch (e) {
-      console.error(e);
-      setSettings({
-        communityAnimation: false,
-        messageBoardVisible: true,
-        reactionsVisible: true,
-        lurkerBoxVisible: false,
-        timerVisible: false,
-      });
-    }
-  }, []);
-
-  // save settings when they change
-  useEffect(() => {
-    // debugger;
-    localStorage.setItem("settings", JSON.stringify(settings));
-  }, [settings]);
+  const toggleMessageBoard = (enabled) => {
+    setSettingsGuard({ messageBoardVisible: enabled });
+  };
 
   const toggleCommunityAnimation = (enabled) => {
-    setSettings({
-      ...settings,
+    setSettingsGuard({
       communityAnimation: enabled,
     });
   };
 
-  const toggleMessageBoard = (enabled) => {
-    setSettings({ ...settings, messageBoardVisible: enabled });
-  };
-
   const toggleReactions = (enabled) => {
-    setSettings({ ...settings, reactionsVisible: enabled });
+    setSettingsGuard({ reactionsVisible: enabled });
   };
 
   const toggleLurkerBox = (enabled) => {
-    setSettings({ ...settings, lurkerBoxVisible: enabled });
+    setSettingsGuard({ lurkerBoxVisible: enabled });
   };
 
   const toggleTimerVisible = (enabled) => {
-    setSettings({ ...settings, timerVisible: enabled });
+    setSettingsGuard({ timerVisible: enabled });
   };
 
   //   const recoverUserFromStorage = () => {
