@@ -142,9 +142,9 @@ const leaveCommunity = async ({ communityId, username, userId }) => {
 const submitVote = async ({ communityId, userId, vote }) => {
   const communityState = await getCommunityBy(communityId);
   const { revealed, citizens } = communityState;
-  const doubleVote =
-    revealed &&
-    Boolean(citizens.find((citizen) => citizen.userId === userId)?.vote);
+  
+  const previousVote = citizens.find((citizen) => citizen.userId === userId)?.vote
+  const doubleVote = revealed && previousVote !== undefined && previousVote !== null && previousVote !== vote;
 
   const result = await postgresClient.submitVote({
     communityId,
