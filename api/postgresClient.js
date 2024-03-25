@@ -24,7 +24,7 @@ try {
 const executeQuery = async ({ query, values }) => {
   try {
     const client = await pool.connect();
-    
+
     const result = await client.query(query, values);
     client.release();
 
@@ -123,8 +123,11 @@ const resetCommunity = async ({ communityId }) => {
     WITH updated_citizens AS (
       SELECT jsonb_agg(
         jsonb_set(
-          jsonb_set(citizen::jsonb, '{vote}', 'null'), 
-          '{hasVoted}', 'false'
+          jsonb_set(
+            jsonb_set(citizen::jsonb, '{vote}', 'null'), 
+            '{hasVoted}', 'false'
+          ),
+          '{doubleVote}', 'false'
         )
       ) AS citizens
       FROM jsonb_array_elements((SELECT data::jsonb->'citizens' FROM communities WHERE id = $1)) AS citizen

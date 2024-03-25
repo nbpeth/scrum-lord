@@ -143,8 +143,11 @@ const submitVote = async ({ communityId, userId, vote }) => {
   const communityState = await getCommunityBy(communityId);
   const { revealed, citizens } = communityState;
   
-  const previousVote = citizens.find((citizen) => citizen.userId === userId)?.vote
-  const doubleVote = revealed && previousVote !== undefined && previousVote !== null && previousVote !== vote;
+  const votingCitizen = citizens.find((citizen) => citizen.userId === userId);
+
+  const previousVote = votingCitizen?.vote;
+  const previousDoubleVote = votingCitizen?.doubleVote;
+  const doubleVote = revealed && (previousDoubleVote || (previousVote !== undefined && previousVote !== null && previousVote !== vote));
 
   const result = await postgresClient.submitVote({
     communityId,

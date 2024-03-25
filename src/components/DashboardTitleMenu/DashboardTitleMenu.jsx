@@ -44,14 +44,14 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                window.open("https://github.com/nbpeth/scrum-lord", "_blank");
+                window.open("https://github.com/nbpeth/scrum-lord/releases", "_blank");
               }}
               sx={{ cursor: "pointer" }}
             >
               <ListItemIcon>
                 <GitHubIcon />
               </ListItemIcon>
-              <ListItemText secondary="Github" />
+              <ListItemText secondary="Change log" />
             </MenuItem>
           </MenuList>
         </Paper>
