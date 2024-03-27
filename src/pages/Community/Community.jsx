@@ -248,6 +248,8 @@ export const Community = ({
     setDeleteCommunityModalOpen(false);
   };
 
+  // console.log("currentCommunity", currentCommunity?.citizens);
+
   const lurkers =
     currentCommunity?.citizens?.filter((c) => !c?.votingMember) || [];
 

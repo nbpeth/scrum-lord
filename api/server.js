@@ -6,11 +6,11 @@ const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
 
-
-
 const apiKey = process.env.REACT_APP_API_KEY;
 const env = process.env.ENV;
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",")?.map((x) => x.trim());
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",")?.map((x) =>
+  x.trim()
+);
 const isProd = env === "production";
 
 const state = {
@@ -390,8 +390,6 @@ const handleReveal = async (payload) => {
   await killTimerIfExists(communityId);
 
   const result = await communityClient.reveal({ communityId });
-  // const isSynergized = verifySynergy(result);
-  console.log("reveal", result);
 
   const reply = {
     type: "reveal-reply",

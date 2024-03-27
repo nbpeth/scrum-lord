@@ -142,12 +142,17 @@ const leaveCommunity = async ({ communityId, username, userId }) => {
 const submitVote = async ({ communityId, userId, vote }) => {
   const communityState = await getCommunityBy(communityId);
   const { revealed, citizens } = communityState;
-  
+
   const votingCitizen = citizens.find((citizen) => citizen.userId === userId);
 
   const previousVote = votingCitizen?.vote;
   const previousDoubleVote = votingCitizen?.doubleVote;
-  const doubleVote = revealed && (previousDoubleVote || (previousVote !== undefined && previousVote !== null && previousVote !== vote));
+  const doubleVote =
+    revealed &&
+    (previousDoubleVote ||
+      (previousVote !== undefined &&
+        previousVote !== null &&
+        previousVote !== vote));
 
   const result = await postgresClient.submitVote({
     communityId,
@@ -185,14 +190,15 @@ const verifySynergy = (result) => {
 
 const reveal = async ({ communityId }) => {
   const result = await postgresClient.revealCommunity({ communityId });
-  const { data } = result[0];
+  let { data } = result[0];
 
   const isSynergized = verifySynergy(data);
   if (isSynergized) {
     const synergyResult = await postgresClient.synergizeCommunity({
       communityId,
     });
-    return { ...synergyResult, isSynergized };
+
+    data = synergyResult?.[0]?.data;
   }
 
   return { ...data, isSynergized };
