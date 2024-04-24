@@ -44,7 +44,10 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                window.open("https://github.com/nbpeth/scrum-lord/releases", "_blank");
+                window.open(
+                  "https://github.com/nbpeth/scrum-lord/releases",
+                  "_blank"
+                );
               }}
               sx={{ cursor: "pointer" }}
             >
@@ -52,6 +55,20 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
                 <GitHubIcon />
               </ListItemIcon>
               <ListItemText secondary="Change log" />
+            </MenuItem>{" "}
+            <MenuItem
+              onClick={() => {
+                window.open(
+                  "https://github.com/nbpeth/scrum-lord/issues",
+                  "_blank"
+                );
+              }}
+              sx={{ cursor: "pointer" }}
+            >
+              <ListItemIcon>
+                <GitHubIcon />
+              </ListItemIcon>
+              <ListItemText secondary="Issues" />
             </MenuItem>
           </MenuList>
         </Paper>
