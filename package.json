@@ -78,5 +78,8 @@
       ],
       "extensions": "js,jsx"
     }
+  },
+  "devDependencies": {
+    "cypress": "^13.7.1"
   }
 }

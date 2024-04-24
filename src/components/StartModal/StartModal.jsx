@@ -99,6 +99,7 @@ export const StartModal = ({
 
             <Grid item xs={4}>
               <Button
+                id="new-room-button"
                 fullWidth
                 variant="contained"
                 onClick={setCreateRoomModalOpen}
@@ -128,7 +129,12 @@ export const StartModal = ({
             </Grid>
           </Grid>
 
-          <Grid item xs={6} sx={{ overflow: "auto", height: "50vh" }}>
+          <Grid
+            id="dashboard-public-rooms"
+            item
+            xs={6}
+            sx={{ overflow: "auto", height: "50vh" }}
+          >
             <DashboardCommunities
               communities={filteredCommunities}
               fullsizeScreen={fullsizeScreen}
@@ -137,6 +143,7 @@ export const StartModal = ({
 
           <Grid item xs={6} sx={{ overflow: "auto" }}>
             <DashboardCommunities
+              id="dashboard-private-rooms"
               fullsizeScreen={fullsizeScreen}
               context="private"
               communities={filteredPrivateRooms}

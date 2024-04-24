@@ -94,8 +94,8 @@ export const CreateRoomModal = ({ open, handleClose }) => {
               onChange={(e) =>
                 setNewCommunity({ ...newCommunity, name: e.target.value })
               }
-              label="Community Name"
-              id="name"
+              label="Room Name"
+              id="new-room-name-text-input"
             />
           </Grid>
           <Grid item container alignItems="center" spacing={1}>
@@ -103,6 +103,7 @@ export const CreateRoomModal = ({ open, handleClose }) => {
               <FormControlLabel
                 control={
                   <Checkbox
+                    id="new-room-private-checkbox"
                     checked={isPrivate}
                     onChange={(e) => {
                       setIsPrivate(e.target.checked);
@@ -124,6 +125,7 @@ export const CreateRoomModal = ({ open, handleClose }) => {
           <Grid container item xs={12} justifyContent="space-between">
             <Grid item>
               <Button
+                id="new-room-create-button"
                 onClick={() => close({ ...getCommunityName(), isPrivate })}
               >
                 Create

@@ -155,6 +155,7 @@ export const Dashboard = () => {
         }}
       >
         <Button
+          id="dashboard-start-button"
           sx={{
             fontFamily: "monospace",
             fontSize: ".8em",

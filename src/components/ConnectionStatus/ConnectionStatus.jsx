@@ -41,7 +41,7 @@ export const ConnectionStatus = ({ readyState, reconnection }) => {
   const { severity, message } = getSeverity(readyState);
 
   return (
-    <Alert severity={severity}>
+    <Alert severity={severity} id="connection-status-alert">
       {/* {JSON.stringify(reconnection)} */}
       {fullsizeScreen ? message : null}
     </Alert>
