@@ -95,7 +95,9 @@ export const Community = ({
 
   useEffect(() => {
     recoverUserFromStorage();
-    // updatePrivateRooms(currentCommunity);
+    
+    // set the current room to the stored rooms
+    updatePrivateRooms(currentCommunity);
 
     if (currentCommunity?.isSynergized) {
       handleCelebrationChange(true);
@@ -178,8 +180,6 @@ export const Community = ({
     userStateObj[communityId] = userId;
 
     localStorage.setItem("userstate", JSON.stringify(userStateObj));
-    // set the current room to the stored rooms
-    updatePrivateRooms(currentCommunity);
   };
 
   const handleTimerClicked = ({ communityId, timerValue }) => {
@@ -256,7 +256,6 @@ export const Community = ({
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        
         <JoinCommunityModal
           open={joinCommunityModalOpen}
           handleClose={handleJoinCommunityModalClose}
@@ -445,7 +444,7 @@ export const Community = ({
                       </MenuItem>
                     </>
                   )}
-                   <Divider />
+                  <Divider />
                   {/* <MenuItem>
                     <a
                       target="_blank"
