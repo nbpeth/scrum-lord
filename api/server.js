@@ -5,7 +5,7 @@ const url = require("url");
 const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
-
+const newRelic = require("newrelic");
 const apiKey = process.env.REACT_APP_API_KEY;
 const env = process.env.ENV;
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",")?.map((x) =>
@@ -108,6 +108,7 @@ const validateRequest = (request) => {
 };
 
 websocketServer.on("connection", (ws, request) => {
+  // newRelic.startSegment("connection", true, () => {
   const validRequest = validateRequest(request);
   if (!validRequest) {
     console.error("unauthorized");
@@ -204,7 +205,9 @@ websocketServer.on("connection", (ws, request) => {
   ws.on("close", close(ws));
   ws.on("pong", pong);
 
-  ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
+  newRelic.startSegment("send message", true, () => {
+    ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
+  });
 });
 
 const notifyCaller = (ws, message) => {
@@ -384,25 +387,27 @@ const handleSubmitVote = async (payload) => {
 
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
 const handleReveal = async (payload) => {
-  const { community, username, userId, userColor } = payload;
-  const { id: communityId } = community;
+  newRelic.startSegment("handleReveal", true, async () => {
+    const { community, username, userId, userColor } = payload;
+    const { id: communityId } = community;
 
-  await killTimerIfExists(communityId);
+    await killTimerIfExists(communityId);
 
-  const result = await communityClient.reveal({ communityId });
+    const result = await communityClient.reveal({ communityId });
 
-  const reply = {
-    type: "reveal-reply",
-    payload: {
-      community: { ...result },
-      username,
-      userId,
-      userColor,
-      isSynergized: result?.isSynergized,
-    },
-  };
+    const reply = {
+      type: "reveal-reply",
+      payload: {
+        community: { ...result },
+        username,
+        userId,
+        userColor,
+        isSynergized: result?.isSynergized,
+      },
+    };
 
-  notifyClients({ message: reply, communityId });
+    notifyClients({ message: reply, communityId });
+  });
 };
 
 const handleReset = async (payload) => {
