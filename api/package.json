@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "node ./server.js",
-    "start:api:local": "REACT_APP_API_KEY='key123' ALLOWED_ORIGINS='localhost:3000' DATABASE_URL='postgresql://user:secrets@localhost:5432/scrumlord' yarn start",
+    "startlocal": "REACT_APP_API_KEY='key123' ALLOWED_ORIGINS='localhost:3000' DATABASE_URL='postgresql://user:secrets@localhost:5432/scrumlord' yarn start",
     "start:api:dc": "echo DATABASE_URL $DATABASE_URL && DATABASE_URL=$DATABASE_URL yarn start",
     "build": "yarn build",
     "heroku-postbuild": "yarn build"
