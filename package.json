@@ -1,6 +1,6 @@
 {
   "name": "scrumlord",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.3",
@@ -17,6 +17,7 @@
     "jsonwebtoken": "^9.0.2",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
+    "newrelic": "^11.16.0",
     "npm-watch": "^0.11.0",
     "pg": "^8.11.3",
     "random-words": "^2.0.0",
