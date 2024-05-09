@@ -205,12 +205,14 @@ websocketServer.on("connection", (ws, request) => {
   ws.on("close", close(ws));
   ws.on("pong", pong);
 
+  newRelic.setTransactionName('send message transation');
   newRelic.startSegment("send message", true, () => {
     ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
   });
 });
 
 const notifyCaller = (ws, message) => {
+  newRelic.setTransactionName('notify caller transation');
   newRelic.startSegment("notifyCaller", true, () => {
     ws.send(JSON.stringify(message));
   });
