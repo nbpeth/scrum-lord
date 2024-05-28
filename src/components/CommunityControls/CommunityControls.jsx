@@ -170,20 +170,21 @@ export const CommunityControls = ({
 
           {settings?.timerVisible && (
             <>
-            <Grid item xs={12}>
-              <TimerControl {...{ community, handleTimerClicked }} />
-            </Grid>
-               <Grid item xs={12}>
-               <List>
-                 <Divider />
-               </List>
-             </Grid>
-             </>
+              <Grid item xs={12}>
+                <TimerControl {...{ community, handleTimerClicked }} />
+              </Grid>
+              <Grid item xs={12}>
+                <List>
+                  <Divider />
+                </List>
+              </Grid>
+            </>
           )}
-       
-          <Grid item xs={12}>
-            {community && community.revealed ? (
+
+          <Grid container item xs={12} direction="column" spacing={3}>
+            <Grid item>
               <Button
+                disabled={community && !community.revealed}
                 fullWidth
                 variant="outlined"
                 color="warning"
@@ -191,8 +192,10 @@ export const CommunityControls = ({
               >
                 Reset
               </Button>
-            ) : (
+            </Grid>
+            <Grid item>
               <Button
+                disabled={community && community.revealed}
                 fullWidth
                 variant="outlined"
                 color="success"
@@ -200,7 +203,7 @@ export const CommunityControls = ({
               >
                 Reveal
               </Button>
-            )}
+            </Grid>
           </Grid>
           <Grid item xs={12}>
             <List>
