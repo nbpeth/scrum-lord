@@ -5,40 +5,86 @@ import {
   MenuItem,
   Modal,
   Select,
-  TextField,
   Typography,
 } from "@mui/material";
-import useCommunity from "../../hooks/useCommunity";
 import { useState } from "react";
 
+const calculateAverageNumbers = (numbers) => {
+  if (!numbers.length) return 0;
+  const sum = numbers.reduce((total, num) => total + num, 0);
+  const average = sum / numbers.length;
+  // const hasDecicimal = average % 1 !== 0;
+
+  // return hasDecicimal ? average.toFixed(2) : average.toFixed(0);
+  return average?.toFixed(0);
+};
+export const highestOccurenceOfValues = (arr) => {
+  const counts = arr.reduce((res, next) => {
+    if (res[next]) {
+      res[next]++;
+    } else {
+      res[next] = 1;
+    }
+
+    return res;
+  }, {});
+
+  const result = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  return result;
+};
+
+// write some tests for averages
 export const VoteOptions = {
-  fibonacci: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
-  tshirt: ["XS", "S", "M", "L", "XL", "XXL"],
-  yesNo: ["Yes", "No"],
-  boolean: ["True", "False"],
-  thumbs: ["👍", "👎", "🫰", "🤌"],
-  naturalNumbers: Array.from(Array(50).keys()),
-  deficientNumbers: [
-    1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 19, 21, 22, 23, 25, 26,
-    27, 29, 31, 32, 33, 34, 35, 37, 38, 39, 41, 43, 44, 45, 46, 47, 49, 50,
-  ],
-  abundantNumbers: [
-    12, 18, 20, 24, 30, 36, 40, 42, 48, 54, 56, 60, 66, 70, 72, 78, 80, 84, 88,
-    90, 96, 100, 102, 104, 108,
-  ],
-  foodEmojis: [
-    "🍕",
-    "🍟",
-    "🌭",
-    "🍔",
-    "🧀",
-    "🥔",
-    "🌮",
-    "🥩",
-    "🍖",
-    "🍺",
-    "🥪",
-  ],
+  fibonacci: {
+    values: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
+    calculateAverage: calculateAverageNumbers,
+  },
+  tshirt: {
+    values: ["XS", "S", "M", "L", "XL", "XXL"],
+    calculateAverage: (votes) => {
+      // duplication
+      const mostFrequent = highestOccurenceOfValues(votes);
+      // todo: something more interesting with the values, e.g., how do you average emojis?
+      return mostFrequent;
+    },
+  },
+  yesNo: { values: ["Yes", "No"], calculateAverage: (votes) => {} },
+  boolean: { values: ["True", "False"], calculateAverage: (votes) => {} },
+  thumbs: {
+    values: ["👍", "👎", "🫰", "🤌"],
+    calculateAverage: (votes) => {
+      const mostFrequent = highestOccurenceOfValues(votes);
+      // todo: something more interesting with the values, e.g., how do you average emojis?
+      return mostFrequent;
+    },
+  },
+  naturalNumbers: {
+    values: Array.from(Array(50).keys()),
+    calculateAverage: calculateAverageNumbers,
+  },
+  deficientNumbers: {
+    values: [
+      1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 19, 21, 22, 23, 25,
+      26, 27, 29, 31, 32, 33, 34, 35, 37, 38, 39, 41, 43, 44, 45, 46, 47, 49,
+      50,
+    ],
+    calculateAverage: calculateAverageNumbers,
+  },
+  abundantNumbers: {
+    values: [
+      12, 18, 20, 24, 30, 36, 40, 42, 48, 54, 56, 60, 66, 70, 72, 78, 80, 84,
+      88, 90, 96, 100, 102, 104, 108,
+    ],
+    calculateAverage: calculateAverageNumbers,
+  },
+  foodEmojis: {
+    values: ["🍕", "🍟", "🌭", "🍔", "🧀", "🥔", "🌮", "🥩", "🍖", "🍺", "🥪"],
+    calculateAverage: (votes) => {
+      const mostFrequent = highestOccurenceOfValues(votes);
+      // todo: something more interesting with the values, e.g., how do you average emojis?
+      return mostFrequent;
+    },
+  },
 };
 
 export const VoteOptionsLabels = {
@@ -58,7 +104,7 @@ export const EditPointSchemeModal = ({
   editPointScheme,
   handleClose,
   community,
-  iamCitizen
+  iamCitizen,
 }) => {
   const style = {
     position: "relative",
@@ -79,7 +125,7 @@ export const EditPointSchemeModal = ({
   };
 
   const onUpdate = () => {
-    editPointScheme({scheme: selectedScheme, ...iamCitizen});
+    editPointScheme({ scheme: selectedScheme, ...iamCitizen });
     close();
   };
 

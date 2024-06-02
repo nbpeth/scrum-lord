@@ -62,7 +62,7 @@ export const CommunityControls = ({
   React.useEffect(() => {
     if (community) {
       setSelectOptions(
-        VoteOptions[community?.pointScheme] ?? VoteOptions["fibonacci"]
+        VoteOptions[community?.pointScheme]?.values ?? VoteOptions["fibonacci"].values
       );
     }
   }, [community]);

@@ -2,6 +2,7 @@ import { Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { CitizenCard } from "../../components/CitizenCard/CitizenCard";
 
 import * as React from "react";
+import { PointChart } from "../PointChart/PointChart";
 
 export const CommunityCitizens = ({
   citizens,
@@ -9,18 +10,61 @@ export const CommunityCitizens = ({
   handleDeleteUser,
   currentCommunity,
 }) => {
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  const containerRef = React.useRef(null);
   const theme = useTheme();
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
+  const pointScheme = currentCommunity?.pointScheme ?? "fibonacci";
+  const votes = currentCommunity?.citizens?.map((c) => c.vote);
+
+  React.useEffect(() => {
+    function handleResize() {
+      if (containerRef.current) {
+        console.log("resize", containerRef.current.clientWidth);
+        setContainerWidth(containerRef.current.clientWidth);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, [containerRef.current]);
 
   return (
     <Grid
       container
-      direction="column"
+      direction="row"
       xs={12}
       spacing={3}
-      sx={{ padding: "15px" }}
+      justifyContent="center"
+      sx={{ padding: "15px", height: "100%", position: "relative" }}
     >
-      <Grid container item spacing={1} xs={12} justifyContent="center">
+      <Grid xs={12} item id="point-chart-container">
+        {currentCommunity?.revealed && (
+          <div ref={containerRef}>
+            <PointChart
+              votes={votes}
+              pointScheme={pointScheme}
+              containerWidth={containerWidth}
+            />
+          </div>
+        )}
+      </Grid>
+
+      <Grid
+        id="vote-card-container"
+        container
+        item
+        spacing={1}
+        // overlap chart
+        sx={{
+          transform:
+            currentCommunity?.revealed &&
+            `translateY(-${containerWidth / 2}px)`,
+        }}
+        justifyContent="center"
+      >
         {citizens.length ? (
           citizens
             ?.filter((c) => c.votingMember)

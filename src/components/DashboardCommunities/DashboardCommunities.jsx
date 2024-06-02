@@ -1,16 +1,15 @@
+import { Schedule } from "@mui/icons-material";
 import {
   Card,
   CardContent,
   Grid,
-  LinearProgress,
   Tooltip,
   Typography,
   alpha,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import { differenceInDays, format, parseISO } from "date-fns";
 import { NavLink } from "react-router-dom";
-import { Schedule } from "@mui/icons-material";
 import emptyImgUrl from "../../missing-5.png";
 
 export const DashboardCommunities = ({

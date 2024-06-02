@@ -169,23 +169,26 @@ const submitVote = async ({ communityId, userId, vote }) => {
 
 // if all votes are the same for at least two people, let's party
 const verifySynergy = (result) => {
-  return (
+  const citizens =
     result &&
     result.citizens &&
     result.citizens?.length > 1 &&
     result.citizens
       // don't count votes for lurkers
-      ?.filter((citizen) => citizen.votingMember)
-      .map((citizen) => citizen.vote)
-      .every((vote) => {
-        // all votes are the same and all votes were cast
-        return (
-          vote === result.citizens[0].vote &&
-          vote !== null &&
-          vote !== undefined
-        );
-      })
-  );
+      ?.filter((citizen) => {
+        return citizen.votingMember;
+      });
+
+  if (!citizens || citizens.length < 1) {
+    return false;
+  }
+  
+  const votes = citizens?.map((citizen) => citizen.vote);
+
+  return votes?.every((vote) => {
+    // all votes are the same and all votes were cast
+    return vote === votes[0] && vote !== null && vote !== undefined;
+  });
 };
 
 const reveal = async ({ communityId }) => {
