@@ -4,7 +4,6 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import React, { useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import { useMediaQuery } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import "./App.css";
 import { Fireworks } from "./components/Particles/Fireworks";
@@ -12,6 +11,10 @@ import { HyperSpace } from "./components/Particles/Hyperspace";
 import { Stars } from "./components/Particles/Stars";
 import { Community } from "./pages/Community/Community";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
+
+import axios from "axios";
+
+import { useEffect } from "react";
 
 const darkTheme = createTheme({
   palette: {
@@ -30,7 +33,6 @@ const useStyles = makeStyles({
     "&:hover": {
       transform: "scale(2)", // Example: scale the image up on hover
     },
-    
   },
 
   "@keyframes move-image": {
@@ -38,7 +40,6 @@ const useStyles = makeStyles({
       transform: "rotate(0deg)",
       left: "0vw",
       bottom: "-100vh",
-      
     },
     // "25%": {
     //   transform: "rotate(180deg)",
@@ -86,15 +87,27 @@ const useStyles = makeStyles({
 // todo: add sound to reveal
 
 const App = () => {
+  const [version, setVersion] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("https://api.github.com/repos/nbpeth/scrum-lord/tags")
+      .then((response) => {
+        if (response?.data?.length > 0) {
+          setVersion(response.data[0].name);
+        }
+      })
+      .catch((error) => console.error(error));
+  }, []);
   return (
     <div className="App" style={{ height: "calc(100vh)" }}>
-      <AppContent />
+      <AppContent version={version} />
     </div>
   );
 };
 
-const AppContent = () => {
-  const classes = useStyles();
+const AppContent = ({ version }) => {
+  // const classes = useStyles();
 
   const [communityBackgroundIsAnimated, setCommunityBackgroundIsAnimated] =
     useState(false);
@@ -109,7 +122,7 @@ const AppContent = () => {
   };
 
   const roomComponent = (
-    <div style={{position: "relative"}}>
+    <div style={{ position: "relative" }}>
       {/* {communityBackgroundIsAnimated && (
         <div >
           <img
@@ -120,6 +133,7 @@ const AppContent = () => {
         </div>
       )} */}
       <Community
+        version={version}
         handleCelebrationChange={handleCelebrationChange}
         handleCommunityBackgroundAnimationChange={
           handleCommunityBackgroundAnimationChange
@@ -136,7 +150,7 @@ const AppContent = () => {
       element: (
         <>
           <HyperSpace />
-          <Dashboard />
+          <Dashboard version={version} />
         </>
       ),
     },

@@ -1,5 +1,6 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import {
+  Divider,
   Grid,
   ListItemIcon,
   ListItemText,
@@ -14,7 +15,7 @@ import { useState } from "react";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { Link } from "react-router-dom";
 
-export const DashboardTitleMenu = ({ createRoomClicked }) => {
+export const DashboardTitleMenu = ({ createRoomClicked, version }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -37,11 +38,8 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
       >
         <Paper sx={{ background: "none" }}>
           <MenuList>
-            <MenuItem>
-              <a target="_blank" href="https://www.buymeacoffee.com/nbpetha">
-                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" />
-              </a>
-            </MenuItem>
+            <MenuItem sx={{ cursor: "default" }}>{version}</MenuItem>
+            <Divider />
             <MenuItem
               onClick={() => {
                 window.open(
@@ -55,7 +53,7 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
                 <GitHubIcon />
               </ListItemIcon>
               <ListItemText secondary="Change log" />
-            </MenuItem>{" "}
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 window.open(
@@ -69,6 +67,12 @@ export const DashboardTitleMenu = ({ createRoomClicked }) => {
                 <GitHubIcon />
               </ListItemIcon>
               <ListItemText secondary="Issues" />
+            </MenuItem>
+            <Divider />
+            <MenuItem>
+              <a target="_blank" href="https://www.buymeacoffee.com/nbpetha">
+                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" />
+              </a>
             </MenuItem>
           </MenuList>
         </Paper>

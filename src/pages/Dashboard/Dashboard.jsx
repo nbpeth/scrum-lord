@@ -19,7 +19,7 @@ import { StartModal } from "../../components/StartModal/StartModal";
 import logoUrl from "../../scrum-lord.png";
 import { useSettings } from "../../hooks/useSettings";
 
-export const Dashboard = () => {
+export const Dashboard = ({ version }) => {
   const {
     listCommunities,
     addCommunity,
@@ -116,7 +116,10 @@ export const Dashboard = () => {
             >
               <Grid container item xs={3} spacing={3}>
                 <Grid item>
-                  <DashboardTitleMenu createRoomClicked={createRoomClicked} />
+                  <DashboardTitleMenu
+                    version={version}
+                    createRoomClicked={createRoomClicked}
+                  />
                 </Grid>
               </Grid>
               <Grid item>

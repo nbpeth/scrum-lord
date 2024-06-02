@@ -1,6 +1,6 @@
 {
   "name": "scrumlord",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.3",
@@ -12,6 +12,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.2",
     "date-fns": "^3.2.0",
     "jsonwebtoken": "^9.0.2",
     "localforage": "^1.10.0",

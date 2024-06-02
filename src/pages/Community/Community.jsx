@@ -45,6 +45,7 @@ import { useSettings } from "../../hooks/useSettings";
 export const Community = ({
   handleCommunityBackgroundAnimationChange,
   handleCelebrationChange,
+  version,
 }) => {
   const params = useParams();
   const communityId = params.communityId;
@@ -281,7 +282,10 @@ export const Community = ({
             <ScrumLordMenu>
               <Paper sx={{ width: 300, maxWidth: "100%" }}>
                 <MenuList>
-                  {/* <Divider /> */}
+                  <MenuItem sx={{cursor: "default"}}>
+                    {version}
+                  </MenuItem>
+                  <Divider />
                   <MenuItem
                     onClick={() => {
                       navigate("/");
