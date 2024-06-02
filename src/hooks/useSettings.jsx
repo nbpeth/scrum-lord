@@ -67,9 +67,7 @@ export const useSettings = () => {
     if (!community) {
       return;
     }
-
-    console.log("updating private rooms!", community)
-
+    
     const updatedRooms = { ...yourPrivateRooms, [community.id]: community };
 
     setYourPrivateRooms(updatedRooms);

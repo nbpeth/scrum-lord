@@ -15,7 +15,7 @@ export const PointChart = ({ votes, pointScheme, containerWidth }) => {
     if (!options || !votes) {
       return;
     }
-    const voteCounts = votes?.reduce((acc, vote) => {
+    const voteCounts = votes?.filter(v => v !== undefined && v !== null).reduce((acc, vote) => {
       acc[vote] = (acc[vote] || 0) + 1;
       return acc;
     }, {});

@@ -11,8 +11,9 @@ import { useState } from "react";
 
 const calculateAverageNumbers = (numbers) => {
   if (!numbers.length) return 0;
-  const sum = numbers.reduce((total, num) => total + num, 0);
-  const average = sum / numbers.length;
+  const actualVotes = numbers.filter((n) => n !== undefined && n !== null);
+  const sum = actualVotes.reduce((total, num) => total + num, 0);
+  const average = sum / actualVotes.length;
   // const hasDecicimal = average % 1 !== 0;
 
   // return hasDecicimal ? average.toFixed(2) : average.toFixed(0);
