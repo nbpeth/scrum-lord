@@ -59,7 +59,7 @@ export const PointChart = ({ votes, pointScheme, containerWidth }) => {
   }
 
   const getArcLabel = (params) => {
-    return params?.label;
+    return params?.label === "null" ? "-" : params?.label;
   };
 
   return (
