@@ -11,17 +11,23 @@ export const CommunityCitizens = ({
   currentCommunity,
 }) => {
   const [containerWidth, setContainerWidth] = React.useState(0);
+  const [containerDimensions, setContainerDimensions] = React.useState({
+    containerWidth: 0,
+    containerHeight: 0,
+  });
   const containerRef = React.useRef(null);
   const theme = useTheme();
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
   const pointScheme = currentCommunity?.pointScheme ?? "fibonacci";
   const votes = currentCommunity?.citizens?.map((c) => c.vote);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     function handleResize() {
       if (containerRef.current) {
-        console.log("resize", containerRef.current.clientWidth);
-        setContainerWidth(containerRef.current.clientWidth);
+        setContainerDimensions({
+          containerWidth: containerRef.current.clientWidth,
+          containerHeight: containerRef.current.offsetHeight,
+        });
       }
     }
 
@@ -29,39 +35,49 @@ export const CommunityCitizens = ({
     handleResize();
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [containerRef.current]);
+  }, []);
 
   return (
     <Grid
+      id="community-citizens-container"
       container
       direction="row"
       xs={12}
-      spacing={3}
-      justifyContent="center"
-      sx={{ padding: "15px", height: "100%", position: "relative" }}
+      spacing={0}
+      // sx={{ background: "green" }}
     >
-      <Grid xs={12} item id="point-chart-container">
+      <Grid
+        xs={2}
+        item
+        id="point-chart-container"
+        // spacing={1}
+        // sx={{ background: "red", }}
+      >
         {currentCommunity?.revealed && (
-          <div ref={containerRef}>
+          <div
+            ref={containerRef}
+            style={{ height: "100%" }}
+          >
             <PointChart
               votes={votes}
               pointScheme={pointScheme}
               containerWidth={containerWidth}
+              containerDimensions={containerDimensions}
             />
           </div>
         )}
       </Grid>
 
       <Grid
+        xs={8}
         id="vote-card-container"
-        container
         item
+        container
         spacing={1}
-        // overlap chart
+        alignContent="flex-start"
         sx={{
-          transform:
-            currentCommunity?.revealed &&
-            `translateY(-${containerWidth / 2}px)`,
+          margin: "10px 0px 0px 30px",
+          // background: "blue",
         }}
         justifyContent="center"
       >
@@ -73,9 +89,11 @@ export const CommunityCitizens = ({
                 <Grid
                   item
                   xs={fullsizeScreen ? 6 : 12}
-                  md={fullsizeScreen ? 3 : 12}
-                  lg={fullsizeScreen ? 2 : 12}
+                  md={fullsizeScreen ? 4 : 12}
+                  lg={fullsizeScreen ? 3 : 12}
                   key={citizen.userId}
+                  // spacing={1}
+                  // sx={{margin: "5px"}}
                 >
                   <CitizenCard
                     fullsizeScreen={fullsizeScreen}
@@ -100,7 +118,6 @@ export const CommunityCitizens = ({
           </Grid>
         )}
       </Grid>
-      <Grid container item></Grid>
     </Grid>
   );
 };

@@ -476,12 +476,12 @@ export const Community = ({
       </Box>
       <Grid container xs={12} spacing={3}>
         {/* desktop component */}
-        {fullsizeScreen && (
+        { (
           <>
-            <Grid item xs={fullsizeScreen ? 9 : 12} sx={{ paddingTop: 10 }}>
+            <Grid item xs={9} sx={{ paddingTop: 10 }}>
               {currentCommunity ? (
                 <Grid container item xs={12} justifyContent="space-between">
-                  {settings?.lurkerBoxVisible && (
+                  {settings?.lurkerBoxVisible && fullsizeScreen && (
                     <Grid item xs={2} sx={{ paddingTop: "10px" }}>
                       <LurkerBox
                         lurkers={lurkers}

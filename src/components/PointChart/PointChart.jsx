@@ -1,88 +1,81 @@
-import { keyframes, styled, useTheme } from "@mui/material";
-import { PieChart, useDrawingArea } from "@mui/x-charts";
+import { Box, Grid, Typography, keyframes, useTheme } from "@mui/material";
+import { BarChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
 import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
 
-export const PointChart = ({ votes, pointScheme, containerWidth }) => {
+export const PointChart = ({ votes, pointScheme, containerDimensions }) => {
   const [seriesData, setSeriesData] = useState(null);
   const schemeConfig = VoteOptions[pointScheme];
   const theme = useTheme();
+
   const options = schemeConfig?.values;
-  const averageCalculator = schemeConfig?.calculateAverage
+  const averageCalculator = schemeConfig?.calculateAverage;
   const average = votes && averageCalculator(votes);
 
   useEffect(() => {
     if (!options || !votes) {
       return;
     }
-    const voteCounts = votes?.filter(v => v !== undefined && v !== null).reduce((acc, vote) => {
-      acc[vote] = (acc[vote] || 0) + 1;
-      return acc;
-    }, {});
+    const voteCounts = votes
+      ?.filter((v) => v !== undefined && v !== null)
+      .reduce((acc, vote) => {
+        acc[vote] = (acc[vote] || 0) + 1;
+        return acc;
+      }, {});
 
-    const data = Object.entries(voteCounts).map(([label, value]) => ({
-      label,
-      value,
-    }));
-
+    const data = Object.entries(voteCounts).map(([label, value]) => {
+      return {
+        data: [value],
+        stack: "A",
+        label,
+      };
+    });
     setSeriesData(data);
   }, [votes]);
 
   if (!seriesData) return null;
 
   const colorChange = keyframes`
-    0% { fill: ${theme.palette.secondary.main}; }
-    25% { fill: ${theme.palette.secondary.dark} }
-    50% { fill: #fff; }
-    75% { fill: ${theme.palette.secondary.dark} }
-    100% { fill: ${theme.palette.secondary.main}; }
+    0% { color: ${theme.palette.primary.main}; }
+    10% { color: ${theme.palette.primary.light}; }
+    20% { color: ${theme.palette.primary.dark}; }
+    30% { color: ${theme.palette.secondary.main}; }
+    40% { color: ${theme.palette.secondary.light}; }
+    50% { color: ${theme.palette.secondary.dark}; }
+    60% { color: ${theme.palette.error.main}; }
+    70% { color: ${theme.palette.error.light}; }
+    80% { color: ${theme.palette.error.dark}; }
+    90% { color: ${theme.palette.warning.main}; }
+    100% { color: ${theme.palette.info.main}; }
   `;
 
-  const StyledText = styled("text")(({ theme }) => ({
-    fill: theme.palette.text.primary,
-    textAnchor: "middle",
-    dominantBaseline: "text-after-edge",
-    fontSize: 60,
-    // stroke: "red",
-    // strokeWidth: 2,
-    fontWeight: 800,
-    animation: `${colorChange} 1s infinite`,
-  }));
-
-  function PieCenterLabel({ children }) {
-    const { width, height, left, top } = useDrawingArea();
-    return (
-      <StyledText x={left + width / 2} y={top + height / 2 - 15}>
-        {children}
-      </StyledText>
-    );
-  }
-
-  const getArcLabel = (params) => {
-    return params?.label === "null" ? "-" : params?.label;
-  };
-
   return (
-    <PieChart
-      slotProps={{
-        legend: { hidden: true },
-      }}
-      width={containerWidth}
-      height={containerWidth}
-      margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-      series={[
-        {
-          startAngle: -90,
-          endAngle: 90,
-          innerRadius: 120,
-          data: seriesData,
-          paddingAngle: 5,
-          arcLabel: getArcLabel,
-          arcLabelMinAngle: 5,
-        },
-      ]}
-    >
-      <PieCenterLabel>{average}</PieCenterLabel>
-    </PieChart>
+    <Grid container direction="column">
+      <Grid item>
+        <Typography
+          variant="h1"
+          fontWeight="bold"
+          sx={{
+            animation: `${colorChange} 2s infinite`,
+          }}
+        >
+          {average}
+        </Typography>
+      </Grid>
+      <Grid item>
+        <BarChart
+          slotProps={{
+            legend: { hidden: true },
+          }}
+          series={seriesData}
+          width={
+            containerDimensions?.containerWidth >= 155
+              ? containerDimensions?.containerWidth
+              : 155
+          }
+          height={containerDimensions?.containerHeight * 0.7}
+        />
+      </Grid>
+    </Grid>
   );
 };

@@ -20,15 +20,17 @@ const calculateAverageNumbers = (numbers) => {
   return average?.toFixed(0);
 };
 export const highestOccurenceOfValues = (arr) => {
-  const counts = arr.reduce((res, next) => {
-    if (res[next]) {
-      res[next]++;
-    } else {
-      res[next] = 1;
-    }
+  const counts = arr
+    .filter((x) => x !== undefined && x !== null)
+    .reduce((res, next) => {
+      if (res[next]) {
+        res[next]++;
+      } else {
+        res[next] = 1;
+      }
 
-    return res;
-  }, {});
+      return res;
+    }, {});
 
   const result = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
   return result;
