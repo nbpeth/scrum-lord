@@ -36,7 +36,7 @@ const getCommunitiesAsArray = async () => {
 const getCommunityBy = async (id) => {
   const result = await postgresClient.getCommunityById({ id });
 
-  if (result.length === 0) {
+  if (!result || result.length === 0) {
     console.warn("no community found", id);
     return null;
   }
