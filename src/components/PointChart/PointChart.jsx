@@ -36,7 +36,7 @@ export const PointChart = ({ votes, pointScheme, containerDimensions }) => {
     setSeriesData(data);
   }, [votes]);
 
-  console.log(filteredVotes)
+
   if (!filteredVotes || filteredVotes.length <= 0 ||  !seriesData) return null;
 
   const colorChange = keyframes`

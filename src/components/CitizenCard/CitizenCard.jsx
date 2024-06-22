@@ -10,17 +10,23 @@ import {
   useTheme,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useEffect, useState } from "react";
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+import { useEffect, useMemo, useState } from "react";
 
 const useStyles = makeStyles({
-  cardReveal: {
-    animation: `$reveal-card-${getRandomInt(0,4)} 2s ease-in-out`,
+  cardReveal0: {
+    animation: `$reveal-card-0 2s ease-in-out`,
+  },
+  cardReveal1: {
+    animation: `$reveal-card-1 2s ease-in-out`,
+  },
+  cardReveal2: {
+    animation: `$reveal-card-2 2s ease-in-out`,
+  },
+  cardReveal3: {
+    animation: `$reveal-card-3 2s ease-in-out`,
+  },
+  cardReveal4: {
+    animation: `$reveal-card-4 2s ease-in-out`,
   },
   "@keyframes reveal-card-0": {
     "0%": { transform: "perspective(300px) rotateY(0deg)" },
@@ -62,6 +68,7 @@ export const CitizenCard = ({
   iAmCitizen,
   position,
   fullsizeScreen,
+  animationClassPosition,
 }) => {
   const classes = useStyles();
 
@@ -115,6 +122,7 @@ export const CitizenCard = ({
         getBackgroundColor={getBackgroundColor}
         isMyCard={isMyCard}
         classes={classes}
+        animationClassPosition={animationClassPosition}
         cardAnimating={cardAnimating}
       />
     );
@@ -144,12 +152,14 @@ export const CitizenCardDesktop = ({
   classes,
   revealed,
   cardAnimating,
+  animationClassPosition,
   theme,
 }) => {
   const { vote, hasVoted, username, userColor, doubleVote } = citizen;
+  // console.log("animationClass", animationClass)
   return (
     <Card
-      className={cardAnimating ? classes.cardReveal : null}
+      className={cardAnimating ? classes[`cardReveal${animationClassPosition}`] : null}
       key={citizen.id}
       sx={{
         padding: "10px",
@@ -208,8 +218,7 @@ export const CitizenCardDesktop = ({
               ) : (
                 <DeleteTwoToneIcon
                   fontSize="x-small"
-                  sx={{ cursor: "none", opacity: 0}}
-                  
+                  sx={{ cursor: "none", opacity: 0 }}
                 />
               )}
             </CardActions>
@@ -281,15 +290,13 @@ export const CitizenCardMobile = ({
               />
             </Grid>
             <Grid item xs={2}>
-              {
-                !isMyCard && (
-                  <DeleteTwoToneIcon
-                    fontSize="x-small"
-                    sx={{ cursor: "pointer" }}
-                    onClick={() => handleDeleteUser(citizen)}
-                  />
-                )
-              }
+              {!isMyCard && (
+                <DeleteTwoToneIcon
+                  fontSize="x-small"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => handleDeleteUser(citizen)}
+                />
+              )}
             </Grid>
           </Grid>
         </div>

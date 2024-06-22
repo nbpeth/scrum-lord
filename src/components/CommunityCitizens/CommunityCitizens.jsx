@@ -4,6 +4,12 @@ import { CitizenCard } from "../../components/CitizenCard/CitizenCard";
 import * as React from "react";
 import { PointChart } from "../PointChart/PointChart";
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export const CommunityCitizens = ({
   citizens,
   iAmCitizen,
@@ -20,6 +26,7 @@ export const CommunityCitizens = ({
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
   const pointScheme = currentCommunity?.pointScheme ?? "fibonacci";
   const votes = currentCommunity?.citizens?.map((c) => c.vote);
+  const { revealed } = currentCommunity;
 
   React.useLayoutEffect(() => {
     function handleResize() {
@@ -37,6 +44,12 @@ export const CommunityCitizens = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const [animationClassPosition, setAnimationClassPosition] = React.useState(0);
+
+  React.useEffect(() => {
+    setAnimationClassPosition(getRandomInt(0, 4));
+  }, [revealed]);
+
   return (
     <Grid
       id="community-citizens-container"
@@ -45,16 +58,9 @@ export const CommunityCitizens = ({
       xs={12}
       spacing={2}
     >
-      <Grid
-        xs={2}
-        item
-        id="point-chart-container"
-      >
-        {currentCommunity?.revealed && (
-          <div
-            ref={containerRef}
-            style={{ height: "100%" }}
-          >
+      <Grid xs={2} item id="point-chart-container">
+        {revealed && (
+          <div ref={containerRef} style={{ height: "100%" }}>
             <PointChart
               votes={votes}
               pointScheme={pointScheme}
@@ -92,6 +98,7 @@ export const CommunityCitizens = ({
                   // sx={{margin: "5px"}}
                 >
                   <CitizenCard
+                    animationClassPosition={animationClassPosition}
                     fullsizeScreen={fullsizeScreen}
                     position={i}
                     currentCommunity={currentCommunity}
