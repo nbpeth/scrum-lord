@@ -474,9 +474,10 @@ export const Community = ({
           </Toolbar>
         </AppBar>
       </Box>
+
       <Grid container xs={12} spacing={3}>
         {/* desktop component */}
-        { (
+        { fullsizeScreen && (
           <>
             <Grid item xs={9} sx={{ paddingTop: 10 }}>
               {currentCommunity ? (
@@ -505,9 +506,6 @@ export const Community = ({
               ) : null}
             </Grid>
             <Grid container item xs={3}>
-              {/* <Grid item>
-              <PointChart community={currentCommunity} />
-            </Grid> */}
               <Grid item xs={12}>
                 <CommunityControls
                   handleTimerClicked={handleTimerClicked}

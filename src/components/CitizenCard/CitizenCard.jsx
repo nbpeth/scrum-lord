@@ -20,7 +20,7 @@ function getRandomInt(min, max) {
 
 const useStyles = makeStyles({
   cardReveal: {
-    animation: `$reveal-card-${getRandomInt(4,4)} 2s ease-in-out`,
+    animation: `$reveal-card-${getRandomInt(0,4)} 2s ease-in-out`,
   },
   "@keyframes reveal-card-0": {
     "0%": { transform: "perspective(300px) rotateY(0deg)" },
