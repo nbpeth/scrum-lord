@@ -7,6 +7,7 @@ export const PointChart = ({ votes, pointScheme, containerDimensions }) => {
   const [seriesData, setSeriesData] = useState(null);
   const schemeConfig = VoteOptions[pointScheme];
   const theme = useTheme();
+  const filteredVotes = votes?.filter((v) => v !== undefined && v !== null)
 
   const options = schemeConfig?.values;
   const averageCalculator = schemeConfig?.calculateAverage;
@@ -16,24 +17,27 @@ export const PointChart = ({ votes, pointScheme, containerDimensions }) => {
     if (!options || !votes) {
       return;
     }
-    const voteCounts = votes
-      ?.filter((v) => v !== undefined && v !== null)
+    const voteCounts = filteredVotes
       .reduce((acc, vote) => {
         acc[vote] = (acc[vote] || 0) + 1;
         return acc;
       }, {});
 
-    const data = Object.entries(voteCounts).map(([label, value]) => {
+    const data = Object.entries(voteCounts)?.map(([label, value]) => {
       return {
         data: [value],
         stack: "A",
         label,
+        disableLine: true,
+        disableTicks: true, // figure me out, bro
       };
     });
+
     setSeriesData(data);
   }, [votes]);
 
-  if (!seriesData) return null;
+  console.log(filteredVotes)
+  if (!filteredVotes || filteredVotes.length <= 0 ||  !seriesData) return null;
 
   const colorChange = keyframes`
     0% { color: ${theme.palette.primary.main}; }
@@ -50,7 +54,7 @@ export const PointChart = ({ votes, pointScheme, containerDimensions }) => {
   `;
 
   return (
-    <Grid container direction="column">
+    <Grid container direction="row" alignItems="center" justifyContent="center">
       <Grid item>
         <Typography
           variant="h1"
@@ -65,15 +69,13 @@ export const PointChart = ({ votes, pointScheme, containerDimensions }) => {
       <Grid item>
         <BarChart
           slotProps={{
-            legend: { hidden: true },
+            legend: { hidden: false },
           }}
+          layout="horizontal"
           series={seriesData}
-          width={
-            containerDimensions?.containerWidth >= 155
-              ? containerDimensions?.containerWidth
-              : 155
-          }
-          height={containerDimensions?.containerHeight * 0.7}
+          // xAxis={[{ disableGrid: true, label: "Votes"}]}
+          width={containerDimensions?.containerWidth * 0.7}
+          height={150}
         />
       </Grid>
     </Grid>

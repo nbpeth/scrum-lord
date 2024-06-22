@@ -41,7 +41,7 @@ export const CommunityCitizens = ({
     <Grid
       id="community-citizens-container"
       container
-      direction="row"
+      direction="column"
       xs={12}
       spacing={0}
       // sx={{ background: "green" }}

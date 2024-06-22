@@ -32,7 +32,7 @@ export const highestOccurenceOfValues = (arr) => {
       return res;
     }, {});
 
-  const result = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  const result = Object.entries(counts)?.sort((a, b) => b[1] - a[1])?.[0]?.[0];
   return result;
 };
 
