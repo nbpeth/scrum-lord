@@ -9,19 +9,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-// import { makeStyles } from "@mui/styles";
 import * as React from "react";
 import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
-
-// const useStyles = makeStyles((theme) => ({
-//   reactionButton: {
-//     "&:hover": {},
-//     backgroundColor: theme.palette.primary.main,
-
-//   }
-// })
-// )
 
 export const CommunityControls = ({
   handleReveal,
@@ -36,8 +26,6 @@ export const CommunityControls = ({
 }) => {
   const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
-  // const classes = useStyles();
-
   const handleVoteChange = (event) => {
     setSelectedVote(event.target.value);
   };

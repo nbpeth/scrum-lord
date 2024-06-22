@@ -43,15 +43,12 @@ export const CommunityCitizens = ({
       container
       direction="column"
       xs={12}
-      spacing={0}
-      // sx={{ background: "green" }}
+      spacing={2}
     >
       <Grid
         xs={2}
         item
         id="point-chart-container"
-        // spacing={1}
-        // sx={{ background: "red", }}
       >
         {currentCommunity?.revealed && (
           <div
@@ -77,7 +74,6 @@ export const CommunityCitizens = ({
         alignContent="flex-start"
         sx={{
           margin: "10px 0px 0px 30px",
-          // background: "blue",
         }}
         justifyContent="center"
       >

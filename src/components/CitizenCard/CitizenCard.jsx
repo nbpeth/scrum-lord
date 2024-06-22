@@ -1,6 +1,7 @@
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import {
   Card,
+  CardActionArea,
   CardActions,
   CardContent,
   Grid,
@@ -11,25 +12,40 @@ import {
 import { makeStyles } from "@mui/styles";
 import { useEffect, useState } from "react";
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 const useStyles = makeStyles({
   cardReveal: {
-    animation: "$reveal-card 2s ease-in-out",
+    animation: `$reveal-card-${getRandomInt(4,4)} 2s ease-in-out`,
   },
-  cardRevealMobile: {
-    animation: "$reveal-card-mobile 2s ease-in-out",
+  "@keyframes reveal-card-0": {
+    "0%": { transform: "perspective(300px) rotateY(0deg)" },
+    "100%": { transform: "perspective(300px) rotateY(180deg)" },
   },
-  "@keyframes reveal-card": {
-    "0%": { transform: "perspective(200px) rotateY(0deg)" },
-    "100%": { transform: "perspective(200px) rotateY(180deg)" },
+  "@keyframes reveal-card-1": {
+    "0%": { opacity: 0 },
+    "100%": { opacity: 1 },
   },
-  "@keyframes reveal-card-mobile": {
-    "0%": { transform: "perspective(200px) rotateX(0deg)" },
-    "100%": { transform: "perspective(200px) rotateX(180deg)" },
+  "@keyframes reveal-card-2": {
+    "0%": { opacity: 0, transform: "translateY(50px)" },
+    "100%": { opacity: 1, transform: "translateY(0)" },
+  },
+  "@keyframes reveal-card-3": {
+    "0%": { transform: "scale(1)" },
+    "50%": { transform: "scale(1.5)" },
+    "100%": { transform: "scale(1)" },
+  },
+  "@keyframes reveal-card-4": {
+    "0%, 100%": { filter: "blur(0px)" },
+    "50%": { filter: "blur(1000px)" },
   },
   contentHide: {
     visibility: "hidden",
   },
-
   contentShow: {
     animation: "$show-content 500ms ease-in forwards",
   },
@@ -181,15 +197,23 @@ export const CitizenCardDesktop = ({
             <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
           </CardContent>
 
-          <CardActions>
-            {!isMyCard && (
-              <DeleteTwoToneIcon
-                fontSize="x-small"
-                sx={{ cursor: "pointer" }}
-                onClick={() => handleDeleteUser(citizen)}
-              />
-            )}
-          </CardActions>
+          <CardActionArea>
+            <CardActions>
+              {!isMyCard ? (
+                <DeleteTwoToneIcon
+                  fontSize="x-small"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => handleDeleteUser(citizen)}
+                />
+              ) : (
+                <DeleteTwoToneIcon
+                  fontSize="x-small"
+                  sx={{ cursor: "none", opacity: 0}}
+                  
+                />
+              )}
+            </CardActions>
+          </CardActionArea>
         </div>
       </span>
     </Card>
@@ -210,7 +234,7 @@ export const CitizenCardMobile = ({
   const { vote, hasVoted, username, userColor, doubleVote } = citizen;
   return (
     <Card
-      className={cardAnimating ? classes.cardRevealMobile : null}
+      className={cardAnimating ? classes.cardReveal : null}
       key={citizen.id}
       sx={{
         padding: "10px",
@@ -257,13 +281,15 @@ export const CitizenCardMobile = ({
               />
             </Grid>
             <Grid item xs={2}>
-              {!isMyCard && (
-                <DeleteTwoToneIcon
-                  fontSize="x-small"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => handleDeleteUser(citizen)}
-                />
-              )}
+              {
+                !isMyCard && (
+                  <DeleteTwoToneIcon
+                    fontSize="x-small"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => handleDeleteUser(citizen)}
+                  />
+                )
+              }
             </Grid>
           </Grid>
         </div>
