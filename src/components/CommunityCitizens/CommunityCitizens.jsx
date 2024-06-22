@@ -47,7 +47,9 @@ export const CommunityCitizens = ({
   const [animationClassPosition, setAnimationClassPosition] = React.useState(0);
 
   React.useEffect(() => {
-    setAnimationClassPosition(getRandomInt(0, 4));
+    if (!revealed) {
+      setAnimationClassPosition(getRandomInt(0, 4));
+    }
   }, [revealed]);
 
   return (
@@ -59,7 +61,7 @@ export const CommunityCitizens = ({
       spacing={2}
     >
       <Grid xs={2} item id="point-chart-container">
-        {revealed && (
+        {currentCommunity?.revealed && (
           <div ref={containerRef} style={{ height: "100%" }}>
             <PointChart
               votes={votes}
