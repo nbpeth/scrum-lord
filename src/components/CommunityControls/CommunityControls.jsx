@@ -50,7 +50,8 @@ export const CommunityControls = ({
   React.useEffect(() => {
     if (community) {
       setSelectOptions(
-        VoteOptions[community?.pointScheme]?.values ?? VoteOptions["fibonacci"].values
+        VoteOptions[community?.pointScheme]?.values ??
+          VoteOptions["fibonacci"].values
       );
     }
   }, [community]);
@@ -114,6 +115,33 @@ export const CommunityControls = ({
                 >
                   👎
                 </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "love" })}
+                >
+                  ❤️‍🔥
+                </Button>
+                {/* nonplussed */}
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "heartbreak" })}
+                >
+                  ❤️‍🔥
+                </Button>
+                {/* nonplussed */}
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => onReaction({ event: "shrug" })}
+                >
+                  🤷
+                </Button>
+                {/* nonplussed */}
               </Grid>
             </Grid>
           )}

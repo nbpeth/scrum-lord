@@ -41,6 +41,7 @@ import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinComm
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 // import { PointChart } from "../../components/PointChart/PointChart";
 import { useSettings } from "../../hooks/useSettings";
+// import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachine";
 
 export const Community = ({
   handleCommunityBackgroundAnimationChange,
@@ -96,7 +97,7 @@ export const Community = ({
 
   useEffect(() => {
     recoverUserFromStorage();
-    
+
     // set the current room to the stored rooms
     updatePrivateRooms(currentCommunity);
 
@@ -282,9 +283,7 @@ export const Community = ({
             <ScrumLordMenu>
               <Paper sx={{ width: 300, maxWidth: "100%" }}>
                 <MenuList>
-                  <MenuItem sx={{cursor: "default"}}>
-                    {version}
-                  </MenuItem>
+                  <MenuItem sx={{ cursor: "default" }}>{version}</MenuItem>
                   <Divider />
                   <MenuItem
                     onClick={() => {
@@ -477,7 +476,7 @@ export const Community = ({
 
       <Grid container xs={12} spacing={3}>
         {/* desktop component */}
-        { fullsizeScreen && (
+        {fullsizeScreen && (
           <>
             <Grid item xs={9} sx={{ paddingTop: 10 }}>
               {currentCommunity ? (
@@ -664,6 +663,9 @@ export const LurkerBox = ({ lurkers, handleDeleteUser }) => {
             })}
           </Grid>
         </div>
+        {/* <div style={{ }}>
+          <ReactionMachine />
+        </div> */}
       </Grid>
     </div>
   );

@@ -15,6 +15,7 @@ import { Dashboard } from "./pages/Dashboard/Dashboard";
 import axios from "axios";
 
 import { useEffect } from "react";
+// import { ReactionMachine, Test } from "./components/Test/Test";
 
 const darkTheme = createTheme({
   palette: {
@@ -158,6 +159,10 @@ const AppContent = ({ version }) => {
       path: "/communities/:communityId",
       element: roomComponent,
     },
+    // {
+    //   path: "/test",
+    //   element: <ReactionMachine />,
+    // },
     // {
     //   path: "/rooms/:roomId",
     //   element: roomComponent,waaw

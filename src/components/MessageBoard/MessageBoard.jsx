@@ -1,4 +1,5 @@
 import { List, ListItem, Typography, useTheme } from "@mui/material";
+import { ReactionMachine } from "../ReactionMachine/ReactionMachine";
 
 export const MessageBoard = ({ messageHistory, communityId }) => {
   const messages = messageHistory
@@ -8,6 +9,7 @@ export const MessageBoard = ({ messageHistory, communityId }) => {
     .slice(0, 100);
 
   const theme = useTheme();
+
   return (
     <div id="community-message-board">
       <List
@@ -30,6 +32,9 @@ export const MessageBoard = ({ messageHistory, communityId }) => {
           );
         })}
       </List>
+      <div style={{}}>
+        <ReactionMachine />
+      </div>
     </div>
   );
 };

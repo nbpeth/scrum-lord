@@ -4,6 +4,7 @@ import useWebSocket from "react-use-websocket";
 import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
 import { getSocketBaseUrl, socketOptions } from "../util/config";
 // import { Web } from "@mui/icons-material";
+import * as uuid from "uuid";
 import { useSettings } from "./useSettings";
 
 export default function useCommunity() {
@@ -24,6 +25,7 @@ export default function useCommunity() {
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
   const [messageHistory, setMessageHistory] = useState([]);
+  const [lastReaction, setLastReaction] = useState();
   const [roomEvents, setRoomEvents] = useState({});
 
   const navigate = useNavigate();
@@ -72,7 +74,7 @@ export default function useCommunity() {
 
   const handleCommunityLeftReply = (payload) => {
     const { leftUser, community } = payload;
-    const { citizens: updatedCitizens, id } = community;
+    // const { citizens: updatedCitizens, id } = community;
 
     setCommunity(community);
     // setAlertMessage({ message: `${leftUser.username} left the community` });
@@ -88,7 +90,7 @@ export default function useCommunity() {
 
   // blanket holistic updates for now, duplicated but unsure where to go in the future
   const handleSubmittedVoteReply = (payload) => {
-    const { community, username, userColor, userId, doubleVote } = payload;
+    const { community, username, userColor, doubleVote } = payload;
 
     setCommunity(community);
 
@@ -107,7 +109,7 @@ export default function useCommunity() {
   };
 
   const handleCommunityReactionReply = (payload) => {
-    const { event, userId, username, userColor } = payload;
+    const { event, username, userColor } = payload;
 
     let message;
     switch (event) {
@@ -126,14 +128,32 @@ export default function useCommunity() {
       case "downvote":
         message = "👎";
         break;
+      case "love":
+        message = "❤️‍🔥";
+        break;
+      case "heartbreak":
+        message = "❤️‍🔥";
+        break;
+      case "shrug":
+        message = "🤷";
+        break;
       default:
         message = "🤷";
     }
 
+    // Used by ReactionMachine, probably overkill
+    setLastReaction({ id: uuid.v4(), message });
+
     // setAlertMessage({ message: `"${username}" - ${message}` });
     setMessageHistory([
       ...messageHistory,
-      { communityId, text: `"${username}" - ${message}`, userColor },
+      {
+        communityId,
+        text: `"${username}" - ${message}`,
+        userColor,
+        rawText: message,
+        type: "reaction",
+      },
     ]);
   };
 
@@ -149,7 +169,7 @@ export default function useCommunity() {
   };
 
   const handleRevealReply = (payload) => {
-    const { community, username, userColor, isSynergized } = payload;
+    const { community, username, userColor } = payload;
 
     setCommunity(community);
 
@@ -189,7 +209,7 @@ export default function useCommunity() {
   };
 
   const handleTimerFinishedReply = (payload) => {
-    const { community, username, userColor, timerLength } = payload;
+    const { community, userColor } = payload;
     setCommunity(community);
 
     setMessageHistory([
@@ -203,7 +223,7 @@ export default function useCommunity() {
   };
 
   const handleCancelTimerReply = (payload) => {
-    const { community, username, userColor, timerLength } = payload;
+    const { community, username, userColor } = payload;
     setCommunity(community);
 
     setMessageHistory([
@@ -464,6 +484,7 @@ export default function useCommunity() {
     clearAlertMessage,
     community,
     communityReaction,
+    lastReaction,
     deleteCommunity,
     editPointScheme,
     joinCommunity,
