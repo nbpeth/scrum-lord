@@ -130,7 +130,7 @@ export const CommunityControls = ({
                   variant="outlined"
                   onClick={() => onReaction({ event: "heartbreak" })}
                 >
-                  ❤️‍🔥
+                  💔
                 </Button>
                 {/* nonplussed */}
               </Grid>

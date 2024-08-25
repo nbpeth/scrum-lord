@@ -132,7 +132,7 @@ export default function useCommunity() {
         message = "❤️‍🔥";
         break;
       case "heartbreak":
-        message = "❤️‍🔥";
+        message = "💔";
         break;
       case "shrug":
         message = "🤷";
