@@ -134,6 +134,9 @@ export default function useCommunity() {
       case "heartbreak":
         message = "💔";
         break;
+      case "hotdog":
+        message = "🌭";
+        break;
       case "shrug":
         message = "🤷";
         break;

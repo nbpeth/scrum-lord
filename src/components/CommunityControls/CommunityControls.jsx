@@ -86,6 +86,14 @@ export const CommunityControls = ({
               <Grid item>
                 <Button
                   variant="outlined"
+                  onClick={() => onReaction({ event: "hotdog" })}
+                >
+                  🌭
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
                   onClick={() => onReaction({ event: "party" })}
                 >
                   🎉
