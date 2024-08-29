@@ -3,18 +3,49 @@ import { makeStyles } from "@mui/styles";
 import { useEffect, useState } from "react";
 import useCommunity from "../../hooks/useCommunity";
 
+// some day, styled components
 const useStyles = makeStyles({
-  moveit: {
-    animation: `$move-it 3s ease-in-out`,
+  moveit1: {
+    animation: `$move-it-1 3s ease-in-out`,
   },
-
-  // "@keyframes move-it": {
-  //   "0%": { top: "90%", opacity: 1, left: "50%" },
-  //   "100%": { top: "40%", opacity: 0, left: "40%" },
-  // },
-  "@keyframes move-it": {
+  moveit2: {
+    animation: `$move-it-2 3s ease-in-out`,
+  },
+  moveit3: {
+    animation: `$move-it-3 3s ease-in-out`,
+  },
+  moveit4: {
+    animation: `$move-it-4 3s ease-in-out`,
+  },
+  moveit5: {
+    animation: `$move-it-5 3s ease-in-out`,
+  },
+  moveit6: {
+    animation: `$move-it-6 3s ease-in-out`,
+  },
+  "@keyframes move-it-1": {
     "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "40%", transform: "scale(5)" },
+    "100%": { top: "0%", opacity: 0, left: "40%", transform: "scale(7)" },
+  },
+  "@keyframes move-it-2": {
+    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
+    "100%": { top: "0%", opacity: 0, left: "30%", transform: "scale(6)" },
+  },
+  "@keyframes move-it-3": {
+    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
+    "100%": { top: "0%", opacity: 0, left: "50%", transform: "scale(5)" },
+  },
+  "@keyframes move-it-4": {
+    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
+    "100%": { top: "0%", opacity: 0, left: "60%", transform: "scale(4)" },
+  },
+  "@keyframes move-it-5": {
+    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
+    "100%": { top: "0%", opacity: 0, left: "70%", transform: "scale(5)" },
+  },
+  "@keyframes move-it-6": {
+    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
+    "100%": { top: "0%", opacity: 0, left: "20%", transform: "scale(6)" },
   },
 });
 
@@ -49,6 +80,8 @@ export const ReactionMachine = () => {
 
 const Reaction = ({ id, message, setReactions }) => {
   const classes = useStyles({});
+  const [x, _] = useState(Math.floor(Math.random() * (6-1 + 1)) + 1);
+  const classX = classes[`moveit${x}`]
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -57,17 +90,16 @@ const Reaction = ({ id, message, setReactions }) => {
       );
     }, 2500);
 
-    return () => clearTimeout(timeoutId); 
+    return () => clearTimeout(timeoutId);
   }, [id, setReactions]);
 
   return (
     <div
-      className={classes.moveit}
+      className={classX}
       style={{
         position: "absolute",
         top: "90%",
         transform: "translate(-50%, -50%)",
-
         fontSize: "3rem",
       }}
     >
