@@ -153,18 +153,33 @@ export const Dashboard = ({ version }) => {
             width: "35vh",
             height: "35vh",
             borderRadius: "50%",
-            boxShadow: `0px 5px 25vh 15vh ${alpha("rgb(65, 105, 225)", 0.5)}`,
-            transition:
-              "box-shadow 1.5s ease-in-out, font-size 1.5s ease-in-out, width 1.5s ease-in-out, height 1.5s ease-in-out",
-            "&:hover": {
+            position: "relative",
+            overflow: "visible",
+            willChange: "transform",
+            transition: "transform 1.5s ease-in-out",
+            "&::before, &::after": {
+              content: '""',
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              pointerEvents: "none",
+              transition: "opacity 1.5s ease-in-out",
+            },
+            "&::before": {
+              boxShadow: `0px 5px 25vh 15vh ${alpha("rgb(65, 105, 225)", 0.5)}`,
+              opacity: 1,
+            },
+            "&::after": {
               boxShadow: "0px 5px 50px 10px rgb(100, 200, 255)",
-              fontSize: "1.5em",
-              height: "45vh",
-              width: "45vh",
+              opacity: 0,
+            },
+            "&:hover": {
+              transform: "scale(1.3)",
+              "&::before": { opacity: 0 },
+              "&::after": { opacity: 1 },
             },
           }}
           onClick={startModalClicked}
-          // onClick={createRoomClicked}
           variant="outline"
         >
           <img
@@ -173,11 +188,6 @@ export const Dashboard = ({ version }) => {
             style={{
               height: "20vh",
               width: "20vh",
-              transition: "width 1.5s ease-in-out, height 1.5s ease-in-out",
-              "&:hover": {
-                height: "35vh",
-                width: "35vh",
-              },
             }}
           />
         </Button>

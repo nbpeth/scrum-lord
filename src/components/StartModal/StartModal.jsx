@@ -43,15 +43,7 @@ export const StartModal = ({
   };
 
   return (
-    <Modal
-      id="modal"
-      open={open}
-      onClose={(e, reason) => {
-        if (reason !== "backdropClick") {
-          handleClose();
-        }
-      }}
-    >
+    <Modal id="modal" open={open} onClose={handleClose}>
       <Paper
         elevation={12}
         sx={{
