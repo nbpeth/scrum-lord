@@ -1,12 +1,15 @@
 import {
+  alpha,
   Box,
   Button,
   Grid,
   MenuItem,
   Modal,
   Select,
+  Stack,
   Switch,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -15,20 +18,29 @@ import { useState } from "react";
 import * as uuidv4 from "uuid";
 
 import * as React from "react";
-import { Refresh } from "@mui/icons-material";
-export const JoinCommunityModal = ({ open, handleClose }) => {
-  const style = {
-    position: "relative",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-  };
+import { GroupAdd, HelpOutline, Refresh } from "@mui/icons-material";
 
+const modalSurfaceSx = (theme) => ({
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: "calc(100% - 32px)", sm: 420 },
+  maxWidth: "100%",
+  maxHeight: "90vh",
+  overflow: "auto",
+  p: 3,
+  borderRadius: 2,
+  border: "1px solid",
+  borderColor: "divider",
+  background: alpha(theme.palette.background.default, 0.72),
+  backdropFilter: "blur(14px)",
+  WebkitBackdropFilter: "blur(14px)",
+  boxShadow: `0 16px 48px ${alpha(theme.palette.common.black, 0.45)}`,
+  outline: "none",
+});
+
+export const JoinCommunityModal = ({ open, handleClose }) => {
   const theme = useTheme();
 
   const setNewRandomName = () => {
@@ -81,71 +93,170 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
           onClose();
         }
       }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: alpha(theme.palette.common.black, 0.52),
+          backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
+        },
+      }}
     >
-      <Box sx={style}>
-        <Grid container justifyContent="left" spacing={2}>
-          {votingMemberChecked && (
-            <Grid container item xs={12} alignItems="center" spacing={1}>
-              <Grid item xs={11}>
+      <Box
+        sx={{
+          ...modalSurfaceSx(theme),
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch",
+        }}
+      >
+        <Stack spacing={2.5} sx={{ width: "100%", boxSizing: "border-box" }}>
+          <Typography
+            variant="subtitle1"
+            component="h2"
+            fontWeight={600}
+            sx={{ width: "100%", textAlign: "left" }}
+          >
+            Join room
+          </Typography>
+
+          <Stack spacing={2} sx={{ width: "100%" }}>
+            {votingMemberChecked && (
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "100%" }}>
                 <TextField
                   fullWidth
                   value={newUser?.username}
                   onChange={(e) =>
                     setNewUser({ ...newUser, username: e.target.value })
                   }
-                  label="User Name"
+                  label="User name"
                   id="username"
+                  size="small"
+                  sx={{ flex: 1, minWidth: 0 }}
                 />
-              </Grid>
-              <Grid item xs={1}>
                 <Refresh
                   onClick={() => setNewRandomName()}
-                  sx={{ cursor: "pointer" }}
+                  sx={{
+                    flexShrink: 0,
+                    cursor: "pointer",
+                    color: "text.secondary",
+                    "&:hover": { color: "primary.main" },
+                  }}
+                  aria-label="Generate random name"
                 />
-              </Grid>
-            </Grid>
-          )}
-          <Grid container item alignItems="center" xs={12} spacing={2}>
-            <Grid item xs={12}>
+              </Stack>
+            )}
+
+            <Box sx={{ width: "100%" }}>
               <ColorSelector onColorChange={onColorChange} />
-            </Grid>
-            <Grid item>
+            </Box>
+
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ width: "100%", flexWrap: "wrap" }}
+            >
               <Switch
                 checked={votingMemberChecked}
                 onChange={(c) => {
                   setVotingMemberChecked(c.target.checked);
                 }}
+                size="small"
               />
-            </Grid>
-            <Grid>
-              <Typography variant="body2" color={theme.palette.grey[400]}>
-                Voting Member
+              <Typography variant="body2" color="text.secondary" component="span">
+                Voting member
               </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item xs={12} justifyContent="space-between">
-            <Grid item>
+              <Tooltip
+                title="Non-voting members will be able to participate in the session without needing to cast a vote"
+                placement="top"
+                arrow
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    color: "text.secondary",
+                    cursor: "default",
+                    ml: 0.25,
+                  }}
+                >
+                  <HelpOutline
+                    sx={{ fontSize: 16 }}
+                    aria-label="About non-voting members"
+                  />
+                </Box>
+              </Tooltip>
+            </Stack>
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              gap={1.5}
+              sx={{
+                width: "100%",
+                pt: 2.5,
+                mt: 0.5,
+                borderTop: "1px solid",
+                borderColor: "divider",
+                boxSizing: "border-box",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => onClose()}
+                sx={(t) => ({
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 2,
+                  py: 0.875,
+                  borderRadius: 1.5,
+                  borderColor: alpha(t.palette.error.main, 0.65),
+                  color: "error.main",
+                  "&:hover": {
+                    borderColor: "error.main",
+                    backgroundColor: alpha(t.palette.error.main, 0.08),
+                  },
+                })}
+              >
+                Cancel
+              </Button>
               <Button
                 variant="contained"
+                color="primary"
                 onClick={() => onClose(getUserName())}
                 disabled={votingMemberChecked && !newUser?.username}
+                startIcon={<GroupAdd sx={{ fontSize: 18 }} />}
+                sx={(t) => ({
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 2.25,
+                  py: 0.875,
+                  borderRadius: 1.5,
+                  boxShadow: "none",
+                  minWidth: 120,
+                  "&:hover": {
+                    boxShadow: `0 4px 16px ${alpha(t.palette.primary.main, 0.42)}`,
+                  },
+                  "&.Mui-disabled": {
+                    boxShadow: "none",
+                  },
+                })}
               >
                 Join
               </Button>
-            </Grid>
-            <Grid item>
-              <Button color="error" onClick={() => onClose()}>
-                Cancel
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+            </Stack>
+          </Stack>
+        </Stack>
       </Box>
     </Modal>
   );
 };
 
 export const ColorSelector = ({ onColorChange }) => {
+  const theme = useTheme();
   const colors = [
     "#AD28FC",
     "#D160BD",
@@ -188,36 +299,52 @@ export const ColorSelector = ({ onColorChange }) => {
   };
 
   return (
-    <div>
+    <Box>
       <Select
         fullWidth
+        size="small"
         labelId="color-selector-label"
         id="color-selector"
         value={selectedColor}
-        label="Color"
         onChange={handleColorChange}
-        MenuProps={{ style: { maxHeight: "400px" } }}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              maxHeight: 360,
+              background: alpha(theme.palette.background.default, 0.95),
+              backdropFilter: "blur(12px)",
+              border: "1px solid",
+              borderColor: "divider",
+            },
+          },
+        }}
       >
         {colors.map((color) => {
           return (
-            <MenuItem value={color} id={color}>
-              <Grid container alignItems="center">
+            <MenuItem key={color} value={color}>
+              <Grid container alignItems="center" spacing={1}>
                 <Grid item>
-                  <div
-                    id={`color-${color}`}
-                    style={{ height: "10px", width: "10px", background: color }}
+                  <Box
+                    sx={{
+                      height: 12,
+                      width: 12,
+                      borderRadius: 0.5,
+                      backgroundColor: color,
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
                   />
                 </Grid>
                 <Grid item>
-                  <div style={{ paddingLeft: "10px" }}>
-                    <Typography variant="body2">{color}</Typography>
-                  </div>
+                  <Typography variant="body2" color="text.secondary">
+                    {color}
+                  </Typography>
                 </Grid>
               </Grid>
             </MenuItem>
           );
         })}
       </Select>
-    </div>
+    </Box>
   );
 };
