@@ -1,17 +1,46 @@
 import {
+  Box,
   Button,
   Divider,
-  Grid,
-  List,
+  FormControl,
+  InputLabel,
   MenuItem,
+  Paper,
   Select,
+  Stack,
   TextField,
   Typography,
+  alpha,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import * as React from "react";
 import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
+
+const reactionEmoji = {
+  lightning: "⚡",
+  hotdog: "🌭",
+  party: "🎉",
+  thinking: "🤔",
+  upvote: "👍",
+  downvote: "👎",
+  love: "❤️‍🔥",
+  heartbreak: "💔",
+  shrug: "🤷",
+};
+
+const reactionOrder = [
+  "lightning",
+  "hotdog",
+  "party",
+  "thinking",
+  "upvote",
+  "downvote",
+  "love",
+  "heartbreak",
+  "shrug",
+];
 
 export const CommunityControls = ({
   handleReveal,
@@ -24,6 +53,7 @@ export const CommunityControls = ({
   communityReaction,
   settings,
 }) => {
+  const theme = useTheme();
   const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
   const handleVoteChange = (event) => {
@@ -56,185 +86,222 @@ export const CommunityControls = ({
     }
   }, [community]);
 
+  const panelSx = {
+    p: { xs: 2, sm: 2.25 },
+    borderRadius: 3,
+    border: "1px solid",
+    borderColor: "divider",
+    background: (t) => alpha(t.palette.background.paper, 0.55),
+    backdropFilter: "blur(12px)",
+    boxShadow: (t) =>
+      `0 4px 24px ${alpha(t.palette.common.black, 0.12)}`,
+  };
+
+  const subtleDivider = (
+    <Divider
+      sx={{
+        borderColor: (t) => alpha(t.palette.divider, 0.6),
+        my: 0.5,
+      }}
+    />
+  );
+
+  const showReactions = settings?.reactionsVisible;
+  const showVote = iAmCitizen && iAmCitizen.votingMember;
+  const showTimer = settings?.timerVisible;
+
   return (
     <>
       {iAmCitizen && (
-        <Grid
-          container
-          direction="column"
-          justifyContent="space-between"
-          xs={12}
-          spacing={3}
-          sx={{ padding: "15px" }}
-        >
-          {settings?.reactionsVisible && (
-            <Grid
-              container
-              item
-              spacing={1}
-              xs={6}
-              justifyContent="space-between"
-            >
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "lightning" })}
+        <Paper elevation={0} sx={panelSx}>
+          <Stack spacing={2.25}>
+            {showReactions && (
+              <Box>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    display: "block",
+                    mb: 1,
+                    color: "text.secondary",
+                    letterSpacing: 0.08,
+                    fontSize: "0.65rem",
+                  }}
                 >
-                  ⚡
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "hotdog" })}
+                  Reactions
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 1,
+                  }}
                 >
-                  🌭
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "party" })}
+                  {reactionOrder.map((key) => (
+                    <Button
+                      key={key}
+                      size="small"
+                      variant="outlined"
+                      onClick={() => onReaction({ event: key })}
+                      sx={{
+                        minWidth: 44,
+                        minHeight: 40,
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 2,
+                        borderColor: alpha(theme.palette.divider, 0.9),
+                        color: "text.primary",
+                        fontSize: "1.15rem",
+                        lineHeight: 1,
+                        transition: "background-color 0.2s, border-color 0.2s",
+                        "&:hover": {
+                          borderColor: "primary.main",
+                          backgroundColor: (t) =>
+                            alpha(t.palette.primary.main, 0.08),
+                        },
+                      }}
+                    >
+                      {reactionEmoji[key]}
+                    </Button>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {showReactions && (showVote || showTimer) && subtleDivider}
+
+            {showVote && (
+              <Stack spacing={1.5}>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    display: "block",
+                    color: "text.secondary",
+                    letterSpacing: 0.08,
+                    fontSize: "0.65rem",
+                  }}
                 >
-                  🎉
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "thinking" })}
-                >
-                  🤔
-                </Button>
-                {/* nonplussed */}
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "upvote" })}
-                >
-                  👍
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "downvote" })}
-                >
-                  👎
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "love" })}
-                >
-                  ❤️‍🔥
-                </Button>
-                {/* nonplussed */}
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "heartbreak" })}
-                >
-                  💔
-                </Button>
-                {/* nonplussed */}
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => onReaction({ event: "shrug" })}
-                >
-                  🤷
-                </Button>
-                {/* nonplussed */}
-              </Grid>
-            </Grid>
-          )}
-          <Grid item xs={12}>
-            <List>
-              <Divider />
-            </List>
-          </Grid>
-          {iAmCitizen && iAmCitizen.votingMember && (
-            <Grid container item spacing={2}>
-              <Grid item xs={12}>
-                <Select
-                  fullWidth
-                  labelId="vote-selector-label"
-                  id="vote-selector"
-                  value={selectedVote}
-                  label="Vote"
-                  onChange={handleVoteChange}
-                  MenuProps={{ style: { maxHeight: "400px" } }}
-                >
-                  {selectOptions?.map((option) => {
-                    return (
+                  Your vote
+                </Typography>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="vote-selector-label">Points</InputLabel>
+                  <Select
+                    labelId="vote-selector-label"
+                    id="vote-selector"
+                    value={selectedVote}
+                    label="Points"
+                    onChange={handleVoteChange}
+                    MenuProps={{ PaperProps: { style: { maxHeight: 360 } } }}
+                    sx={{
+                      borderRadius: 2,
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: alpha(theme.palette.divider, 0.9),
+                      },
+                    }}
+                  >
+                    {selectOptions?.map((option) => (
                       <MenuItem key={option} value={option}>
                         {option}
                       </MenuItem>
-                    );
-                  })}
-                </Select>
-              </Grid>
-              <Grid item xs={12}>
-                <Button fullWidth variant="contained" onClick={onVoteSubmit}>
-                  Vote
+                    ))}
+                  </Select>
+                </FormControl>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  onClick={onVoteSubmit}
+                  sx={{
+                    borderRadius: 2,
+                    py: 1.1,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    boxShadow: "none",
+                    "&:hover": { boxShadow: (t) => `0 4px 16px ${alpha(t.palette.primary.main, 0.35)}` },
+                  }}
+                >
+                  Submit vote
                 </Button>
-              </Grid>
-              <Grid item xs={12}>
-                <List>
-                  <Divider />
-                </List>
-              </Grid>
-            </Grid>
-          )}
+              </Stack>
+            )}
 
-          {settings?.timerVisible && (
-            <>
-              <Grid item xs={12}>
+            {showVote && showTimer && subtleDivider}
+
+            {showTimer && (
+              <Box>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    display: "block",
+                    mb: 1,
+                    color: "text.secondary",
+                    letterSpacing: 0.08,
+                    fontSize: "0.65rem",
+                  }}
+                >
+                  Timer
+                </Typography>
                 <TimerControl {...{ community, handleTimerClicked }} />
-              </Grid>
-              <Grid item xs={12}>
-                <List>
-                  <Divider />
-                </List>
-              </Grid>
-            </>
-          )}
+              </Box>
+            )}
 
-          <Grid container item xs={12} direction="column" spacing={3}>
-            <Grid item>
+            {(showReactions || showVote || showTimer) && subtleDivider}
+
+            <Stack spacing={1.25}>
+              <Typography
+                variant="overline"
+                sx={{
+                  display: "block",
+                  color: "text.secondary",
+                  letterSpacing: 0.08,
+                  fontSize: "0.65rem",
+                }}
+              >
+                Room
+              </Typography>
               <Button
                 disabled={community && !community.revealed}
                 fullWidth
                 variant="outlined"
                 color="warning"
                 onClick={() => handleReset({ ...iAmCitizen, communityId })}
+                sx={{
+                  borderRadius: 2,
+                  py: 1,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderColor: (t) => alpha(t.palette.warning.main, 0.55),
+                  "&:hover": {
+                    borderColor: "warning.main",
+                    backgroundColor: (t) =>
+                      alpha(t.palette.warning.main, 0.08),
+                  },
+                }}
               >
-                Reset
+                Reset round
               </Button>
-            </Grid>
-            <Grid item>
               <Button
                 disabled={community && community.revealed}
                 fullWidth
-                variant="outlined"
+                variant="contained"
                 color="success"
                 onClick={() => handleReveal({ ...iAmCitizen, communityId })}
+                sx={{
+                  borderRadius: 2,
+                  py: 1,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  boxShadow: "none",
+                  "&:hover": {
+                    boxShadow: (t) =>
+                      `0 4px 16px ${alpha(t.palette.success.main, 0.4)}`,
+                  },
+                }}
               >
-                Reveal
+                Reveal votes
               </Button>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <List>
-              <Divider />
-            </List>
-          </Grid>
-        </Grid>
+            </Stack>
+          </Stack>
+        </Paper>
       )}
     </>
   );
@@ -265,31 +332,47 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
   };
 
   return (
-    <Grid
-      container
-      xs={12}
-      justifyContent="space-between"
-      alignItems="center"
-      spacing={2}
-    >
-      <Grid item xs={8}>
+    <Stack spacing={1.5}>
+      <Stack
+        direction="row"
+        alignItems="stretch"
+        spacing={1.25}
+        sx={{ flexWrap: { xs: "wrap", sm: "nowrap" } }}
+      >
         <Button
           disabled={timerValue > 600}
           fullWidth
           variant="contained"
           color="secondary"
           onClick={onTimerClicked}
+          sx={{
+            borderRadius: 2,
+            py: 1,
+            textTransform: "none",
+            fontWeight: 600,
+            flex: { xs: "1 1 100%", sm: "1 1 auto" },
+            minWidth: 0,
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: (t) =>
+                `0 4px 16px ${alpha(t.palette.secondary.main, 0.35)}`,
+            },
+          }}
         >
-          {community?.timer?.running ? "Cancel Timer " : "Start Timer"}
+          {community?.timer?.running ? "Cancel timer" : "Start timer"}
         </Button>
-      </Grid>
-      <Grid item xs={3}>
         <TextField
           type="number"
-          error={error}
-          inputProps={{ style: { textAlign: "center" } }}
+          size="small"
+          error={Boolean(error)}
+          placeholder="Sec"
+          inputProps={{
+            style: { textAlign: "center" },
+            min: 1,
+            max: 600,
+          }}
           disabled={community?.timer?.running}
-          variant="standard"
+          variant="outlined"
           value={timerValue}
           onChange={onTimerValueChanged}
           onKeyDown={(event) => {
@@ -297,18 +380,29 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
               onTimerClicked();
             }
           }}
+          sx={{
+            width: { xs: "100%", sm: 88 },
+            flexShrink: 0,
+            "& .MuiOutlinedInput-root": { borderRadius: 2 },
+          }}
         />
-      </Grid>
-      <Grid item xs={1}>
-        <TimerDisplay community={community} />
-      </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minWidth: 48,
+            px: 0.5,
+          }}
+        >
+          <TimerDisplay community={community} />
+        </Box>
+      </Stack>
       {error && (
-        <Grid item xs={12}>
-          <Typography variant="caption" color="error">
-            {error}
-          </Typography>
-        </Grid>
+        <Typography variant="caption" color="error">
+          {error}
+        </Typography>
       )}
-    </Grid>
+    </Stack>
   );
 };

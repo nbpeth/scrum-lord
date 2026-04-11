@@ -60,7 +60,7 @@ export const CommunityCitizens = ({
       xs={12}
       spacing={2}
     >
-      <Grid xs={2} item id="point-chart-container">
+      {/* <Grid xs={2} item id="point-chart-container">
         {currentCommunity?.revealed && (
           <div ref={containerRef} style={{ height: "100%" }}>
             <PointChart
@@ -71,7 +71,7 @@ export const CommunityCitizens = ({
             />
           </div>
         )}
-      </Grid>
+      </Grid> */}
 
       <Grid
         xs={8}
