@@ -1,7 +1,9 @@
+import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { initAppParticlesEngine } from "./initParticles";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import { makeStyles } from "@mui/styles";
@@ -13,8 +15,6 @@ import { Community } from "./pages/Community/Community";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 
 import axios from "axios";
-
-import { useEffect } from "react";
 // import { ReactionMachine, Test } from "./components/Test/Test";
 
 const darkTheme = createTheme({
@@ -110,9 +110,16 @@ const App = () => {
 const AppContent = ({ version }) => {
   // const classes = useStyles();
 
+  const [particlesReady, setParticlesReady] = useState(false);
   const [communityBackgroundIsAnimated, setCommunityBackgroundIsAnimated] =
     useState(false);
   const [isCelebrating, setIsCelebrating] = useState(false);
+
+  useEffect(() => {
+    initAppParticlesEngine()
+      .then(() => setParticlesReady(true))
+      .catch((err) => console.error("tsParticles init failed", err));
+  }, []);
 
   const handleCommunityBackgroundAnimationChange = (value) => {
     setCommunityBackgroundIsAnimated(value);
@@ -140,8 +147,8 @@ const AppContent = ({ version }) => {
           handleCommunityBackgroundAnimationChange
         }
       />
-      {communityBackgroundIsAnimated && <Stars />}
-      {isCelebrating && <Fireworks />}
+      {particlesReady && communityBackgroundIsAnimated && <Stars />}
+      {particlesReady && isCelebrating && <Fireworks />}
     </div>
   );
 
@@ -150,8 +157,13 @@ const AppContent = ({ version }) => {
       path: "/",
       element: (
         <>
-          <HyperSpace />
-          <Dashboard version={version} />
+          {particlesReady && <HyperSpace />}
+          <Box
+            component="main"
+            sx={{ position: "relative", zIndex: 1, minHeight: "100vh" }}
+          >
+            <Dashboard version={version} />
+          </Box>
         </>
       ),
     },

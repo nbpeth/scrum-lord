@@ -1,0 +1,5 @@
+/* tsParticles container must fill the fixed wrapper or the canvas can be 0×0 */
+.hyperspace-canvas-host {
+  width: 100%;
+  height: 100%;
+}

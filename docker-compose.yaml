@@ -8,8 +8,8 @@ services:
       POSTGRES_PASSWORD: secrets
       POSTGRES_DB: scrumlord
     volumes:
-      - data:/var/lib/postgresql/data
-      - ./api/db-ddl.sql:/docker-entrypoint-initdb.d/init.sql
+      - data:/var/lib/postgresql
+      - ./api/db-ddl.sql:/docker-entrypoint-initdb.d/01-db-ddl.sql
   # todo: connection between API and DB refused
   # api:
   #   build: 

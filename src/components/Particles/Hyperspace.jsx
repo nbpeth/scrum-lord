@@ -1,31 +1,39 @@
-import styled from "@emotion/styled";
-import { useCallback } from "react";
-import { Particles } from "react-tsparticles";
-import { loadHyperspacePreset } from "tsparticles-preset-hyperspace";
+import { memo, useMemo } from "react";
+import { Particles } from "@tsparticles/react";
+import "./particles.css";
 
-export function HyperSpace(props) {
-  const customInit = useCallback(async (engine) => {
-    await loadHyperspacePreset(engine);
-  });
-
-  const options = {
-    preset: "hyperspace",
-    particles: {
-      color: {
-        value: "#BBFFFF",
+export const HyperSpace = memo(function HyperSpace() {
+  const options = useMemo(
+    () => ({
+      preset: "hyperspace",
+      particles: {
+        color: {
+          value: "#BBFFFF",
+        },
+        size: {
+          value: 3,
+        },
       },
-      size: {
-        value: 3
-      }
-    }
-  };
+    }),
+    []
+  );
 
-  return <StyledParticles options={options} init={customInit} />;
-}
-
-const StyledParticles = styled(Particles)`
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-`;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 0,
+        pointerEvents: "none",
+      }}
+    >
+      <Particles
+        id="particles-hyperspace"
+        className="hyperspace-canvas-host"
+        options={options}
+      />
+    </div>
+  );
+});
