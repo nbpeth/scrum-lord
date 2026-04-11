@@ -45,6 +45,8 @@ export const CommunityHeader = ({
   toggleLurkerBox,
   toggleMessageBoard,
   toggleTimerVisible,
+  /** When true, bar is not sticky (parent rail handles `position: sticky`). */
+  embedded = false,
 }) => {
   return (
     <Stack
@@ -52,9 +54,9 @@ export const CommunityHeader = ({
       alignItems="center"
       spacing={2}
       sx={{
-        position: "sticky",
-        top: 0,
-        zIndex: 10,
+        ...(embedded
+          ? { position: "relative", zIndex: 1 }
+          : { position: "sticky", top: 0, zIndex: 10 }),
         px: 2,
         py: 1,
         borderRadius: 0,

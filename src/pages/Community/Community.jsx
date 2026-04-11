@@ -1,4 +1,4 @@
-import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Grid, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
@@ -225,29 +225,65 @@ export const Community = ({
           community={currentCommunity}
         />
 
-        <CommunityHeader
-          navigate={navigate}
-          communityName={currentCommunity?.name}
-          readyState={readyState}
-          version={version}
-          iAmCitizen={iAmCitizen}
-          onJoin={handleJoin}
-          onLeave={handleLeave}
-          onEditPointScheme={() => setEditPointSchemeModalOpen(true)}
-          onDeleteRoom={handleDeleteCommunity}
-          settings={settings}
-          toggleReactions={toggleReactions}
-          toggleCommunityAnimation={toggleCommunityAnimation}
-          toggleLurkerBox={toggleLurkerBox}
-          toggleMessageBoard={toggleMessageBoard}
-          toggleTimerVisible={toggleTimerVisible}
-        />
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            width: "100%",
+          }}
+        >
+          <CommunityHeader
+            embedded
+            navigate={navigate}
+            communityName={currentCommunity?.name}
+            readyState={readyState}
+            version={version}
+            iAmCitizen={iAmCitizen}
+            onJoin={handleJoin}
+            onLeave={handleLeave}
+            onEditPointScheme={() => setEditPointSchemeModalOpen(true)}
+            onDeleteRoom={handleDeleteCommunity}
+            settings={settings}
+            toggleReactions={toggleReactions}
+            toggleCommunityAnimation={toggleCommunityAnimation}
+            toggleLurkerBox={toggleLurkerBox}
+            toggleMessageBoard={toggleMessageBoard}
+            toggleTimerVisible={toggleTimerVisible}
+          />
+          {iAmCitizen && (
+            <Box
+              sx={{
+                px: { xs: 1.5, sm: 2 },
+                py: 1.5,
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                background: (t) => alpha(t.palette.background.default, 0.72),
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              <Box sx={{ maxWidth: 1200, mx: "auto", width: "100%" }}>
+                <CommunityControls
+                  handleTimerClicked={handleTimerClicked}
+                  community={currentCommunity}
+                  handleReveal={handleReveal}
+                  handleReset={handleReset}
+                  iAmCitizen={iAmCitizen}
+                  communityId={communityId}
+                  submitVote={submitVote}
+                  communityReaction={communityReaction}
+                  settings={settings}
+                />
+              </Box>
+            </Box>
+          )}
+        </Box>
       </Box>
 
       <Grid container xs={12} spacing={3}>
         {fullsizeScreen && (
           <>
-            <Grid item xs={9} sx={{ paddingTop: 10 }}>
+            <Grid item xs={12} sx={{ paddingTop: 2 }}>
               {currentCommunity ? (
                 <Grid container item xs={12} justifyContent="space-between">
                   {settings?.lurkerBoxVisible && fullsizeScreen && (
@@ -273,75 +309,28 @@ export const Community = ({
                 </Grid>
               ) : null}
             </Grid>
-            <Grid container item xs={3}>
-              <Grid item xs={12}>
-                <CommunityControls
-                  handleTimerClicked={handleTimerClicked}
-                  community={currentCommunity}
-                  handleReveal={handleReveal}
-                  handleReset={handleReset}
-                  iAmCitizen={iAmCitizen}
+
+            {settings?.messageBoardVisible && (
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  backgroundColor: settings?.communityAnimationEnabled
+                    ? "none"
+                    : theme.palette.background.paper,
+                }}
+              >
+                <MessageBoard
+                  messageHistory={messageHistory}
                   communityId={communityId}
-                  submitVote={submitVote}
-                  communityReaction={communityReaction}
-                  settings={settings}
                 />
               </Grid>
-
-              {settings?.messageBoardVisible && (
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    backgroundColor: settings?.communityAnimationEnabled
-                      ? "none"
-                      : theme.palette.background.paper,
-                  }}
-                >
-                  <MessageBoard
-                    messageHistory={messageHistory}
-                    communityId={communityId}
-                  />
-                </Grid>
-              )}
-            </Grid>
+            )}
           </>
         )}
         {!fullsizeScreen && (
           <>
-            <Grid container item xs={12}>
-              <Grid item xs={12}>
-                <CommunityControls
-                  handleTimerClicked={handleTimerClicked}
-                  community={currentCommunity}
-                  handleReveal={handleReveal}
-                  handleReset={handleReset}
-                  iAmCitizen={iAmCitizen}
-                  communityId={communityId}
-                  submitVote={submitVote}
-                  communityReaction={communityReaction}
-                  settings={settings}
-                />
-              </Grid>
-
-              {settings?.messageBoardVisible && (
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    backgroundColor: settings?.communityAnimationEnabled
-                      ? "none"
-                      : theme.palette.background.paper,
-                  }}
-                >
-                  <MessageBoard
-                    messageHistory={messageHistory}
-                    communityId={communityId}
-                  />
-                </Grid>
-              )}
-            </Grid>
-            <Grid item xs={12} sx={{ paddingTop: 10 }}>
+            <Grid item xs={12} sx={{ paddingTop: 2 }}>
               {currentCommunity ? (
                 <Grid container item xs={12} justifyContent="space-between">
                   {settings?.lurkerBoxVisible && (
@@ -367,6 +356,23 @@ export const Community = ({
                 </Grid>
               ) : null}
             </Grid>
+
+            {settings?.messageBoardVisible && (
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  backgroundColor: settings?.communityAnimationEnabled
+                    ? "none"
+                    : theme.palette.background.paper,
+                }}
+              >
+                <MessageBoard
+                  messageHistory={messageHistory}
+                  communityId={communityId}
+                />
+              </Grid>
+            )}
           </>
         )}
       </Grid>

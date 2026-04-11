@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -42,6 +41,22 @@ const reactionOrder = [
   "shrug",
 ];
 
+const reactionBtnSx = (theme) => ({
+  minWidth: 30,
+  width: 30,
+  height: 30,
+  minHeight: 30,
+  p: 0,
+  fontSize: "0.95rem",
+  lineHeight: 1,
+  borderRadius: 1,
+  borderColor: alpha(theme.palette.divider, 0.85),
+  "&:hover": {
+    borderColor: "primary.main",
+    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+  },
+});
+
 export const CommunityControls = ({
   handleReveal,
   handleReset,
@@ -56,6 +71,7 @@ export const CommunityControls = ({
   const theme = useTheme();
   const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
+
   const handleVoteChange = (event) => {
     setSelectedVote(event.target.value);
   };
@@ -87,227 +103,209 @@ export const CommunityControls = ({
   }, [community]);
 
   const panelSx = {
-    p: { xs: 2, sm: 2.25 },
-    borderRadius: 3,
+    py: 0.75,
+    px: { xs: 1, sm: 1.25 },
+    borderRadius: 2,
     border: "1px solid",
     borderColor: "divider",
-    background: (t) => alpha(t.palette.background.paper, 0.55),
-    backdropFilter: "blur(12px)",
-    boxShadow: (t) =>
-      `0 4px 24px ${alpha(t.palette.common.black, 0.12)}`,
+    background: (t) => alpha(t.palette.background.paper, 0.5),
+    backdropFilter: "blur(10px)",
+    boxShadow: (t) => `0 2px 12px ${alpha(t.palette.common.black, 0.08)}`,
   };
-
-  const subtleDivider = (
-    <Divider
-      sx={{
-        borderColor: (t) => alpha(t.palette.divider, 0.6),
-        my: 0.5,
-      }}
-    />
-  );
 
   const showReactions = settings?.reactionsVisible;
   const showVote = iAmCitizen && iAmCitizen.votingMember;
   const showTimer = settings?.timerVisible;
 
+  const roomButtons = (
+    <Stack direction="row" spacing={0.75} flexShrink={0}>
+      <Button
+        disabled={community && !community.revealed}
+        size="small"
+        variant="outlined"
+        color="warning"
+        onClick={() => handleReset({ ...iAmCitizen, communityId })}
+        sx={{
+          textTransform: "none",
+          fontWeight: 600,
+          px: 1.25,
+          py: 0.35,
+          borderColor: (t) => alpha(t.palette.warning.main, 0.55),
+          "&:hover": {
+            borderColor: "warning.main",
+            backgroundColor: (t) => alpha(t.palette.warning.main, 0.08),
+          },
+        }}
+      >
+        Reset
+      </Button>
+      <Button
+        disabled={community && community.revealed}
+        size="small"
+        variant="contained"
+        color="success"
+        onClick={() => handleReveal({ ...iAmCitizen, communityId })}
+        sx={{
+          textTransform: "none",
+          fontWeight: 600,
+          px: 1.25,
+          py: 0.35,
+          boxShadow: "none",
+          "&:hover": {
+            boxShadow: (t) =>
+              `0 2px 10px ${alpha(t.palette.success.main, 0.35)}`,
+          },
+        }}
+      >
+        Reveal
+      </Button>
+    </Stack>
+  );
+
+  const mainControls = (
+    <Stack
+      direction="row"
+      alignItems="center"
+      flexWrap="wrap"
+      useFlexGap
+      spacing={1}
+      sx={{
+        justifyContent: { xs: "flex-start", sm: "flex-end" },
+        flex: { sm: showReactions ? "1 1 auto" : "0 1 auto" },
+        minWidth: 0,
+        columnGap: 1,
+        rowGap: 1,
+      }}
+    >
+      {showVote && (
+        <Stack
+          direction="row"
+          spacing={0.75}
+          alignItems="center"
+          sx={{ flexShrink: 0 }}
+        >
+          <FormControl size="small" sx={{ minWidth: 76, maxWidth: 110 }}>
+            <InputLabel id="vote-selector-label">Pts</InputLabel>
+            <Select
+              labelId="vote-selector-label"
+              id="vote-selector"
+              value={selectedVote}
+              label="Pts"
+              onChange={handleVoteChange}
+              MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
+              sx={{
+                borderRadius: 1,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: alpha(theme.palette.divider, 0.85),
+                },
+                "& .MuiSelect-select": { py: 0.45 },
+              }}
+            >
+              {selectOptions?.map((option) => (
+                <MenuItem key={option} value={option} dense>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={onVoteSubmit}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              px: 1.5,
+              py: 0.35,
+              boxShadow: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Vote
+          </Button>
+        </Stack>
+      )}
+
+      {showTimer && (
+        <TimerControl
+          community={community}
+          handleTimerClicked={handleTimerClicked}
+          dense
+        />
+      )}
+
+      {roomButtons}
+    </Stack>
+  );
+
   return (
     <>
       {iAmCitizen && (
         <Paper elevation={0} sx={panelSx}>
-          <Stack spacing={2.25}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "stretch", sm: "center" },
+              justifyContent: showReactions
+                ? { xs: "flex-start", sm: "space-between" }
+                : { xs: "flex-start", sm: "flex-end" },
+              gap: { xs: 1.25, sm: 2 },
+              width: "100%",
+              flexWrap: "wrap",
+            }}
+          >
             {showReactions && (
-              <Box>
-                <Typography
-                  variant="overline"
-                  sx={{
-                    display: "block",
-                    mb: 1,
-                    color: "text.secondary",
-                    letterSpacing: 0.08,
-                    fontSize: "0.65rem",
-                  }}
-                >
-                  Reactions
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 1,
-                  }}
-                >
-                  {reactionOrder.map((key) => (
-                    <Button
-                      key={key}
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onReaction({ event: key })}
-                      sx={{
-                        minWidth: 44,
-                        minHeight: 40,
-                        px: 1,
-                        py: 0.5,
-                        borderRadius: 2,
-                        borderColor: alpha(theme.palette.divider, 0.9),
-                        color: "text.primary",
-                        fontSize: "1.15rem",
-                        lineHeight: 1,
-                        transition: "background-color 0.2s, border-color 0.2s",
-                        "&:hover": {
-                          borderColor: "primary.main",
-                          backgroundColor: (t) =>
-                            alpha(t.palette.primary.main, 0.08),
-                        },
-                      }}
-                    >
-                      {reactionEmoji[key]}
-                    </Button>
-                  ))}
-                </Box>
-              </Box>
-            )}
-
-            {showReactions && (showVote || showTimer) && subtleDivider}
-
-            {showVote && (
-              <Stack spacing={1.5}>
-                <Typography
-                  variant="overline"
-                  sx={{
-                    display: "block",
-                    color: "text.secondary",
-                    letterSpacing: 0.08,
-                    fontSize: "0.65rem",
-                  }}
-                >
-                  Your vote
-                </Typography>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="vote-selector-label">Points</InputLabel>
-                  <Select
-                    labelId="vote-selector-label"
-                    id="vote-selector"
-                    value={selectedVote}
-                    label="Points"
-                    onChange={handleVoteChange}
-                    MenuProps={{ PaperProps: { style: { maxHeight: 360 } } }}
-                    sx={{
-                      borderRadius: 2,
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: alpha(theme.palette.divider, 0.9),
-                      },
-                    }}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  alignSelf: { xs: "flex-start", sm: "center" },
+                  gap: 0.5,
+                  flexShrink: 0,
+                  pb: { xs: 1, sm: 0 },
+                  mb: { xs: 0.25, sm: 0 },
+                  pr: { sm: 1.5 },
+                  mr: { sm: 0.5 },
+                  borderBottom: {
+                    xs: (t) => `1px solid ${alpha(t.palette.divider, 0.45)}`,
+                    sm: "none",
+                  },
+                  borderRight: {
+                    sm: (t) => `1px solid ${alpha(t.palette.divider, 0.45)}`,
+                  },
+                }}
+              >
+                {reactionOrder.map((key) => (
+                  <Button
+                    key={key}
+                    size="small"
+                    variant="outlined"
+                    onClick={() => onReaction({ event: key })}
+                    title={key}
+                    sx={reactionBtnSx(theme)}
                   >
-                    {selectOptions?.map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  onClick={onVoteSubmit}
-                  sx={{
-                    borderRadius: 2,
-                    py: 1.1,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    boxShadow: "none",
-                    "&:hover": { boxShadow: (t) => `0 4px 16px ${alpha(t.palette.primary.main, 0.35)}` },
-                  }}
-                >
-                  Submit vote
-                </Button>
-              </Stack>
-            )}
-
-            {showVote && showTimer && subtleDivider}
-
-            {showTimer && (
-              <Box>
-                <Typography
-                  variant="overline"
-                  sx={{
-                    display: "block",
-                    mb: 1,
-                    color: "text.secondary",
-                    letterSpacing: 0.08,
-                    fontSize: "0.65rem",
-                  }}
-                >
-                  Timer
-                </Typography>
-                <TimerControl {...{ community, handleTimerClicked }} />
+                    {reactionEmoji[key]}
+                  </Button>
+                ))}
               </Box>
             )}
 
-            {(showReactions || showVote || showTimer) && subtleDivider}
-
-            <Stack spacing={1.25}>
-              <Typography
-                variant="overline"
-                sx={{
-                  display: "block",
-                  color: "text.secondary",
-                  letterSpacing: 0.08,
-                  fontSize: "0.65rem",
-                }}
-              >
-                Room
-              </Typography>
-              <Button
-                disabled={community && !community.revealed}
-                fullWidth
-                variant="outlined"
-                color="warning"
-                onClick={() => handleReset({ ...iAmCitizen, communityId })}
-                sx={{
-                  borderRadius: 2,
-                  py: 1,
-                  textTransform: "none",
-                  fontWeight: 600,
-                  borderColor: (t) => alpha(t.palette.warning.main, 0.55),
-                  "&:hover": {
-                    borderColor: "warning.main",
-                    backgroundColor: (t) =>
-                      alpha(t.palette.warning.main, 0.08),
-                  },
-                }}
-              >
-                Reset round
-              </Button>
-              <Button
-                disabled={community && community.revealed}
-                fullWidth
-                variant="contained"
-                color="success"
-                onClick={() => handleReveal({ ...iAmCitizen, communityId })}
-                sx={{
-                  borderRadius: 2,
-                  py: 1,
-                  textTransform: "none",
-                  fontWeight: 600,
-                  boxShadow: "none",
-                  "&:hover": {
-                    boxShadow: (t) =>
-                      `0 4px 16px ${alpha(t.palette.success.main, 0.4)}`,
-                  },
-                }}
-              >
-                Reveal votes
-              </Button>
-            </Stack>
-          </Stack>
+            {mainControls}
+          </Box>
         </Paper>
       )}
     </>
   );
 };
 
-export const TimerControl = ({ community, handleTimerClicked }) => {
+export const TimerControl = ({
+  community,
+  handleTimerClicked,
+  dense = false,
+}) => {
   const [timerValue, setTimerValue] = useState(60);
   const [error, setError] = useState(undefined);
 
@@ -331,75 +329,78 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
     });
   };
 
+  const btnSize = dense ? "small" : "medium";
+  const tfSize = dense ? "small" : "small";
+
   return (
-    <Stack spacing={1.5}>
-      <Stack
-        direction="row"
-        alignItems="stretch"
-        spacing={1.25}
-        sx={{ flexWrap: { xs: "wrap", sm: "nowrap" } }}
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={dense ? 0.75 : 1.25}
+      flexWrap="wrap"
+      sx={{ flexShrink: 0 }}
+    >
+      <Button
+        disabled={timerValue > 600}
+        size={btnSize}
+        variant="contained"
+        color="secondary"
+        onClick={onTimerClicked}
+        sx={{
+          textTransform: "none",
+          fontWeight: 600,
+          px: dense ? 1.25 : 2,
+          py: dense ? 0.35 : 0.75,
+          boxShadow: "none",
+          whiteSpace: "nowrap",
+          "&:hover": {
+            boxShadow: (t) =>
+              `0 2px 10px ${alpha(t.palette.secondary.main, 0.3)}`,
+          },
+        }}
       >
-        <Button
-          disabled={timerValue > 600}
-          fullWidth
-          variant="contained"
-          color="secondary"
-          onClick={onTimerClicked}
-          sx={{
-            borderRadius: 2,
-            py: 1,
-            textTransform: "none",
-            fontWeight: 600,
-            flex: { xs: "1 1 100%", sm: "1 1 auto" },
-            minWidth: 0,
-            boxShadow: "none",
-            "&:hover": {
-              boxShadow: (t) =>
-                `0 4px 16px ${alpha(t.palette.secondary.main, 0.35)}`,
-            },
-          }}
-        >
-          {community?.timer?.running ? "Cancel timer" : "Start timer"}
-        </Button>
-        <TextField
-          type="number"
-          size="small"
-          error={Boolean(error)}
-          placeholder="Sec"
-          inputProps={{
-            style: { textAlign: "center" },
-            min: 1,
-            max: 600,
-          }}
-          disabled={community?.timer?.running}
-          variant="outlined"
-          value={timerValue}
-          onChange={onTimerValueChanged}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              onTimerClicked();
-            }
-          }}
-          sx={{
-            width: { xs: "100%", sm: 88 },
-            flexShrink: 0,
-            "& .MuiOutlinedInput-root": { borderRadius: 2 },
-          }}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            minWidth: 48,
-            px: 0.5,
-          }}
-        >
-          <TimerDisplay community={community} />
-        </Box>
-      </Stack>
+        {community?.timer?.running ? "Cancel" : "Timer"}
+      </Button>
+      <TextField
+        type="number"
+        size={tfSize}
+        error={Boolean(error)}
+        placeholder="Sec"
+        inputProps={{
+          style: { textAlign: "center" },
+          min: 1,
+          max: 600,
+        }}
+        disabled={community?.timer?.running}
+        variant="outlined"
+        value={timerValue}
+        onChange={onTimerValueChanged}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            onTimerClicked();
+          }
+        }}
+        sx={{
+          width: dense ? 64 : 88,
+          flexShrink: 0,
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 1,
+            ...(dense && { "& input": { py: 0.65 } }),
+          },
+        }}
+      />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: dense ? 40 : 48,
+        }}
+      >
+        <TimerDisplay community={community} />
+      </Box>
       {error && (
-        <Typography variant="caption" color="error">
+        <Typography variant="caption" color="error" sx={{ width: "100%" }}>
           {error}
         </Typography>
       )}
