@@ -1,7 +1,6 @@
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 import {
-  AppBar,
   Box,
   Button,
   Divider,
@@ -11,10 +10,11 @@ import {
   MenuItem,
   MenuList,
   Paper,
+  Stack,
   Switch,
-  Toolbar,
   Tooltip,
   Typography,
+  alpha,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -25,8 +25,10 @@ import useCommunity from "../../hooks/useCommunity";
 import {
   Celebration,
   ContentCopy,
+  Edit,
   Home,
   ModeComment,
+  Timer,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -278,200 +280,202 @@ export const Community = ({
           community={currentCommunity}
         />
 
-        <AppBar position="static">
-          <Toolbar>
-            <ScrumLordMenu>
-              <Paper sx={{ width: 300, maxWidth: "100%" }}>
-                <MenuList>
-                  <MenuItem sx={{ cursor: "default" }}>{version}</MenuItem>
-                  <Divider />
-                  <MenuItem
-                    onClick={() => {
-                      navigate("/");
-                    }}
-                  >
-                    <ListItemIcon>
-                      <Home />
-                    </ListItemIcon>
-                    <ListItemText secondary="Home" />
-                    <Typography
-                      variant="h6"
-                      component="div"
-                      sx={{ flexGrow: 1 }}
-                    ></Typography>
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                    }}
-                  >
-                    <ListItemIcon>
-                      <ContentCopy />
-                    </ListItemIcon>
-                    <ListItemText secondary="Copy Room URL" />
-                  </MenuItem>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={2}
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            px: 2,
+            py: 1,
+            borderRadius: 0,
+            background: (t) =>
+              alpha(t.palette.background.default, 0.6),
+            backdropFilter: "blur(10px)",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <ScrumLordMenu>
+            <Paper
+              sx={{
+                width: 280,
+                maxWidth: "100%",
+                background: (t) => alpha(t.palette.background.paper, 0.95),
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <MenuList dense>
+                {/* Navigation */}
+                <MenuItem onClick={() => navigate("/")}>
+                  <ListItemIcon><Home fontSize="small" /></ListItemIcon>
+                  <ListItemText>Home</ListItemText>
+                </MenuItem>
+                <MenuItem
+                  onClick={() =>
+                    navigator.clipboard.writeText(window.location.href)
+                  }
+                >
+                  <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
+                  <ListItemText>Copy room link</ListItemText>
+                </MenuItem>
 
-                  <Divider />
-                  <MenuItem>
-                    {!iAmCitizen ? (
+                <Divider sx={{ my: 1 }} />
+
+                {/* Join / Leave */}
+                {!iAmCitizen ? (
+                  <Box sx={{ px: 2, py: 0.5 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="success"
+                      size="small"
+                      onClick={handleJoin}
+                    >
+                      Join room
+                    </Button>
+                  </Box>
+                ) : (
+                  <>
+                    <Box sx={{ px: 2, py: 0.5, textAlign: "center" }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Joined as "{iAmCitizen.username}"
+                      </Typography>
+                    </Box>
+                    <Box sx={{ px: 2, py: 0.5 }}>
                       <Button
                         fullWidth
                         variant="outlined"
-                        color="success"
-                        onClick={handleJoin}
+                        color="secondary"
+                        size="small"
+                        onClick={handleLeave}
                       >
-                        Join
+                        Leave
                       </Button>
-                    ) : (
-                      <Grid container xs={12}>
-                        <Grid
-                          item
-                          xs={12}
-                          sx={{ textAlign: "center", paddingBottom: "10px" }}
-                        >
-                          <Typography variant="body2" color={"gray"}>
-                            Joined as: "{iAmCitizen.username}"
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            color="secondary"
-                            onClick={handleLeave}
-                          >
-                            Leave
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    )}
-                  </MenuItem>
-                  <Divider />
-                  {iAmCitizen && (
-                    <>
-                      <MenuItem>
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          color="success"
-                          onClick={() => setEditPointSchemeModalOpen(true)}
-                        >
-                          Edit Point Scheme
-                        </Button>
-                      </MenuItem>
-                      {/* <MenuItem> */}
-                      <Divider />
-                      {/* </MenuItem> */}
-                      {/* <MenuItem>
-                        <div>
-                          <Typography variant="body2" color={"gray"}>
-                            Options
-                          </Typography>
-                        </div>
-                      </MenuItem> */}
-                      <MenuItem>
-                        <ListItemIcon>
-                          <Celebration />
-                        </ListItemIcon>
-                        <ListItemText secondary="Reaction Panel" />
+                    </Box>
+                  </>
+                )}
 
-                        <Switch
-                          checked={settings?.reactionsVisible}
-                          onChange={(e) => {
-                            toggleReactions(e.target.checked);
-                          }}
-                        />
-                      </MenuItem>
-                      <MenuItem>
-                        <ListItemIcon>
-                          <ModeNightIcon />
-                        </ListItemIcon>
-                        <ListItemText secondary="Stars" />
+                {iAmCitizen && (
+                  <>
+                    <Divider sx={{ my: 1 }} />
 
-                        <Switch
-                          checked={settings?.communityAnimation}
-                          onChange={(e) => {
-                            toggleCommunityAnimation(e.target.checked);
-                          }}
-                        />
-                      </MenuItem>
-                      <MenuItem>
-                        <ListItemIcon>
-                          <Visibility />
-                        </ListItemIcon>
-                        <ListItemText secondary="Non-Voting Members" />
-
-                        <Switch
-                          checked={settings?.lurkerBoxVisible}
-                          onChange={(e) => {
-                            toggleLurkerBox(e.target.checked);
-                          }}
-                        />
-                      </MenuItem>
-                      <MenuItem>
-                        <ListItemIcon>
-                          <ModeComment />
-                        </ListItemIcon>
-                        <ListItemText secondary="Activity" />
-
-                        <Switch
-                          checked={settings?.messageBoardVisible}
-                          onChange={(e) => {
-                            toggleMessageBoard(e.target.checked);
-                          }}
-                        />
-                      </MenuItem>
-                      <MenuItem>
-                        <ListItemIcon>
-                          <Celebration />
-                        </ListItemIcon>
-                        <ListItemText secondary="Timer" />
-
-                        <Switch
-                          checked={settings?.timerVisible}
-                          onChange={(e) => {
-                            toggleTimerVisible(e.target.checked);
-                          }}
-                        />
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem>
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          color="error"
-                          onClick={handleDeleteCommunity}
-                        >
-                          Delete Room
-                        </Button>
-                      </MenuItem>
-                    </>
-                  )}
-                  <Divider />
-                  {/* <MenuItem>
-                    <a
-                      target="_blank"
-                      href="https://www.buymeacoffee.com/nbpetha"
+                    {/* Room actions */}
+                    <MenuItem
+                      onClick={() => setEditPointSchemeModalOpen(true)}
                     >
-                      <img src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" />
-                    </a>
-                  </MenuItem> */}
-                </MenuList>
-              </Paper>
-            </ScrumLordMenu>
-            <div style={{ flexGrow: 1 }}>
-              {fullsizeScreen && (
-                <Typography variant="h4" component="div">
-                  {currentCommunity && currentCommunity.name}
-                </Typography>
-              )}
-            </div>
-            <ConnectionStatus
-              reconnection={reconnection}
-              readyState={readyState}
-            />
-          </Toolbar>
-        </AppBar>
+                      <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
+                      <ListItemText>Edit point scheme</ListItemText>
+                    </MenuItem>
+
+                    <Divider sx={{ my: 1 }} />
+
+                    {/* Toggles */}
+                    <Typography
+                      variant="overline"
+                      sx={{ px: 2, color: "text.secondary", lineHeight: 2.5 }}
+                    >
+                      Display
+                    </Typography>
+                    <MenuItem>
+                      <ListItemIcon><Celebration fontSize="small" /></ListItemIcon>
+                      <ListItemText>Reactions</ListItemText>
+                      <Switch
+                        edge="end"
+                        size="small"
+                        checked={settings?.reactionsVisible}
+                        onChange={(e) => toggleReactions(e.target.checked)}
+                      />
+                    </MenuItem>
+                    <MenuItem>
+                      <ListItemIcon><ModeNightIcon fontSize="small" /></ListItemIcon>
+                      <ListItemText>Stars</ListItemText>
+                      <Switch
+                        edge="end"
+                        size="small"
+                        checked={settings?.communityAnimation}
+                        onChange={(e) =>
+                          toggleCommunityAnimation(e.target.checked)
+                        }
+                      />
+                    </MenuItem>
+                    <MenuItem>
+                      <ListItemIcon><Visibility fontSize="small" /></ListItemIcon>
+                      <ListItemText>Observers</ListItemText>
+                      <Switch
+                        edge="end"
+                        size="small"
+                        checked={settings?.lurkerBoxVisible}
+                        onChange={(e) => toggleLurkerBox(e.target.checked)}
+                      />
+                    </MenuItem>
+                    <MenuItem>
+                      <ListItemIcon><ModeComment fontSize="small" /></ListItemIcon>
+                      <ListItemText>Activity</ListItemText>
+                      <Switch
+                        edge="end"
+                        size="small"
+                        checked={settings?.messageBoardVisible}
+                        onChange={(e) => toggleMessageBoard(e.target.checked)}
+                      />
+                    </MenuItem>
+                    <MenuItem>
+                      <ListItemIcon><Timer fontSize="small" /></ListItemIcon>
+                      <ListItemText>Timer</ListItemText>
+                      <Switch
+                        edge="end"
+                        size="small"
+                        checked={settings?.timerVisible}
+                        onChange={(e) => toggleTimerVisible(e.target.checked)}
+                      />
+                    </MenuItem>
+
+                    <Divider sx={{ my: 1 }} />
+
+                    {/* Danger zone */}
+                    <Box sx={{ px: 2, py: 0.5 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={handleDeleteCommunity}
+                      >
+                        Delete room
+                      </Button>
+                    </Box>
+                  </>
+                )}
+
+                {/* Version footer */}
+                <Divider sx={{ my: 1 }} />
+                <Box sx={{ px: 2, py: 0.5, textAlign: "center" }}>
+                  <Typography variant="caption" color="text.disabled">
+                    {version}
+                  </Typography>
+                </Box>
+              </MenuList>
+            </Paper>
+          </ScrumLordMenu>
+
+          <Typography
+            variant="h6"
+            component="div"
+            noWrap
+            sx={{
+              flex: 1,
+              fontWeight: 600,
+              color: "text.primary",
+              textAlign: "center",
+            }}
+          >
+            {currentCommunity?.name}
+          </Typography>
+
+          <ConnectionStatus readyState={readyState} size={12} />
+        </Stack>
       </Box>
 
       <Grid container xs={12} spacing={3}>
