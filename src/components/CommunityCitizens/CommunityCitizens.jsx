@@ -59,6 +59,13 @@ export const CommunityCitizens = ({
       direction="column"
       xs={12}
       spacing={2}
+      sx={{
+        width: "100%",
+        minWidth: 0,
+        maxWidth: "100%",
+        alignItems: "stretch",
+        justifyContent: "flex-start",
+      }}
     >
       {/* <Grid xs={2} item id="point-chart-container">
         {currentCommunity?.revealed && (
@@ -74,14 +81,19 @@ export const CommunityCitizens = ({
       </Grid> */}
 
       <Grid
-        xs={8}
+        xs={12}
         id="vote-card-container"
         item
         container
         spacing={1}
         alignContent="flex-start"
+        alignItems="flex-start"
         sx={{
-          margin: "10px 0px 0px 30px",
+          mt: 1.25,
+          mx: 0,
+          width: "100%",
+          minWidth: 0,
+          maxWidth: "100%",
         }}
         justifyContent="center"
       >

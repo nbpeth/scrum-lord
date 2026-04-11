@@ -65,7 +65,15 @@ export const ReactionMachine = () => {
   // }, [reactions])
 
   return (
-    <div id="reaction-container">
+    <div
+      id="reaction-container"
+      style={{
+        position: "relative",
+        width: "100%",
+        overflow: "hidden",
+        minHeight: 48,
+      }}
+    >
       {reactions.map((reaction) => (
         <Reaction
           key={reaction.id}

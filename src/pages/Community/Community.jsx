@@ -1,4 +1,4 @@
-import { Box, Grid, alpha, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Grid, alpha, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useCommunity from "../../hooks/useCommunity";
@@ -21,7 +21,6 @@ export const Community = ({
   const params = useParams();
   const communityId = params.communityId;
   const navigate = useNavigate();
-  const fullsizeScreen = useMediaQuery("(min-width:800px)");
 
   const {
     cancelTimer,
@@ -202,9 +201,67 @@ export const Community = ({
   const lurkers =
     currentCommunity?.citizens?.filter((c) => !c?.votingMember) || [];
 
+  const showLurkerColumn = Boolean(settings?.lurkerBoxVisible);
+  const showActivity = Boolean(settings?.messageBoardVisible);
+  const lurkerMd = showLurkerColumn ? 2 : 0;
+  /** Columns shared by CommunityCitizens + MessageBoard (after lurker strip). */
+  const mainRowMd = 12 - lurkerMd;
+  /** At most 25% of that band (¼ of columns); remainder stays with citizens. */
+  const activityMd = showActivity ? Math.floor(mainRowMd / 4) : 0;
+  const citizensMd = showActivity ? mainRowMd - activityMd : mainRowMd;
+
+  // Same palette as the toolbar (background.default) but more translucent so blur/stars read through.
+  const activityPaperSx = {
+    background: (t) =>
+      alpha(
+        t.palette.background.default,
+        settings?.communityAnimationEnabled ? 0.38 : 0.52,
+      ),
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "divider",
+    // Flush to viewport right & bottom on md+ (radius/border only on the gap side).
+    borderRadius: {
+      xs: 2,
+      md: `${theme.shape.borderRadius}px 0 0 ${theme.shape.borderRadius}px`,
+    },
+    borderRight: { md: "none" },
+    borderBottom: { md: "none" },
+    minWidth: 0,
+    maxWidth: "100%",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    alignSelf: "stretch",
+    // md+: fill grid row (page uses gridTemplateRows: auto 1fr + Grid height 100%)
+    minHeight: { xs: 280, md: 0 },
+    height: { xs: "auto", md: "100%" },
+    maxHeight: { xs: "none", md: "100%" },
+  };
+
+  const citizensColumnSx = {
+    minWidth: 0,
+    maxWidth: "100%",
+    overflow: "hidden",
+  };
+
   return (
-    <>
-      <Box sx={{ flexGrow: 1 }}>
+    <Box
+      sx={{
+        minHeight: "100dvh",
+        height: "100%",
+        width: "100%",
+        maxWidth: "100%",
+        boxSizing: "border-box",
+        display: "grid",
+        gridTemplateRows: "auto 1fr",
+        overflowX: "hidden",
+        textAlign: "initial",
+      }}
+    >
+      <Box>
         <JoinCommunityModal
           open={joinCommunityModalOpen}
           handleClose={handleJoinCommunityModalClose}
@@ -280,44 +337,89 @@ export const Community = ({
         </Box>
       </Box>
 
-      <Grid container xs={12} spacing={3}>
-        {fullsizeScreen && (
+      <Grid
+        container
+        rowSpacing={2}
+        columnSpacing={{ xs: 2, md: showActivity ? 0 : 2 }}
+        sx={{
+          minHeight: 0,
+          height: "100%",
+          pt: 2,
+          px: 0,
+          pb: 0,
+          width: "100%",
+          maxWidth: "100%",
+          overflow: "hidden",
+          flexWrap: "wrap",
+          alignItems: "stretch",
+          alignContent: "stretch",
+        }}
+      >
+        {currentCommunity ? (
           <>
-            <Grid item xs={12} sx={{ paddingTop: 2 }}>
-              {currentCommunity ? (
-                <Grid container item xs={12} justifyContent="space-between">
-                  {settings?.lurkerBoxVisible && fullsizeScreen && (
-                    <Grid item xs={2} sx={{ paddingTop: "10px" }}>
-                      <LurkerBox
-                        lurkers={lurkers}
-                        handleDeleteUser={handleDeleteUser}
-                      />
-                    </Grid>
-                  )}
-                  <Grid
-                    item
-                    justifyContent="center"
-                    xs={settings?.lurkerBoxVisible ? 10 : 12}
-                  >
-                    <CommunityCitizens
-                      citizens={citizens}
-                      iAmCitizen={iAmCitizen}
-                      handleDeleteUser={handleDeleteUser}
-                      currentCommunity={currentCommunity}
-                    />
-                  </Grid>
-                </Grid>
-              ) : null}
-            </Grid>
-
-            {settings?.messageBoardVisible && (
+            {showLurkerColumn && (
               <Grid
                 item
                 xs={12}
+                md={2}
                 sx={{
-                  backgroundColor: settings?.communityAnimationEnabled
-                    ? "none"
-                    : theme.palette.background.paper,
+                  paddingTop: { md: "10px" },
+                  pr: { md: showActivity ? 2 : undefined },
+                  minWidth: 0,
+                  maxWidth: "100%",
+                  height: { md: "100%" },
+                }}
+              >
+                <LurkerBox
+                  lurkers={lurkers}
+                  handleDeleteUser={handleDeleteUser}
+                />
+              </Grid>
+            )}
+            <Grid
+              item
+              xs={12}
+              md={citizensMd}
+              sx={{
+                justifyContent: "flex-start",
+                alignItems: "stretch",
+                ...citizensColumnSx,
+                display: "flex",
+                flexDirection: "column",
+                minWidth: 0,
+                height: { md: "100%" },
+                pr: { md: showActivity ? 2 : undefined },
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  minWidth: 0,
+                  maxWidth: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "stretch",
+                }}
+              >
+                <CommunityCitizens
+                  citizens={citizens}
+                  iAmCitizen={iAmCitizen}
+                  handleDeleteUser={handleDeleteUser}
+                  currentCommunity={currentCommunity}
+                />
+              </Box>
+            </Grid>
+            {showActivity && (
+              <Grid
+                item
+                xs={12}
+                md={activityMd}
+                sx={{
+                  ...activityPaperSx,
+                  minWidth: 0,
+                  pr: { md: 0 },
+                  mr: { md: 0 },
+                  alignSelf: { md: "stretch" },
                 }}
               >
                 <MessageBoard
@@ -327,55 +429,8 @@ export const Community = ({
               </Grid>
             )}
           </>
-        )}
-        {!fullsizeScreen && (
-          <>
-            <Grid item xs={12} sx={{ paddingTop: 2 }}>
-              {currentCommunity ? (
-                <Grid container item xs={12} justifyContent="space-between">
-                  {settings?.lurkerBoxVisible && (
-                    <Grid item xs={2} sx={{ paddingTop: "10px" }}>
-                      <LurkerBox
-                        lurkers={lurkers}
-                        handleDeleteUser={handleDeleteUser}
-                      />
-                    </Grid>
-                  )}
-                  <Grid
-                    item
-                    justifyContent="center"
-                    xs={settings?.lurkerBoxVisible ? 10 : 12}
-                  >
-                    <CommunityCitizens
-                      citizens={citizens}
-                      iAmCitizen={iAmCitizen}
-                      handleDeleteUser={handleDeleteUser}
-                      currentCommunity={currentCommunity}
-                    />
-                  </Grid>
-                </Grid>
-              ) : null}
-            </Grid>
-
-            {settings?.messageBoardVisible && (
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  backgroundColor: settings?.communityAnimationEnabled
-                    ? "none"
-                    : theme.palette.background.paper,
-                }}
-              >
-                <MessageBoard
-                  messageHistory={messageHistory}
-                  communityId={communityId}
-                />
-              </Grid>
-            )}
-          </>
-        )}
+        ) : null}
       </Grid>
-    </>
+    </Box>
   );
 };

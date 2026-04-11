@@ -130,7 +130,17 @@ const AppContent = ({ version }) => {
   };
 
   const roomComponent = (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        margin: 0,
+        padding: 0,
+        minHeight: "100%",
+        boxSizing: "border-box",
+      }}
+    >
       {/* {communityBackgroundIsAnimated && (
         <div >
           <img

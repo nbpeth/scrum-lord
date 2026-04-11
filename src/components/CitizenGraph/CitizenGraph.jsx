@@ -257,7 +257,7 @@ export const CitizenGraph = ({
       sx={{
         position: "relative",
         width: "100%",
-        maxWidth: 920,
+        maxWidth: "min(920px, 100%)",
         mx: "auto",
         // Height must track viewport height (vh), not only width — otherwise
         // vertical-only window resize keeps width constant and the graph never
