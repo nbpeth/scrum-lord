@@ -21,7 +21,6 @@ import { useSettings } from "../../hooks/useSettings";
 
 export const Dashboard = ({ version }) => {
   const {
-    listCommunities,
     addCommunity,
     fetchCommunities,
     communityCreatedComplete,
@@ -38,11 +37,6 @@ export const Dashboard = ({ version }) => {
   const [errorFromQuery, setErrorFromQuery] = useState(
     queryParams.get("error")
   );
-  const communityList = listCommunities();
-  const [communities, setCommunities] = useState(communityList);
-  /*
-   */
-  // const communitLimitReached = communities?.length >= 10;
   const navigate = useNavigate();
 
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
@@ -51,11 +45,6 @@ export const Dashboard = ({ version }) => {
   useEffect(() => {
     fetchCommunities();
   }, []);
-
-  // update the list of communities when the list changes
-  useEffect(() => {
-    setCommunities(communityList);
-  }, [communityList]);
 
   // useEffect(() => {
   //   if (communitLimitReached) {
@@ -143,7 +132,6 @@ export const Dashboard = ({ version }) => {
         open={startModalOpen}
         handleClose={() => setStartModalOpen(false)}
         onBlur={() => setStartModalOpen(false)}
-        communities={communities}
         yourPrivateRooms={yourPrivateRooms}
         setCreateRoomModalOpen={setCreateRoomModalOpen}
         fullsizeScreen={fullsizeScreen}

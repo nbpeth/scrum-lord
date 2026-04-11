@@ -1,68 +1,45 @@
+import { Close } from "@mui/icons-material";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Grid,
+  IconButton,
   Modal,
+  Paper,
+  Stack,
   Typography,
+  alpha,
   useTheme,
 } from "@mui/material";
-
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { DashboardCommunities } from "../DashboardCommunities/DashboardCommunities";
 import { SearchInput } from "../SearchInput/SearchInput";
-import { useEffect, useState } from "react";
-import { Close } from "@mui/icons-material";
 
 export const StartModal = ({
   open,
   handleClose,
-  communities,
   setCreateRoomModalOpen,
   fullsizeScreen,
   yourPrivateRooms,
 }) => {
-  const style = {
-    position: "relative",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    maxHeight: "75vh",
-    maxWidth: "85vw",
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-    overflow: "auto",
-  };
-  const privateRooms = Object.values(yourPrivateRooms);
-  const [filteredCommunities, setFilteredCommunities] = useState(communities);
-  const [filteredPrivateRooms, setFilteredPrivateRooms] =
-    useState(privateRooms);
   const theme = useTheme();
+  const privateRooms = Object.values(yourPrivateRooms ?? {});
+  const [filteredRooms, setFilteredRooms] = useState(privateRooms);
 
   useEffect(() => {
-    setFilteredCommunities(communities);
-  }, [communities]);
+    setFilteredRooms(privateRooms);
+  }, [yourPrivateRooms]);
 
   const searchValueChanged = (e) => {
     e.preventDefault();
-    if (e.target.value === "") {
-      setFilteredCommunities(communities);
-      setFilteredPrivateRooms(privateRooms);
-    } else {
-      setFilteredCommunities(
-        communities?.filter((c) =>
-          c.name?.toLowerCase().includes(e.target.value.toLowerCase())
-        ) || []
-      );
-      setFilteredPrivateRooms(
-        privateRooms?.filter((c) =>
-          c.name?.toLowerCase().includes(e.target.value.toLowerCase())
-        ) || []
-      );
+    const q = e.target.value?.trim().toLowerCase() ?? "";
+    if (!q) {
+      setFilteredRooms(privateRooms);
+      return;
     }
+    setFilteredRooms(
+      privateRooms.filter((c) => c.name?.toLowerCase().includes(q)) ?? []
+    );
   };
 
   return (
@@ -75,82 +52,84 @@ export const StartModal = ({
         }
       }}
     >
-      <Box sx={style} id="box">
-        <Grid container xs={12} spacing={2} justifyContent="center" id="top">
-          <Grid item xs={12} textAlign="right">
-            <Close
-              sx={{ cursor: "pointer", position: "relative" }}
-              onClick={handleClose}
-            />
-          </Grid>
-
-          <Grid
-            id="search-and-new"
-            container
-            item
-            xs={12}
-            spacing={2}
-            alignItems="center"
-            justifyContent="flex-end"
+      <Paper
+        elevation={12}
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          maxHeight: "min(78vh, 720px)",
+          width: "min(92vw, 520px)",
+          maxWidth: "100%",
+          borderRadius: 3,
+          overflow: "hidden",
+          border: "1px solid",
+          borderColor: alpha(theme.palette.divider, 0.9),
+          background: alpha(theme.palette.background.paper, 0.92),
+          backdropFilter: "blur(12px)",
+          boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.45)}`,
+        }}
+      >
+        <Stack sx={{ p: 2.5, pb: 2 }}>
+          <Stack
+            direction="row"
+            alignItems="flex-start"
+            justifyContent="space-between"
+            spacing={1}
+            sx={{ mb: 2 }}
           >
-            <Grid item xs={8}>
+            <Box>
+              <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+                Your rooms
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Jump back in or open a new space
+              </Typography>
+            </Box>
+            <IconButton
+              aria-label="Close"
+              size="small"
+              onClick={handleClose}
+              sx={{ color: "text.secondary", mt: -0.5 }}
+            >
+              <Close />
+            </IconButton>
+          </Stack>
+
+          <Grid container spacing={1.5} alignItems="stretch" sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={8}>
               <SearchInput onChange={searchValueChanged} />
             </Grid>
-
-            <Grid item xs={4}>
+            <Grid item xs={12} sm={4}>
               <Button
                 id="new-room-button"
                 fullWidth
                 variant="contained"
-                onClick={setCreateRoomModalOpen}
+                onClick={() => setCreateRoomModalOpen(true)}
+                sx={{ height: "100%", py: 1.25, fontWeight: 600 }}
               >
-                New
+                New room
               </Button>
             </Grid>
           </Grid>
-          <Grid
-            container
-            item
-            xs={12}
-            id="rooms"
-            spacing={2}
-            justifyContent="space-between"
-            sx={{ paddingBottom: "10px" }}
-          >
-            <Grid item>
-              <Typography variant="h5" color={theme.palette.primary.dark}>
-                Public Rooms
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="h5" color={theme.palette.secondary.light}>
-                Your Rooms
-              </Typography>
-            </Grid>
-          </Grid>
+        </Stack>
 
-          <Grid
-            id="dashboard-public-rooms"
-            item
-            xs={6}
-            sx={{ overflow: "auto", height: "50vh" }}
-          >
-            <DashboardCommunities
-              communities={filteredCommunities}
-              fullsizeScreen={fullsizeScreen}
-            />
-          </Grid>
-
-          <Grid item xs={6} sx={{ overflow: "auto" }}>
-            <DashboardCommunities
-              id="dashboard-private-rooms"
-              fullsizeScreen={fullsizeScreen}
-              context="private"
-              communities={filteredPrivateRooms}
-            />
-          </Grid>
-        </Grid>
-      </Box>
+        <Box
+          id="dashboard-your-rooms"
+          sx={{
+            px: 2.5,
+            pb: 2.5,
+            overflow: "auto",
+            maxHeight: "min(52vh, 440px)",
+          }}
+        >
+          <DashboardCommunities
+            communities={filteredRooms}
+            fullsizeScreen={fullsizeScreen}
+          />
+        </Box>
+      </Paper>
     </Modal>
   );
 };

@@ -1,7 +1,7 @@
 import { generate } from "random-words";
 
 describe("template spec", () => {
-  it("can create a public room", () => {
+  it("can create a room from the dashboard", () => {
     cy.visit("http://localhost:3000");
 
     const connectionStatus = cy.get("#connection-status-alert");
@@ -31,8 +31,8 @@ describe("template spec", () => {
     createButton.click();
 
     // Wait for the room to be created, then click on it
-    const publicRooms = cy.get("#dashboard-public-rooms", { timeout: 3000 });
-    const roomButton = publicRooms.contains(roomName);
+    const yourRooms = cy.get("#dashboard-your-rooms", { timeout: 3000 });
+    const roomButton = yourRooms.contains(roomName);
     roomButton.click();
   });
 });

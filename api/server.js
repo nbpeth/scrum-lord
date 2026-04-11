@@ -5,7 +5,6 @@ const url = require("url");
 const uuid = require("uuid");
 const communityClient = require("./communityClient");
 const color = require("randomcolor");
-const newRelic = require("newrelic");
 const apiKey = process.env.REACT_APP_API_KEY;
 const env = process.env.ENV;
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",")?.map((x) =>
@@ -108,7 +107,6 @@ const validateRequest = (request) => {
 };
 
 websocketServer.on("connection", (ws, request) => {
-  // newRelic.startSegment("connection", true, () => {
   const validRequest = validateRequest(request);
   if (!validRequest) {
     console.error("unauthorized");
@@ -205,17 +203,17 @@ websocketServer.on("connection", (ws, request) => {
   ws.on("close", close(ws));
   ws.on("pong", pong);
 
-  newRelic.setTransactionName('send message transation');
-  newRelic.startSegment("send message", true, () => {
-    ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
-  });
+  // newRelic.setTransactionName('send message transation');
+  // newRelic.startSegment("send message", true, () => {
+  //   ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
+  // });
 });
 
 const notifyCaller = (ws, message) => {
-  newRelic.setTransactionName('notify caller transation');
-  newRelic.startSegment("notifyCaller", true, () => {
+  // newRelic.setTransactionName('notify caller transation');
+  // newRelic.startSegment("notifyCaller", true, () => {
     ws.send(JSON.stringify(message));
-  });
+  // });
 };
 
 const notifyClients = ({ message, communityId }) => {
@@ -239,7 +237,7 @@ const notifyClients = ({ message, communityId }) => {
 };
 
 const handleCommunityReaction = (payload) => {
-  newRelic.startSegment("handleCommunityReaction", true, () => {
+  // newRelic.startSegment("handleCommunityReaction", true, () => {
     const { community, event, userId, username, userColor } = payload;
     const { id: communityId } = community;
 
@@ -249,7 +247,7 @@ const handleCommunityReaction = (payload) => {
     };
 
     notifyClients({ message: reply, communityId });
-  });
+  // });
 };
 
 const handleCreateCommunity = async (payload, ws) => {
@@ -342,7 +340,7 @@ const handleLeaveCommunity = async (payload) => {
 };
 
 const handleListCommunities = async () => {
-  newRelic.startSegment("listCommunities", true, async () => {
+  // newRelic.startSegment("listCommunities", true, async () => {
     const communitiesSummary = await communityClient.getCommunitiesAsArray();
 
     const reply = {
@@ -353,7 +351,7 @@ const handleListCommunities = async () => {
     };
 
     notifyClients({ message: reply });
-  });
+  // });
 };
 
 const handleGetCommunity = async (payload) => {
@@ -395,7 +393,7 @@ const handleSubmitVote = async (payload) => {
 
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
 const handleReveal = async (payload) => {
-  newRelic.startSegment("handleReveal", true, async () => {
+  // newRelic.startSegment("handleReveal", true, async () => {
     const { community, username, userId, userColor } = payload;
     const { id: communityId } = community;
 
@@ -415,7 +413,7 @@ const handleReveal = async (payload) => {
     };
 
     notifyClients({ message: reply, communityId });
-  });
+  // });
 };
 
 const handleReset = async (payload) => {
