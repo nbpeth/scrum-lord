@@ -154,16 +154,23 @@ const resetCommunity = async ({ communityId }) => {
 };
 
 const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
+  // Pair each citizen with their array index using WITH ORDINALITY — do not
+  // cross join jsonb_array_elements with generate_series (that returns many
+  // rows per user and breaks scalar subqueries on idx).
   const query = `
       WITH to_update AS (
-        SELECT jsonb_array_elements(data::jsonb->'citizens') ->> 'userId' AS citizen_userId, generate_series(0, jsonb_array_length(data::jsonb->'citizens')) AS index
-        FROM communities
+        SELECT
+          elem ->> 'userId' AS citizen_userId,
+          (ord - 1) AS index
+        FROM communities,
+             jsonb_array_elements(data::jsonb->'citizens') WITH ORDINALITY AS t(elem, ord)
         WHERE id = $1
       ),
       idx AS (
         SELECT index
         FROM to_update
         WHERE citizen_userId = $2
+        LIMIT 1
       )
       UPDATE communities
       SET data = jsonb_set(
