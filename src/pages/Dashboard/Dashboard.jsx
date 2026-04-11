@@ -1,10 +1,8 @@
 import {
   Alert,
-  AppBar,
   Box,
   Button,
-  Grid,
-  Toolbar,
+  Stack,
   alpha,
   useMediaQuery,
 } from "@mui/material";
@@ -92,35 +90,36 @@ export const Dashboard = ({ version }) => {
 
   return (
     <div>
-      <Box sx={{ flexGrow: 1, paddingBottom: "10px" }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Grid
-              container
-              spacing={2}
-              justifyContent="space-between"
-              alignItems="center"
-              direction="row"
-              xs={12}
-            >
-              <Grid container item xs={3} spacing={3}>
-                <Grid item>
-                  <DashboardTitleMenu
-                    version={version}
-                    createRoomClicked={createRoomClicked}
-                  />
-                </Grid>
-              </Grid>
-              <Grid item>
-                <ConnectionStatus readyState={readyState} />
-              </Grid>
-            </Grid>
-          </Toolbar>
-        </AppBar>
-      </Box>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+          px: 2,
+          py: 1.5,
+          pointerEvents: "none",
+          "& > *": { pointerEvents: "auto" },
+        }}
+      >
+        <DashboardTitleMenu
+          version={version}
+          createRoomClicked={createRoomClicked}
+        />
+        <ConnectionStatus readyState={readyState} size={12} />
+      </Stack>
 
       {errorFromQuery && getErrorMessage(errorFromQuery) && (
-        <Alert severity="error">{getErrorMessage(errorFromQuery)}</Alert>
+        <Alert
+          severity="error"
+          sx={{ position: "fixed", top: 56, left: 16, right: 16, zIndex: 10 }}
+        >
+          {getErrorMessage(errorFromQuery)}
+        </Alert>
       )}
 
       <CreateRoomModal
