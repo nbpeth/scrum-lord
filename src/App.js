@@ -2,13 +2,14 @@ import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { initAppParticlesEngine } from "./initParticles";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import { makeStyles } from "@mui/styles";
 import "./App.css";
 import { Fireworks } from "./components/Particles/Fireworks";
+import { HotDogAlertParticles } from "./components/Particles/HotDogAlert";
 import { PlanetaryOrbit } from "./components/Particles/PlanetaryOrbit";
 import { Stars } from "./components/Particles/Stars";
 import { Community } from "./pages/Community/Community";
@@ -114,6 +115,7 @@ const AppContent = ({ version }) => {
   const [communityBackgroundIsAnimated, setCommunityBackgroundIsAnimated] =
     useState(false);
   const [isCelebrating, setIsCelebrating] = useState(false);
+  const [isHotDogAlert, setIsHotDogAlert] = useState(false);
 
   useEffect(() => {
     initAppParticlesEngine()
@@ -128,6 +130,12 @@ const AppContent = ({ version }) => {
   const handleCelebrationChange = (value) => {
     setIsCelebrating(value);
   };
+
+  const handleGlobalEvent = useCallback((event) => {
+    if (event?.type === "hotdogalert") {
+      setIsHotDogAlert(Boolean(event.value));
+    }
+  }, []);
 
   const roomComponent = (
     <div
@@ -156,9 +164,11 @@ const AppContent = ({ version }) => {
         handleCommunityBackgroundAnimationChange={
           handleCommunityBackgroundAnimationChange
         }
+        handleGlobalEvent={handleGlobalEvent}
       />
       {particlesReady && communityBackgroundIsAnimated && <Stars />}
       {particlesReady && isCelebrating && <Fireworks />}
+      {isHotDogAlert && <HotDogAlertParticles />}
     </div>
   );
 

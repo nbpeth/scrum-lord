@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
@@ -19,8 +19,11 @@ export default function useCommunity() {
 
   const { removePrivateRoom } = useSettings();
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+  const processMessageRef = useRef(() => {});
+
+  const { sendMessage, readyState } = useWebSocket(socketUrl, {
     ...socketOptions({ setReconnection }),
+    onMessage: (event) => processMessageRef.current(event.data),
   });
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
@@ -239,9 +242,51 @@ export default function useCommunity() {
     ]);
   };
 
-  useEffect(() => {
+  const handleHotDogAlertReply = (payload) => {
+    setRoomEvents((prev) => ({
+      ...prev,
+      alerts: {
+        ...prev?.alerts,
+        hotdog: {
+          active: true,
+          userId: payload.userId,
+          username: payload.username,
+        },
+      },
+    }));
+  };
+
+  const handleHotDogAlertInactiveReply = (payload) => {
+    setRoomEvents((prev) => ({
+      ...prev,
+      alerts: {
+        ...prev?.alerts,
+        hotdog: {
+          active: false,
+          userId: payload.userId,
+          username: payload.username,
+        },
+      },
+    }));
+  };
+
+  const handleCommunityDeletedReply = (payload) => {
+    setRoomEvents({
+      ...roomEvents,
+      communityDeleted: {
+        [payload.id]: {
+          deleted: payload.deleted,
+        },
+      },
+    });
+  };
+
+  processMessageRef.current = (rawData) => {
+    if (rawData == null) {
+      return;
+    }
     try {
-      const messageData = JSON.parse(lastMessage?.data);
+      const messageData = JSON.parse(rawData);
       const { type, payload } = messageData;
 
       switch (type) {
@@ -255,71 +300,49 @@ export default function useCommunity() {
           break;
         case "community-joined-reply":
           handleCommunityJoinedReply(payload);
-
           break;
         case "community-left-reply":
           handleCommunityLeftReply(payload);
-
           break;
         case "submit-vote-reply":
           handleSubmittedVoteReply(payload);
-
           break;
-
         case "reveal-reply":
           handleRevealReply(payload);
-
           break;
         case "reset-reply":
           handleResetReply(payload);
-
           break;
         case "community-reaction-reply":
           handleCommunityReactionReply(payload);
-
           break;
-
         case "delete-community-reply":
           handleCommunityDeletedReply(payload);
-
           break;
-
         case "edit-point-scheme-reply":
           handleEditPointSchemeReply(payload);
-
           break;
-
         case "start-timer-reply":
           handleStartTimerReply(payload);
           break;
-
         case "timer-finished-reply":
           handleTimerFinishedReply(payload);
           break;
-
         case "cancel-timer-reply":
           handleCancelTimerReply(payload);
           break;
-
+        case "community-alerts.hotdog.active":
+          handleHotDogAlertReply(payload);
+          break;
+        case "community-alerts.hotdog.inactive":
+          handleHotDogAlertInactiveReply(payload);
+          break;
         default:
           console.log("unknown message type", type);
       }
     } catch (e) {
       console.log("error parsing message", e);
     }
-  }, [lastMessage]);
-
-  useEffect(() => {}, [lastMessage]);
-
-  const handleCommunityDeletedReply = (payload) => {
-    setRoomEvents({
-      ...roomEvents,
-      communityDeleted: {
-        [payload.id]: {
-          deleted: payload.deleted,
-        },
-      },
-    });
   };
 
   const handleReveal = ({ username, userId, userColor }) => {

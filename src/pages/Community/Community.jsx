@@ -17,6 +17,8 @@ import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachin
 export const Community = ({
   handleCommunityBackgroundAnimationChange,
   handleCelebrationChange,
+  /** For App-level overlays (e.g. hotdog particle alert). */
+  handleGlobalEvent,
   version,
 }) => {
   const params = useParams();
@@ -61,6 +63,8 @@ export const Community = ({
   const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
     useState(false);
 
+  const [hotdogAlert, setHotdogAlert] = useState(false);
+
   useEffect(() => {
     recoverUserFromStorage();
 
@@ -78,6 +82,9 @@ export const Community = ({
     if (!roomEvents) {
       return;
     }
+    if (roomEvents?.alerts?.hotdog) {
+      setHotdogAlert(Boolean(roomEvents.alerts.hotdog.active));
+    }
     if (
       roomEvents.communityDeleted &&
       roomEvents.communityDeleted[communityId] &&
@@ -89,7 +96,13 @@ export const Community = ({
         });
       }, 2000);
     }
-  }, [roomEvents, currentCommunity]);
+  }, [roomEvents, currentCommunity, communityId, navigate]);
+
+  useEffect(() => {
+    if (typeof handleGlobalEvent === "function") {
+      handleGlobalEvent({ type: "hotdogalert", value: hotdogAlert });
+    }
+  }, [hotdogAlert, handleGlobalEvent]);
 
   useEffect(() => {
     handleCommunityBackgroundAnimationChange(settings?.communityAnimation);
@@ -290,7 +303,10 @@ export const Community = ({
           <CommunityHeader
             embedded
             navigate={navigate}
-            communityName={currentCommunity?.name}
+            communityName={
+              hotdogAlert ? "Hotdog Overload" : currentCommunity?.name
+            }
+            hotdogOverload={hotdogAlert}
             readyState={readyState}
             version={version}
             iAmCitizen={iAmCitizen}

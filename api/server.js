@@ -18,6 +18,28 @@ const state = {
   },
 };
 
+/** Per-community hotdog streak / overload (in-memory). */
+const hotdogStateByCommunityId = {};
+
+const HOTDOG_MAX = 15;
+
+const eventTypes = {
+  hotdog: "hotdog",
+  communityAlerts: {
+    hotdog: {
+      active: "community-alerts.hotdog.active",
+      inactive: "community-alerts.hotdog.inactive",
+    },
+  },
+};
+
+function getHotdogSlot(communityId) {
+  if (!hotdogStateByCommunityId[communityId]) {
+    hotdogStateByCommunityId[communityId] = { active: false, value: 0 };
+  }
+  return hotdogStateByCommunityId[communityId];
+}
+
 const setTargetSessionOn = (ws, request) => {
   const queryParams = url.parse(request.url, { parseQueryString: true }).query;
   ws.targetCommunityId = queryParams.communityId;
@@ -229,9 +251,64 @@ const notifyClients = ({ message, communityId }) => {
   });
 };
 
+const lowerHotDogLevelsForCommunity = (payload) => {
+  const { community } = payload;
+  const { id: communityId } = community;
+  const hotdogEvent = getHotdogSlot(communityId);
+
+  hotdogEvent.value = hotdogEvent.value ? hotdogEvent.value - 1 : 0;
+};
+
+const handleHotDogAlert = (payload) => {
+  const { community, event, userId, username, userColor } = payload;
+  const { id: communityId } = community;
+  const hotdogEvent = getHotdogSlot(communityId);
+  const hotdogMax = HOTDOG_MAX;
+
+  if (!hotdogEvent.value) {
+    hotdogEvent.value = 0;
+  }
+  if (hotdogEvent.value < hotdogMax) {
+    hotdogEvent.value = hotdogEvent.value ? hotdogEvent.value + 1 : 1;
+  }
+
+  const hotdogOverload = hotdogEvent.value >= hotdogMax;
+
+  if (hotdogOverload && !hotdogEvent.active) {
+    hotdogEvent.active = true;
+
+    setTimeout(() => {
+      hotdogEvent.active = false;
+      hotdogEvent.value = 0;
+
+      const hotdogAlertInactiveMessage = {
+        type: eventTypes.communityAlerts.hotdog.inactive,
+        payload: { event, userId, username, userColor, hotdogCapacity: 0 },
+      };
+
+      notifyClients({ message: hotdogAlertInactiveMessage, communityId });
+    }, 60000);
+
+    const hotdogAlertMessage = {
+      type: eventTypes.communityAlerts.hotdog.active,
+      payload: { event, userId, username, userColor },
+    };
+
+    notifyClients({ message: hotdogAlertMessage, communityId });
+  }
+
+  if (!hotdogEvent.active) {
+    setTimeout(() => lowerHotDogLevelsForCommunity(payload), 2000);
+  }
+};
+
 const handleCommunityReaction = (payload) => {
   const { community, event, userId, username, userColor } = payload;
   const { id: communityId } = community;
+
+  if (event === eventTypes.hotdog) {
+    handleHotDogAlert(payload);
+  }
 
   const reply = {
     type: "community-reaction-reply",

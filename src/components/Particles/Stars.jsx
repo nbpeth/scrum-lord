@@ -8,7 +8,7 @@ export function Stars(props) {
       color: {
         value: "#BBFFFF",
       },
-      number: { value: 50 },
+      number: { value: 100 },
       size: {
         value: 5,
       },

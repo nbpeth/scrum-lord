@@ -32,6 +32,8 @@ import { ScrumLordMenu } from "../DashboardTitleMenu/DashboardTitleMenu";
 export const CommunityHeader = ({
   navigate,
   communityName,
+  /** When true, title shows overload styling (server hotdog alert). */
+  hotdogOverload = false,
   readyState,
   version,
   iAmCitizen,
@@ -242,9 +244,10 @@ export const CommunityHeader = ({
           noWrap
           sx={{
             flex: 1,
-            fontWeight: 600,
-            color: "text.primary",
+            fontWeight: hotdogOverload ? 800 : 600,
+            color: hotdogOverload ? "warning.main" : "text.primary",
             textAlign: "center",
+            letterSpacing: hotdogOverload ? "0.04em" : undefined,
           }}
         >
           {communityName}
