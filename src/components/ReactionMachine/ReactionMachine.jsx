@@ -24,28 +24,88 @@ const useStyles = makeStyles({
     animation: `$move-it-6 3s ease-in-out`,
   },
   "@keyframes move-it-1": {
-    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "40%", transform: "scale(7)" },
+    "0%": {
+      top: "90%",
+      opacity: 1,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    "100%": {
+      top: "0%",
+      opacity: 0,
+      left: "40%",
+      transform: "translate(-50%, -50%) scale(7)",
+    },
   },
   "@keyframes move-it-2": {
-    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "30%", transform: "scale(6)" },
+    "0%": {
+      top: "90%",
+      opacity: 1,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    "100%": {
+      top: "0%",
+      opacity: 0,
+      left: "30%",
+      transform: "translate(-50%, -50%) scale(6)",
+    },
   },
   "@keyframes move-it-3": {
-    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "50%", transform: "scale(5)" },
+    "0%": {
+      top: "90%",
+      opacity: 1,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    "100%": {
+      top: "0%",
+      opacity: 0,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(5)",
+    },
   },
   "@keyframes move-it-4": {
-    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "60%", transform: "scale(4)" },
+    "0%": {
+      top: "90%",
+      opacity: 1,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    "100%": {
+      top: "0%",
+      opacity: 0,
+      left: "60%",
+      transform: "translate(-50%, -50%) scale(4)",
+    },
   },
   "@keyframes move-it-5": {
-    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "70%", transform: "scale(5)" },
+    "0%": {
+      top: "90%",
+      opacity: 1,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    "100%": {
+      top: "0%",
+      opacity: 0,
+      left: "70%",
+      transform: "translate(-50%, -50%) scale(5)",
+    },
   },
   "@keyframes move-it-6": {
-    "0%": { top: "90%", opacity: 1, left: "50%", transform: "scale(1)" },
-    "100%": { top: "0%", opacity: 0, left: "20%", transform: "scale(6)" },
+    "0%": {
+      top: "90%",
+      opacity: 1,
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    "100%": {
+      top: "0%",
+      opacity: 0,
+      left: "20%",
+      transform: "translate(-50%, -50%) scale(6)",
+    },
   },
 });
 
@@ -68,10 +128,13 @@ export const ReactionMachine = () => {
     <div
       id="reaction-container"
       style={{
-        position: "relative",
+        position: "fixed",
+        inset: 0,
         width: "100%",
+        height: "100%",
         overflow: "hidden",
-        minHeight: 48,
+        pointerEvents: "none",
+        zIndex: 8,
       }}
     >
       {reactions.map((reaction) => (
@@ -106,8 +169,8 @@ const Reaction = ({ id, message, setReactions }) => {
       className={classX}
       style={{
         position: "absolute",
+        left: "50%",
         top: "90%",
-        transform: "translate(-50%, -50%)",
         fontSize: "3rem",
       }}
     >

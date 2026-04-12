@@ -1,5 +1,4 @@
 import { Box, List, ListItem, Typography, useTheme } from "@mui/material";
-import { ReactionMachine } from "../ReactionMachine/ReactionMachine";
 
 export const MessageBoard = ({ messageHistory, communityId }) => {
   const messages = messageHistory
@@ -53,17 +52,6 @@ export const MessageBoard = ({ messageHistory, communityId }) => {
           );
         })}
       </List>
-      {/* Reactions use position:absolute; clip so they cannot paint over adjacent columns */}
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          minHeight: 56,
-          overflow: "hidden",
-        }}
-      >
-        <ReactionMachine />
-      </Box>
     </Box>
   );
 };

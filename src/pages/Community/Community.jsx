@@ -12,6 +12,7 @@ import { EditPointSchemeModal } from "../../components/EditPointSchemeModal/Edit
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { LurkerBox } from "../../components/LurkerBox/LurkerBox";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
+import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachine";
 
 export const Community = ({
   handleCommunityBackgroundAnimationChange,
@@ -204,13 +205,10 @@ export const Community = ({
   const showLurkerColumn = Boolean(settings?.lurkerBoxVisible);
   const showActivity = Boolean(settings?.messageBoardVisible);
   const lurkerMd = showLurkerColumn ? 2 : 0;
-  /** Columns shared by CommunityCitizens + MessageBoard (after lurker strip). */
   const mainRowMd = 12 - lurkerMd;
-  /** At most 25% of that band (¼ of columns); remainder stays with citizens. */
   const activityMd = showActivity ? Math.floor(mainRowMd / 4) : 0;
   const citizensMd = showActivity ? mainRowMd - activityMd : mainRowMd;
 
-  // Same palette as the toolbar (background.default) but more translucent so blur/stars read through.
   const activityPaperSx = {
     background: (t) =>
       alpha(
@@ -222,7 +220,6 @@ export const Community = ({
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "divider",
-    // Flush to viewport right & bottom on md+ (radius/border only on the gap side).
     borderRadius: {
       xs: 2,
       md: `${theme.shape.borderRadius}px 0 0 ${theme.shape.borderRadius}px`,
@@ -235,7 +232,6 @@ export const Community = ({
     display: "flex",
     flexDirection: "column",
     alignSelf: "stretch",
-    // md+: fill grid row (page uses gridTemplateRows: auto 1fr + Grid height 100%)
     minHeight: { xs: 280, md: 0 },
     height: { xs: "auto", md: "100%" },
     maxHeight: { xs: "none", md: "100%" },
@@ -261,6 +257,7 @@ export const Community = ({
         textAlign: "initial",
       }}
     >
+      {currentCommunity ? <ReactionMachine /> : null}
       <Box>
         <JoinCommunityModal
           open={joinCommunityModalOpen}

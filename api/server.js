@@ -203,17 +203,10 @@ websocketServer.on("connection", (ws, request) => {
   ws.on("close", close(ws));
   ws.on("pong", pong);
 
-  // newRelic.setTransactionName('send message transation');
-  // newRelic.startSegment("send message", true, () => {
-  //   ws.send(JSON.stringify({ message: "I'm glad you and I could connect" }));
-  // });
 });
 
 const notifyCaller = (ws, message) => {
-  // newRelic.setTransactionName('notify caller transation');
-  // newRelic.startSegment("notifyCaller", true, () => {
-    ws.send(JSON.stringify(message));
-  // });
+  ws.send(JSON.stringify(message));
 };
 
 const notifyClients = ({ message, communityId }) => {
@@ -237,17 +230,15 @@ const notifyClients = ({ message, communityId }) => {
 };
 
 const handleCommunityReaction = (payload) => {
-  // newRelic.startSegment("handleCommunityReaction", true, () => {
-    const { community, event, userId, username, userColor } = payload;
-    const { id: communityId } = community;
+  const { community, event, userId, username, userColor } = payload;
+  const { id: communityId } = community;
 
-    const reply = {
-      type: "community-reaction-reply",
-      payload: { event, userId, username, userColor },
-    };
+  const reply = {
+    type: "community-reaction-reply",
+    payload: { event, userId, username, userColor },
+  };
 
-    notifyClients({ message: reply, communityId });
-  // });
+  notifyClients({ message: reply, communityId });
 };
 
 const handleCreateCommunity = async (payload, ws) => {
@@ -340,18 +331,16 @@ const handleLeaveCommunity = async (payload) => {
 };
 
 const handleListCommunities = async () => {
-  // newRelic.startSegment("listCommunities", true, async () => {
-    const communitiesSummary = await communityClient.getCommunitiesAsArray();
+  const communitiesSummary = await communityClient.getCommunitiesAsArray();
 
-    const reply = {
-      type: "list-communities-reply",
-      payload: {
-        communities: communitiesSummary,
-      },
-    };
+  const reply = {
+    type: "list-communities-reply",
+    payload: {
+      communities: communitiesSummary,
+    },
+  };
 
-    notifyClients({ message: reply });
-  // });
+  notifyClients({ message: reply });
 };
 
 const handleGetCommunity = async (payload) => {
@@ -393,27 +382,25 @@ const handleSubmitVote = async (payload) => {
 
 // technically you can see points by inspecting the ws messages, but that'll be our little secret for now
 const handleReveal = async (payload) => {
-  // newRelic.startSegment("handleReveal", true, async () => {
-    const { community, username, userId, userColor } = payload;
-    const { id: communityId } = community;
+  const { community, username, userId, userColor } = payload;
+  const { id: communityId } = community;
 
-    await killTimerIfExists(communityId);
+  await killTimerIfExists(communityId);
 
-    const result = await communityClient.reveal({ communityId });
+  const result = await communityClient.reveal({ communityId });
 
-    const reply = {
-      type: "reveal-reply",
-      payload: {
-        community: { ...result },
-        username,
-        userId,
-        userColor,
-        isSynergized: result?.isSynergized,
-      },
-    };
+  const reply = {
+    type: "reveal-reply",
+    payload: {
+      community: { ...result },
+      username,
+      userId,
+      userColor,
+      isSynergized: result?.isSynergized,
+    },
+  };
 
-    notifyClients({ message: reply, communityId });
-  // });
+  notifyClients({ message: reply, communityId });
 };
 
 const handleReset = async (payload) => {
