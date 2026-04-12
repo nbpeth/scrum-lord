@@ -2382,6 +2382,20 @@
   resolved "https://registry.yarnpkg.com/@tsparticles/engine/-/engine-3.9.1.tgz#0e92dc54bacb257b1ab45590c1ddd671296ed12d"
   integrity sha512-DpdgAhWMZ3Eh2gyxik8FXS6BKZ8vyea+Eu5BC4epsahqTGY9V3JGGJcXC6lRJx6cPMAx1A0FaQAojPF3v6rkmQ==
 
+"@tsparticles/interaction-external-push@3.9.1":
+  version "3.9.1"
+  resolved "https://registry.yarnpkg.com/@tsparticles/interaction-external-push/-/interaction-external-push-3.9.1.tgz#2fc0136f9b0e3b857ec3dd08bf1a66ea5963c463"
+  integrity sha512-GvnWF9Qy4YkZdx+WJL2iy9IcgLvzOIu3K7aLYJFsQPaxT8d9TF8WlpoMlWKnJID6H5q4JqQuMRKRyWH8aAKyQw==
+  dependencies:
+    "@tsparticles/engine" "3.9.1"
+
+"@tsparticles/interaction-external-repulse@3.9.1":
+  version "3.9.1"
+  resolved "https://registry.yarnpkg.com/@tsparticles/interaction-external-repulse/-/interaction-external-repulse-3.9.1.tgz#2825b1fa6629d36deb5fc1385ee349514054d953"
+  integrity sha512-/LBppXkrMdvLHlEKWC7IykFhzrz+9nebT2fwSSFXK4plEBxDlIwnkDxd3FbVOAbnBvx4+L8+fbrEx+RvC8diAw==
+  dependencies:
+    "@tsparticles/engine" "3.9.1"
+
 "@tsparticles/interaction-particles-links@3.9.1":
   version "3.9.1"
   resolved "https://registry.yarnpkg.com/@tsparticles/interaction-particles-links/-/interaction-particles-links-3.9.1.tgz#98a666e562aa0fe84a13557cffc4c3765db1f0a1"
