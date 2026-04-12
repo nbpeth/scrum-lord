@@ -2382,6 +2382,13 @@
   resolved "https://registry.yarnpkg.com/@tsparticles/engine/-/engine-3.9.1.tgz#0e92dc54bacb257b1ab45590c1ddd671296ed12d"
   integrity sha512-DpdgAhWMZ3Eh2gyxik8FXS6BKZ8vyea+Eu5BC4epsahqTGY9V3JGGJcXC6lRJx6cPMAx1A0FaQAojPF3v6rkmQ==
 
+"@tsparticles/interaction-particles-links@3.9.1":
+  version "3.9.1"
+  resolved "https://registry.yarnpkg.com/@tsparticles/interaction-particles-links/-/interaction-particles-links-3.9.1.tgz#98a666e562aa0fe84a13557cffc4c3765db1f0a1"
+  integrity sha512-MsLbMjy1vY5M5/hu/oa5OSRZAUz49H3+9EBMTIOThiX+a+vpl3sxc9AqNd9gMsPbM4WJlub8T6VBZdyvzez1Vg==
+  dependencies:
+    "@tsparticles/engine" "3.9.1"
+
 "@tsparticles/move-base@3.9.1":
   version "3.9.1"
   resolved "https://registry.yarnpkg.com/@tsparticles/move-base/-/move-base-3.9.1.tgz#a4ffebeb889292cbd28e022d201be5bdb237dbfb"

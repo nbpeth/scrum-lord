@@ -9,7 +9,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import "./App.css";
 import { Fireworks } from "./components/Particles/Fireworks";
-import { HyperSpace } from "./components/Particles/Hyperspace";
+import { PlanetaryOrbit } from "./components/Particles/PlanetaryOrbit";
 import { Stars } from "./components/Particles/Stars";
 import { Community } from "./pages/Community/Community";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
@@ -167,10 +167,17 @@ const AppContent = ({ version }) => {
       path: "/",
       element: (
         <>
-          {particlesReady && <HyperSpace />}
+          <PlanetaryOrbit
+            orbitalRings={[
+              { speed: 0.3, bodies: 2, bodySize: 20 },
+              { speed: 0.15, bodySize: 10, bodies: 4 },
+              { speed: 0.3, bodySize: 50  },
+              { speed: 0.19, bodies: 2, bodySize: 10 },
+            ]}
+          />
           <Box
             component="main"
-            sx={{ position: "relative", zIndex: 1, minHeight: "100vh" }}
+            sx={{ position: "relative", zIndex: 2, minHeight: "100vh" }}
           >
             <Dashboard version={version} />
           </Box>

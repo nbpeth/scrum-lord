@@ -89,7 +89,15 @@ export const Dashboard = ({ version }) => {
   };
 
   return (
-    <div>
+    <Box
+      component="div"
+      sx={{
+        position: "relative",
+        minHeight: "100vh",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
       <Stack
         direction="row"
         alignItems="center"
@@ -138,24 +146,33 @@ export const Dashboard = ({ version }) => {
 
       <Box
         sx={{
+          position: "relative",
+          zIndex: 2,
+          isolation: "isolate",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "80vh",
+          minHeight: "100vh",
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
         <Button
           id="dashboard-start-button"
-          sx={{
+          sx={(theme) => ({
             fontFamily: "monospace",
             fontSize: ".8em",
             width: "35vh",
             height: "35vh",
             borderRadius: "50%",
             position: "relative",
+            zIndex: 1,
             overflow: "visible",
             willChange: "transform",
             transition: "transform 1.5s ease-in-out",
+            backgroundColor: alpha(theme.palette.background.default, 0.96),
+            border: "1px solid",
+            borderColor: "divider",
             "&::before, &::after": {
               content: '""',
               position: "absolute",
@@ -174,10 +191,11 @@ export const Dashboard = ({ version }) => {
             },
             "&:hover": {
               transform: "scale(1.3)",
+              backgroundColor: alpha(theme.palette.background.default, 0.98),
               "&::before": { opacity: 0 },
               "&::after": { opacity: 1 },
             },
-          }}
+          })}
           onClick={startModalClicked}
           variant="outline"
         >
@@ -191,6 +209,6 @@ export const Dashboard = ({ version }) => {
           />
         </Button>
       </Box>
-    </div>
+    </Box>
   );
 };

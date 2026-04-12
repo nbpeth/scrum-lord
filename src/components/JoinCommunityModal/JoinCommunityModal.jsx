@@ -19,12 +19,16 @@ import * as uuidv4 from "uuid";
 
 import * as React from "react";
 import { GroupAdd, HelpOutline, Refresh } from "@mui/icons-material";
+import { StellarOrbit } from "../Particles/StellarOrbit";
 
-const modalSurfaceSx = (theme) => ({
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+/**
+ * Join dialog surface: no backdrop-filter so tsParticles behind the panel stay sharp
+ * (frosted glass would blur whatever is drawn under it, including the particle layer).
+ */
+const dialogPaperSx = (theme) => ({
+  position: "relative",
+  zIndex: 1,
+  pointerEvents: "auto",
   width: { xs: "calc(100% - 32px)", sm: 420 },
   maxWidth: "100%",
   maxHeight: "90vh",
@@ -33,9 +37,7 @@ const modalSurfaceSx = (theme) => ({
   borderRadius: 2,
   border: "1px solid",
   borderColor: "divider",
-  background: alpha(theme.palette.background.default, 0.72),
-  backdropFilter: "blur(14px)",
-  WebkitBackdropFilter: "blur(14px)",
+  background: alpha(theme.palette.background.default, 0.92),
   boxShadow: `0 16px 48px ${alpha(theme.palette.common.black, 0.45)}`,
   outline: "none",
 });
@@ -88,27 +90,45 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
   return (
     <Modal
       open={open}
-      onClose={(e, reason) => {
-        if (reason !== "backdropClick") {
-          onClose();
-        }
-      }}
+      onClose={() => onClose()}
       BackdropProps={{
         sx: {
-          backgroundColor: alpha(theme.palette.common.black, 0.52),
-          backdropFilter: "blur(6px)",
-          WebkitBackdropFilter: "blur(6px)",
+          backgroundColor: alpha(theme.palette.common.black, 0.48),
+          // No backdrop blur: blur would soften the particle layer in the scrim area too.
         },
       }}
     >
+      {/* Single Modal child: particles sit above MUI backdrop (z-index -1) but below this card (z-index 1). */}
       <Box
         sx={{
-          ...modalSurfaceSx(theme),
+          position: "fixed",
+          inset: 0,
+          outline: "none",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "stretch",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          p: { xs: 1.5, sm: 2 },
         }}
       >
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        >
+          {/* <StellarOrbit embedded /> */}
+        </Box>
+        <Box
+          sx={{
+            ...dialogPaperSx(theme),
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "stretch",
+          }}
+        >
         <Stack spacing={2.5} sx={{ width: "100%", boxSizing: "border-box" }}>
           <Typography
             variant="subtitle1"
@@ -250,6 +270,7 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
             </Stack>
           </Stack>
         </Stack>
+        </Box>
       </Box>
     </Modal>
   );
