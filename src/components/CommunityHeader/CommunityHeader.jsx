@@ -242,13 +242,35 @@ export const CommunityHeader = ({
           variant="h6"
           component="div"
           noWrap
-          sx={{
+          sx={(theme) => ({
             flex: 1,
-            fontWeight: hotdogOverload ? 800 : 600,
-            color: hotdogOverload ? "warning.main" : "text.primary",
             textAlign: "center",
-            letterSpacing: hotdogOverload ? "0.04em" : undefined,
-          }}
+            ...(hotdogOverload
+              ? {
+                  fontSize: "clamp(1.45rem, 5vw, 2.5rem)",
+                  fontWeight: 900,
+                  lineHeight: 1.15,
+                  letterSpacing: "0.06em",
+                  color: theme.palette.warning.main,
+                  "@keyframes hotdog-overload-attn": {
+                    "0%, 100%": {
+                      textShadow: `0 0 16px ${alpha(theme.palette.warning.main, 0.95)}, 0 0 36px ${alpha(theme.palette.warning.main, 0.45)}`,
+                    },
+                    "33%": {
+                      textShadow: `0 0 22px ${alpha(theme.palette.error.main, 0.75)}, 0 0 52px ${alpha(theme.palette.warning.main, 0.55)}`,
+                    },
+                    "66%": {
+                      textShadow: `0 0 18px ${alpha(theme.palette.warning.light, 1)}, 0 0 44px ${alpha(theme.palette.error.main, 0.35)}`,
+                    },
+                  },
+                  animation:
+                    "hotdog-overload-attn 1.05s ease-in-out infinite",
+                }
+              : {
+                  fontWeight: 600,
+                  color: "text.primary",
+                }),
+          })}
         >
           {communityName}
         </Typography>
