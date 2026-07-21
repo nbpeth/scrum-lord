@@ -1,3 +1,4 @@
+import GitHubIcon from "@mui/icons-material/GitHub";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   Divider,
@@ -12,42 +13,34 @@ import {
   useTheme,
 } from "@mui/material";
 import { useState } from "react";
-import GitHubIcon from "@mui/icons-material/GitHub";
 import { Link } from "react-router-dom";
 
-export const DashboardTitleMenu = ({ createRoomClicked, version }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+const openInNewTab = (url) => window.open(url, "_blank", "noopener,noreferrer");
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+export const DashboardTitleMenu = ({ version }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
 
   return (
     <>
-      <MenuIcon onClick={handleClick} sx={{ cursor: "pointer" }} />
+      <MenuIcon
+        onClick={(event) => setAnchorEl(event.currentTarget)}
+        sx={{ cursor: "pointer" }}
+      />
 
       <Menu
         id="dashboard-menu"
         anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
       >
         <Paper sx={{ background: "none" }}>
           <MenuList>
             <MenuItem sx={{ cursor: "default" }}>{version}</MenuItem>
             <Divider />
             <MenuItem
-              onClick={() => {
-                window.open(
-                  "https://github.com/nbpeth/scrum-lord/releases",
-                  "_blank"
-                );
-              }}
-              sx={{ cursor: "pointer" }}
+              onClick={() =>
+                openInNewTab("https://github.com/nbpeth/scrum-lord/releases")
+              }
             >
               <ListItemIcon>
                 <GitHubIcon />
@@ -55,13 +48,9 @@ export const DashboardTitleMenu = ({ createRoomClicked, version }) => {
               <ListItemText secondary="Change log" />
             </MenuItem>
             <MenuItem
-              onClick={() => {
-                window.open(
-                  "https://github.com/nbpeth/scrum-lord/issues",
-                  "_blank"
-                );
-              }}
-              sx={{ cursor: "pointer" }}
+              onClick={() =>
+                openInNewTab("https://github.com/nbpeth/scrum-lord/issues")
+              }
             >
               <ListItemIcon>
                 <GitHubIcon />
@@ -70,8 +59,15 @@ export const DashboardTitleMenu = ({ createRoomClicked, version }) => {
             </MenuItem>
             <Divider />
             <MenuItem>
-              <a target="_blank" href="https://www.buymeacoffee.com/nbpetha">
-                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" />
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://www.buymeacoffee.com/nbpetha"
+              >
+                <img
+                  alt="Buy me pizza"
+                  src="https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00"
+                />
               </a>
             </MenuItem>
           </MenuList>
@@ -83,27 +79,21 @@ export const DashboardTitleMenu = ({ createRoomClicked, version }) => {
 
 export const ScrumLordMenu = ({ children }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const theme = useTheme();
 
   return (
     <Grid item>
       <Grid container alignItems="center" spacing={2}>
         <Grid item sx={{ marginTop: "5px" }}>
-          <MenuIcon onClick={handleClick} sx={{ cursor: "pointer" }} />
+          <MenuIcon
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            sx={{ cursor: "pointer" }}
+          />
           <Menu
-            id="dashboard-menu"
+            id="room-menu"
             anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
           >
             {children}
           </Menu>

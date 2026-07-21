@@ -12,10 +12,15 @@
     "uuid": "^9.0.1",
     "ws": "^8.17.0"
   },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.0"
+  },
   "scripts": {
     "start": "node ./server.js",
     "startlocal": "REACT_APP_API_KEY='key123' ALLOWED_ORIGINS='localhost:3000' DATABASE_URL='postgresql://user:secrets@localhost:5432/scrumlord' yarn start",
     "start:api:dc": "echo DATABASE_URL $DATABASE_URL && DATABASE_URL=$DATABASE_URL yarn start",
+    "test": "jest",
     "build": "yarn build",
     "heroku-postbuild": "yarn build"
   }

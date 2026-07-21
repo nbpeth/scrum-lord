@@ -1,28 +1,36 @@
 import { Box, Grid, alpha, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useCommunity from "../../hooks/useCommunity";
 
-import { useSettings } from "../../hooks/useSettings";
 import { CommunityCitizens } from "../../components/CommunityCitizens/CommunityCitizens";
 import { CommunityControls } from "../../components/CommunityControls/CommunityControls";
 import { CommunityHeader } from "../../components/CommunityHeader/CommunityHeader";
-import { DeleteCommunityModal } from "../../components/DeleteCommunityModal.jsx/DeleteCommunityModal";
+import { DeleteCommunityModal } from "../../components/DeleteCommunityModal/DeleteCommunityModal";
 import { EditPointSchemeModal } from "../../components/EditPointSchemeModal/EditPointSchemeModal";
 import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinCommunityModal";
 import { LurkerBox } from "../../components/LurkerBox/LurkerBox";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachine";
+import useCommunity from "../../hooks/useCommunity";
+import { useSettings } from "../../hooks/useSettings";
+
+const USER_STATE_STORAGE_KEY = "userstate";
+
+const readUserState = () => {
+  try {
+    return JSON.parse(localStorage.getItem(USER_STATE_STORAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+};
 
 export const Community = ({
   handleCommunityBackgroundAnimationChange,
   handleCelebrationChange,
-  /** For App-level overlays (e.g. hotdog particle alert). */
   handleGlobalEvent,
   version,
 }) => {
-  const params = useParams();
-  const communityId = params.communityId;
+  const { communityId } = useParams();
   const navigate = useNavigate();
 
   const {
@@ -56,27 +64,30 @@ export const Community = ({
 
   const citizens = currentCommunity?.citizens || [];
   const [iAmCitizen, setIAmCitizen] = useState(null);
-  const [error, setError] = useState(null);
   const [joinCommunityModalOpen, setJoinCommunityModalOpen] = useState(false);
   const [editPointSchemeModalOpen, setEditPointSchemeModalOpen] =
     useState(false);
   const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
     useState(false);
-
   const [hotdogAlert, setHotdogAlert] = useState(false);
 
   useEffect(() => {
-    recoverUserFromStorage();
+    const cachedUserId = readUserState()[communityId];
+    const citizenList = currentCommunity?.citizens || [];
+    if (cachedUserId && citizenList.length) {
+      setIAmCitizen(
+        citizenList.find((citizen) => citizen.userId === cachedUserId)
+      );
+    }
 
     updatePrivateRooms(currentCommunity);
 
     if (currentCommunity?.isSynergized) {
       handleCelebrationChange(true);
-      setTimeout(() => {
-        handleCelebrationChange(false);
-      }, 5000);
+      const id = setTimeout(() => handleCelebrationChange(false), 5000);
+      return () => clearTimeout(id);
     }
-  }, [currentCommunity]);
+  }, [currentCommunity, communityId, updatePrivateRooms, handleCelebrationChange]);
 
   useEffect(() => {
     if (!roomEvents) {
@@ -85,18 +96,14 @@ export const Community = ({
     if (roomEvents?.alerts?.hotdog) {
       setHotdogAlert(Boolean(roomEvents.alerts.hotdog.active));
     }
-    if (
-      roomEvents.communityDeleted &&
-      roomEvents.communityDeleted[communityId] &&
-      roomEvents.communityDeleted[communityId].deleted === true
-    ) {
+    if (roomEvents.communityDeleted?.[communityId]?.deleted === true) {
       setTimeout(() => {
         navigate("/?error=9000", {
           state: { alertMessage: "Community deleted" },
         });
       }, 2000);
     }
-  }, [roomEvents, currentCommunity, communityId, navigate]);
+  }, [roomEvents, communityId, navigate]);
 
   useEffect(() => {
     if (typeof handleGlobalEvent === "function") {
@@ -106,69 +113,43 @@ export const Community = ({
 
   useEffect(() => {
     handleCommunityBackgroundAnimationChange(settings?.communityAnimation);
-  }, [settings]);
+  }, [settings, handleCommunityBackgroundAnimationChange]);
 
-  const handleJoin = () => {
-    setJoinCommunityModalOpen(true);
+  const saveUserToStorage = (userId) => {
+    const userState = readUserState();
+    userState[communityId] = userId;
+    localStorage.setItem(USER_STATE_STORAGE_KEY, JSON.stringify(userState));
   };
 
   const handleJoinCommunityModalClose = (newUser) => {
+    setJoinCommunityModalOpen(false);
     if (!newUser) {
-      setJoinCommunityModalOpen(false);
       return;
     }
 
     const { username, userId, votingMember, userColor } = newUser;
     saveUserToStorage(userId);
 
-    try {
-      joinCommunity({ communityId, userId, username, userColor, votingMember });
-      setIAmCitizen({ userId, username, votingMember, userColor });
-    } catch (e) {
-      console.error(e);
-      setError(e.message);
-    }
-
-    setJoinCommunityModalOpen(false);
-  };
-
-  const recoverUserFromStorage = () => {
-    const userstate = localStorage.getItem("userstate") ?? "{}";
-    const userstateObj = JSON.parse(userstate);
-    const cachedUserIdForCommunity = userstateObj[communityId];
-    const list = currentCommunity?.citizens || [];
-
-    if (cachedUserIdForCommunity && list.length) {
-      const user = list.find(
-        (citizen) => citizen.userId === cachedUserIdForCommunity
-      );
-      setIAmCitizen(user);
-    }
-  };
-
-  const saveUserToStorage = (userId) => {
-    const userState = localStorage.getItem("userstate") || "{}";
-    const userStateObj = JSON.parse(userState);
-    userStateObj[communityId] = userId;
-
-    localStorage.setItem("userstate", JSON.stringify(userStateObj));
+    joinCommunity({ communityId, userId, username, userColor, votingMember });
+    setIAmCitizen({ userId, username, votingMember, userColor });
   };
 
   const handleTimerClicked = ({ timerValue }) => {
     if (currentCommunity?.timer?.running) {
-      cancelTimer({
-        username: iAmCitizen.username,
-        userId: iAmCitizen.userId,
-        userColor: iAmCitizen.userColor,
-      });
+      cancelTimer({ ...iAmCitizen });
     } else {
-      startTimer({
-        timerLength: timerValue,
-        username: iAmCitizen.username,
-        userId: iAmCitizen.userId,
-        userColor: iAmCitizen.userColor,
-      });
+      startTimer({ timerLength: timerValue, ...iAmCitizen });
     }
+  };
+
+  const handleLeave = ({ communityId: id, userId, username } = {}) => {
+    leaveCommunity({
+      communityId: id ?? communityId,
+      userId: userId ?? iAmCitizen.userId,
+      username: username ?? iAmCitizen.username,
+      userColor: iAmCitizen?.userColor,
+    });
+    setIAmCitizen(null);
   };
 
   const handleDeleteUser = (citizen) => {
@@ -179,27 +160,6 @@ export const Community = ({
     });
   };
 
-  const handleLeave = ({ communityId: id, userId, username, userColor }) => {
-    try {
-      leaveCommunity({
-        communityId: id ?? communityId,
-        userId: userId ?? iAmCitizen.userId,
-        username: username ?? iAmCitizen.username,
-        userColor: iAmCitizen?.userColor,
-      });
-      setIAmCitizen(null);
-    } catch (e) {
-      console.error(e);
-      setError(e.message);
-
-      return;
-    }
-  };
-
-  const handleDeleteCommunity = () => {
-    setDeleteCommunityModalOpen(true);
-  };
-
   const onDeleteCommunityModalClose = (deletedCommunityId) => {
     if (deletedCommunityId) {
       deleteCommunity({
@@ -208,12 +168,10 @@ export const Community = ({
         username: iAmCitizen?.username,
       });
     }
-
     setDeleteCommunityModalOpen(false);
   };
 
-  const lurkers =
-    currentCommunity?.citizens?.filter((c) => !c?.votingMember) || [];
+  const lurkers = citizens.filter((c) => !c?.votingMember);
 
   const showLurkerColumn = Boolean(settings?.lurkerBoxVisible);
   const showActivity = Boolean(settings?.messageBoardVisible);
@@ -222,12 +180,11 @@ export const Community = ({
   const activityMd = showActivity ? Math.floor(mainRowMd / 4) : 0;
   const citizensMd = showActivity ? mainRowMd - activityMd : mainRowMd;
 
-  const activityPaperSx = {
-    background: (t) =>
-      alpha(
-        t.palette.background.default,
-        settings?.communityAnimationEnabled ? 0.38 : 0.52,
-      ),
+  const activityPanelSx = {
+    background: alpha(
+      theme.palette.background.default,
+      settings?.communityAnimationEnabled ? 0.38 : 0.52
+    ),
     backdropFilter: "blur(12px)",
     WebkitBackdropFilter: "blur(12px)",
     borderWidth: 1,
@@ -248,12 +205,6 @@ export const Community = ({
     minHeight: { xs: 280, md: 0 },
     height: { xs: "auto", md: "100%" },
     maxHeight: { xs: "none", md: "100%" },
-  };
-
-  const citizensColumnSx = {
-    minWidth: 0,
-    maxWidth: "100%",
-    overflow: "hidden",
   };
 
   return (
@@ -287,19 +238,11 @@ export const Community = ({
           editPointScheme={editPointScheme}
           open={editPointSchemeModalOpen}
           handleClose={() => setEditPointSchemeModalOpen(false)}
-          currentCommunity={currentCommunity}
           iamCitizen={iAmCitizen}
           community={currentCommunity}
         />
 
-        <Box
-          sx={{
-            position: "sticky",
-            top: 0,
-            zIndex: 10,
-            width: "100%",
-          }}
-        >
+        <Box sx={{ position: "sticky", top: 0, zIndex: 10, width: "100%" }}>
           <CommunityHeader
             embedded
             navigate={navigate}
@@ -310,10 +253,10 @@ export const Community = ({
             readyState={readyState}
             version={version}
             iAmCitizen={iAmCitizen}
-            onJoin={handleJoin}
+            onJoin={() => setJoinCommunityModalOpen(true)}
             onLeave={handleLeave}
             onEditPointScheme={() => setEditPointSchemeModalOpen(true)}
-            onDeleteRoom={handleDeleteCommunity}
+            onDeleteRoom={() => setDeleteCommunityModalOpen(true)}
             settings={settings}
             toggleReactions={toggleReactions}
             toggleCommunityAnimation={toggleCommunityAnimation}
@@ -328,7 +271,7 @@ export const Community = ({
                 py: 1.5,
                 borderBottom: "1px solid",
                 borderColor: "divider",
-                background: (t) => alpha(t.palette.background.default, 0.72),
+                background: alpha(theme.palette.background.default, 0.72),
                 backdropFilter: "blur(12px)",
               }}
             >
@@ -358,8 +301,6 @@ export const Community = ({
           minHeight: 0,
           height: "100%",
           pt: 2,
-          px: 0,
-          pb: 0,
           width: "100%",
           maxWidth: "100%",
           overflow: "hidden",
@@ -394,33 +335,23 @@ export const Community = ({
               xs={12}
               md={citizensMd}
               sx={{
-                justifyContent: "flex-start",
-                alignItems: "stretch",
-                ...citizensColumnSx,
                 display: "flex",
                 flexDirection: "column",
+                justifyContent: "flex-start",
+                alignItems: "stretch",
                 minWidth: 0,
+                maxWidth: "100%",
+                overflow: "hidden",
                 height: { md: "100%" },
                 pr: { md: showActivity ? 2 : undefined },
               }}
             >
-              <Box
-                sx={{
-                  width: "100%",
-                  minWidth: 0,
-                  maxWidth: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "stretch",
-                }}
-              >
-                <CommunityCitizens
-                  citizens={citizens}
-                  iAmCitizen={iAmCitizen}
-                  handleDeleteUser={handleDeleteUser}
-                  currentCommunity={currentCommunity}
-                />
-              </Box>
+              <CommunityCitizens
+                citizens={citizens}
+                iAmCitizen={iAmCitizen}
+                handleDeleteUser={handleDeleteUser}
+                currentCommunity={currentCommunity}
+              />
             </Grid>
             {showActivity && (
               <Grid
@@ -428,8 +359,7 @@ export const Community = ({
                 xs={12}
                 md={activityMd}
                 sx={{
-                  ...activityPaperSx,
-                  minWidth: 0,
+                  ...activityPanelSx,
                   pr: { md: 0 },
                   mr: { md: 0 },
                   alignSelf: { md: "stretch" },

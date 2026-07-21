@@ -11,7 +11,7 @@ import {
   alpha,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DashboardCommunities } from "../DashboardCommunities/DashboardCommunities";
 import { SearchInput } from "../SearchInput/SearchInput";
 
@@ -23,23 +23,16 @@ export const StartModal = ({
   yourPrivateRooms,
 }) => {
   const theme = useTheme();
-  const privateRooms = Object.values(yourPrivateRooms ?? {});
-  const [filteredRooms, setFilteredRooms] = useState(privateRooms);
+  const [query, setQuery] = useState("");
 
-  useEffect(() => {
-    setFilteredRooms(privateRooms);
-  }, [yourPrivateRooms]);
+  const privateRooms = Object.values(yourPrivateRooms ?? {});
+  const filteredRooms = query
+    ? privateRooms.filter((c) => c.name?.toLowerCase().includes(query))
+    : privateRooms;
 
   const searchValueChanged = (e) => {
     e.preventDefault();
-    const q = e.target.value?.trim().toLowerCase() ?? "";
-    if (!q) {
-      setFilteredRooms(privateRooms);
-      return;
-    }
-    setFilteredRooms(
-      privateRooms.filter((c) => c.name?.toLowerCase().includes(q)) ?? []
-    );
+    setQuery(e.target.value?.trim().toLowerCase() ?? "");
   };
 
   return (

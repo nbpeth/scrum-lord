@@ -1,11 +1,7 @@
-const postgresClient = require("./postgresClient");
 const datefns = require("date-fns");
+const postgresClient = require("./postgresClient");
 
-const communities = {};
-
-const getCommunities = () => {
-  return communities;
-};
+const firstRowData = (result) => result?.[0]?.data ?? null;
 
 const getCommunitiesAsArray = async () => {
   const result = await postgresClient.getCommunities();
@@ -49,15 +45,13 @@ const addCommunity = async (community) => {
     community: { ...community, citizens: [], synergy: {} },
   });
 
-  return result.map(({ id, data }) => {
-    return {
-      id,
-      isPrivate: data.isPrivate,
-      name: data.name,
-      description: data.description,
-      citizens: data.citizens.length,
-    };
-  });
+  return result.map(({ id, data }) => ({
+    id,
+    isPrivate: data.isPrivate,
+    name: data.name,
+    description: data.description,
+    citizens: data.citizens.length,
+  }));
 };
 
 const joinCommunity = async ({
@@ -75,8 +69,7 @@ const joinCommunity = async ({
     votingMember,
   });
 
-  if (result.length === 0) {
-    // something bad happened, what do
+  if (!result || result.length === 0) {
     console.error(
       "unable to join community",
       { communityId, username, userId, votingMember },
@@ -84,17 +77,23 @@ const joinCommunity = async ({
     );
   }
 
-  const { data } = result[0];
+  return firstRowData(result);
+};
 
-  return data;
+const leaveCommunity = async ({ communityId, username, userId }) => {
+  const result = await postgresClient.leaveCommunity({
+    communityId,
+    username,
+    userId,
+  });
+
+  return firstRowData(result);
 };
 
 const editPointScheme = async ({ communityId, scheme }) => {
   const result = await postgresClient.editPointScheme({ communityId, scheme });
 
-  const { data } = result[0];
-
-  return data;
+  return firstRowData(result);
 };
 
 const startTimer = async ({ communityId, timerLength, enabled }) => {
@@ -106,37 +105,19 @@ const startTimer = async ({ communityId, timerLength, enabled }) => {
     timerEnd,
   });
 
-  const { data } = result[0];
-
-  return data;
+  return firstRowData(result);
 };
 
 const stopTimer = async ({ communityId }) => {
   const result = await postgresClient.stopTimer({ communityId });
 
-  const { data } = result[0];
-
-  return data;
+  return firstRowData(result);
 };
 
 const cancelTimer = async ({ communityId }) => {
   const result = await postgresClient.cancelTimer({ communityId });
 
-  const { data } = result[0];
-
-  return data;
-};
-
-const leaveCommunity = async ({ communityId, username, userId }) => {
-  const result = await postgresClient.leaveCommunity({
-    communityId,
-    username,
-    userId,
-  });
-
-  const { data } = result[0];
-
-  return data;
+  return firstRowData(result);
 };
 
 const submitVote = async ({ communityId, userId, vote }) => {
@@ -162,38 +143,31 @@ const submitVote = async ({ communityId, userId, vote }) => {
     doubleVote,
   });
 
-  const { data } = result[0];
-
-  return { ...data, doubleVote };
+  return { ...firstRowData(result), doubleVote };
 };
 
-// if all votes are the same for at least two people, let's party
-const verifySynergy = (result) => {
-  const citizens =
-    result &&
-    result.citizens &&
-    result.citizens?.length > 1 &&
-    result.citizens
-      // don't count votes for lurkers
-      ?.filter((citizen) => {
-        return citizen.votingMember;
-      });
-
-  if (!citizens || citizens.length < 1) {
+const verifySynergy = (community) => {
+  const citizens = community?.citizens;
+  if (!citizens || citizens.length < 2) {
     return false;
   }
-  
-  const votes = citizens?.map((citizen) => citizen.vote);
 
-  return votes?.every((vote) => {
-    // all votes are the same and all votes were cast
-    return vote === votes[0] && vote !== null && vote !== undefined;
-  });
+  const votes = citizens
+    .filter((citizen) => citizen.votingMember)
+    .map((citizen) => citizen.vote);
+
+  if (!votes.length) {
+    return false;
+  }
+
+  return votes.every(
+    (vote) => vote === votes[0] && vote !== null && vote !== undefined
+  );
 };
 
 const reveal = async ({ communityId }) => {
   const result = await postgresClient.revealCommunity({ communityId });
-  let { data } = result[0];
+  let data = firstRowData(result);
 
   const isSynergized = verifySynergy(data);
   if (isSynergized) {
@@ -201,7 +175,7 @@ const reveal = async ({ communityId }) => {
       communityId,
     });
 
-    data = synergyResult?.[0]?.data;
+    data = firstRowData(synergyResult);
   }
 
   return { ...data, isSynergized };
@@ -210,20 +184,7 @@ const reveal = async ({ communityId }) => {
 const reset = async ({ communityId }) => {
   const result = await postgresClient.resetCommunity({ communityId });
 
-  const { data } = result[0];
-
-  return data;
-};
-
-const communitiesSummary = () => {
-  return Object.values(communities).map((community) => {
-    return {
-      id: community.id,
-      name: community.name,
-      description: community.description,
-      citizens: community.citizens.length,
-    };
-  });
+  return firstRowData(result);
 };
 
 const deleteCommunity = async ({ community, userId, username }) => {
@@ -240,10 +201,8 @@ const deleteCommunity = async ({ community, userId, username }) => {
 module.exports = {
   addCommunity,
   cancelTimer,
-  communitiesSummary,
   deleteCommunity,
   editPointScheme,
-  getCommunities,
   getCommunitiesAsArray,
   getCommunityBy,
   joinCommunity,
@@ -253,4 +212,5 @@ module.exports = {
   startTimer,
   stopTimer,
   submitVote,
+  verifySynergy,
 };

@@ -152,7 +152,6 @@ export const CommunityCard = ({ community, fullsizeScreen }) => {
 };
 
 export const EmptyDash = () => {
-  const theme = useTheme();
   return (
     <Stack
       alignItems="center"

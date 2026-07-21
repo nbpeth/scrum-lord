@@ -1,69 +1,55 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { getSocketBaseUrl, socketOptions } from "../util/config";
 
+const COMMUNITY_LIMIT = 100;
+
 export default function useDashboard() {
-  const [_communities, setCommunities] = useState([]);
+  const [communities, setCommunities] = useState([]);
   const [communityCreatedComplete, setCommunityCreatedComplete] = useState();
   const [socketUrl, setSocketUrl] = useState(null);
-  const [reconnection, setReconnection] = useState({
+  const [, setReconnection] = useState({
     attempts: 15,
     interval: 5,
     reconnecting: false,
   });
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(
-    socketUrl,
-    {...socketOptions({ setReconnection })}
-  );
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    ...socketOptions({ setReconnection }),
+  });
 
   useEffect(() => {
-    const baseUrl = `${getSocketBaseUrl()}/socket`;
-
-    setSocketUrl(`${baseUrl}`);
+    setSocketUrl(`${getSocketBaseUrl()}/socket`);
   }, []);
 
   useEffect(() => {
+    if (!lastMessage?.data) {
+      return;
+    }
     try {
-      const messageData = JSON.parse(lastMessage?.data);
-      const { type, payload } = messageData;
+      const { type, payload } = JSON.parse(lastMessage.data);
 
       switch (type) {
         case "list-communities-reply":
-          const { communities: fetchedCommunities } = payload;
-
           setCommunities(
-            fetchedCommunities.map((c) => ({
+            payload.communities.map((c) => ({
               ...c,
               synergy: {
                 ...c.synergy,
-                value: c.synergy?.hits ?? 0 / c.synergy?.total ?? 1,
+                value: (c.synergy?.hits ?? 0) / (c.synergy?.total ?? 1),
               },
             }))
           );
-
           break;
+
         case "community-created-reply":
-          const { communities } = payload;
-
-          setCommunities(communities);
-
+          setCommunities(payload.communities);
           break;
 
         case "community-created-complete-reply":
-          const { result } = payload;
-          // debugger;
-          if (result?.length > 0) {
-            setCommunityCreatedComplete(result[0]);
+          if (payload.result?.length > 0) {
+            setCommunityCreatedComplete(payload.result[0]);
           }
-          /*
-            id: 'f6f5d00b-ce4f-417d-9e2e-94677e4a6283',
-            isPrivate: true,
-            name: 'x',
-            description: undefined,
-            citizens: 0
-          */
-
           break;
 
         default:
@@ -75,7 +61,7 @@ export default function useDashboard() {
   }, [lastMessage]);
 
   const addCommunity = async (community) => {
-    if (_communities.length >= 100) {
+    if (communities.length >= COMMUNITY_LIMIT) {
       throw new Error("Community limit reached");
     }
 
@@ -84,27 +70,14 @@ export default function useDashboard() {
     );
   };
 
-  const removeCommunity = (communityToRemove) => {};
-
-  const fetchCommunities = () => {
+  const fetchCommunities = useCallback(() => {
     sendMessage(JSON.stringify({ type: "list-communities" }));
-  };
-
-  const listCommunities = () => {
-    return _communities;
-  };
-
-  const getCommunityById = (id) => {
-    return _communities.find((c) => c.id === id);
-  };
+  }, [sendMessage]);
 
   return {
     addCommunity,
     fetchCommunities,
-    listCommunities,
-    readyState,
-    removeCommunity,
     communityCreatedComplete,
-    // privateRoomCreatedComplete,
+    readyState,
   };
 }

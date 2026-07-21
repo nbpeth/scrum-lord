@@ -1,36 +1,26 @@
 const { Pool } = require("pg");
 const uuid = require("uuid");
 
-const DB_CONNECTION_STRING = process.env.DATABASE_URL;
-
 const dbConnectionProperties = {
-  connectionString: DB_CONNECTION_STRING,
+  connectionString: process.env.DATABASE_URL,
   ...(process.env.ENV === "production"
     ? { ssl: { rejectUnauthorized: false } }
     : { ssl: false }),
 };
 
-let pool;
-try {
-  console.log("opening up db connection pool");
-  pool = new Pool({
-    ...dbConnectionProperties,
-  });
-} catch (err) {
-  console.error("could not connect to db!", err);
-  throw err;
-}
+const pool = new Pool(dbConnectionProperties);
 
 const executeQuery = async ({ query, values }) => {
+  let client;
   try {
-    const client = await pool.connect();
-
+    client = await pool.connect();
     const result = await client.query(query, values);
-    client.release();
 
     return result.rows;
   } catch (err) {
     console.error(err.stack);
+  } finally {
+    client?.release();
   }
 };
 
@@ -40,24 +30,17 @@ const addCommunity = async ({ community }) => {
     "INSERT INTO communities(id, data, last_modified) VALUES($1, $2, NOW()) RETURNING *;";
   const values = [id, { ...community, id }];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values });
 };
 
 const getCommunities = async () => {
-  const query = "SELECT * FROM communities";
-
-  const result = await executeQuery({ query });
-
-  return result;
+  return executeQuery({ query: "SELECT * FROM communities" });
 };
 
 const getCommunityById = async ({ id }) => {
   const query = "SELECT * FROM communities where id = $1";
-  const result = await executeQuery({ query, values: [id] });
 
-  return result;
+  return executeQuery({ query, values: [id] });
 };
 
 const joinCommunity = async ({
@@ -77,11 +60,8 @@ const joinCommunity = async ({
   const citizen = JSON.stringify([
     { username, userId, votingMember, userColor },
   ]);
-  const values = [citizen, communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values: [citizen, communityId] });
 };
 
 const leaveCommunity = async ({ communityId, userId }) => {
@@ -106,20 +86,14 @@ const leaveCommunity = async ({ communityId, userId }) => {
     WHERE id = $1
     RETURNING *;
       `;
-  const values = [communityId, userId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values: [communityId, userId] });
 };
 
 const deleteCommunity = async ({ community }) => {
   const query = "DELETE FROM communities where id = $1";
-  const values = [community.id];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values: [community.id] });
 };
 
 const resetCommunity = async ({ communityId }) => {
@@ -128,7 +102,7 @@ const resetCommunity = async ({ communityId }) => {
       SELECT jsonb_agg(
         jsonb_set(
           jsonb_set(
-            jsonb_set(citizen::jsonb, '{vote}', 'null'), 
+            jsonb_set(citizen::jsonb, '{vote}', 'null'),
             '{hasVoted}', 'false'
           ),
           '{doubleVote}', 'false'
@@ -139,22 +113,19 @@ const resetCommunity = async ({ communityId }) => {
     UPDATE communities
     SET data = jsonb_set(
       jsonb_set(
-        data::jsonb, 
-        '{citizens}', 
+        data::jsonb,
+        '{citizens}',
         (SELECT citizens::jsonb FROM updated_citizens)
       ),
-      '{revealed}', 
+      '{revealed}',
       'false'::jsonb
     ),
     last_modified = NOW()
     WHERE id = $1
     RETURNING *;
   `;
-  const values = [communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values: [communityId] });
 };
 
 const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
@@ -180,14 +151,14 @@ const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
       SET data = jsonb_set(
         jsonb_set(
           jsonb_set(
-            data::jsonb, 
-            ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'hasVoted'], 
+            data::jsonb,
+            ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'hasVoted'],
             'true'::jsonb
           ),
-          ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'vote'], 
+          ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'vote'],
           $3::jsonb
         ),
-        ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'doubleVote'], 
+        ARRAY['citizens', (SELECT CAST(index AS TEXT) FROM idx), 'doubleVote'],
         $4::jsonb
       ),
       last_modified = NOW()
@@ -201,13 +172,11 @@ const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
     doubleVote ?? false,
   ];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values });
 };
 
 const revealCommunity = async ({ communityId }) => {
-  // show all votes and increment synergy total votes
+  // Show all votes and increment synergy total votes.
   const query = `
     UPDATE communities
     SET data = jsonb_set(
@@ -222,11 +191,8 @@ const revealCommunity = async ({ communityId }) => {
     WHERE id = $1
     RETURNING *;
   `;
-  const values = [communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values: [communityId] });
 };
 
 const editPointScheme = async ({ communityId, scheme }) => {
@@ -236,11 +202,11 @@ const editPointScheme = async ({ communityId, scheme }) => {
         WHERE id = $2
         RETURNING *;
     `;
-  const values = [JSON.stringify(scheme), communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({
+    query,
+    values: [JSON.stringify(scheme), communityId],
+  });
 };
 
 const startTimer = async ({ communityId, timerLength, timerEnd }) => {
@@ -255,47 +221,35 @@ const startTimer = async ({ communityId, timerLength, timerEnd }) => {
     communityId,
   ];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values });
 };
 
-const stopTimer = async ({ communityId, timerLength }) => {
+const stopTimer = async ({ communityId }) => {
   const query = `
         UPDATE communities
         SET data = jsonb_set(jsonb_set(data::jsonb, '{timer}', $1::jsonb), '{revealed}', 'true')
         WHERE id = $2
         RETURNING *;
     `;
-  const values = [
-    JSON.stringify({ running: false, value: undefined }),
-    communityId,
-  ];
+  const values = [JSON.stringify({ running: false }), communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values });
 };
 
-const cancelTimer = async ({ communityId, timerLength }) => {
+const cancelTimer = async ({ communityId }) => {
   const query = `
         UPDATE communities
         SET data = jsonb_set(data::jsonb, '{timer}', $1::jsonb)
         WHERE id = $2
         RETURNING *;
     `;
-  const values = [
-    JSON.stringify({ running: false, value: undefined }),
-    communityId,
-  ];
+  const values = [JSON.stringify({ running: false }), communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values });
 };
 
 const synergizeCommunity = async ({ communityId }) => {
-  // increment synergy hits
+  // Increment synergy hits.
   const query = `
     UPDATE communities
     SET data =
@@ -303,15 +257,12 @@ const synergizeCommunity = async ({ communityId }) => {
                     data::jsonb,
                     '{synergy, hits}',
                     ((COALESCE((data -> 'synergy' ->> 'hits')::integer, 0) + 1)::text)::jsonb)
-    
+
     WHERE id = $1
     RETURNING *;
 `;
-  const values = [communityId];
 
-  const result = await executeQuery({ query, values });
-
-  return result;
+  return executeQuery({ query, values: [communityId] });
 };
 
 module.exports = {
