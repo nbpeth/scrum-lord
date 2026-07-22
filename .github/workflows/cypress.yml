@@ -66,7 +66,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           start: yarn --cwd api startlocal, yarn start:ui:ci
-          wait-on: "http://localhost:3000, tcp:127.0.0.1:8080"
+          wait-on: "http://localhost:3000"
           wait-on-timeout: 240
           browser: chrome
 
