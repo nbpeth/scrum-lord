@@ -7,13 +7,25 @@ import {
   Stack,
   Tooltip,
   Typography,
-  alpha,
-  useTheme,
 } from "@mui/material";
 import { differenceInDays, format, isValid, parseISO } from "date-fns";
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import emptyImgUrl from "../../missing-5.png";
+import {
+  emptyDashHintSx,
+  emptyDashImageSx,
+  emptyDashSx,
+  emptyDashTitleSx,
+  idleChipIconSx,
+  idleChipSx,
+  lastActivitySx,
+  roomCardActionSx,
+  roomCardSx,
+  roomListStackSx,
+  roomNameBoxSx,
+  roomNameSx,
+} from "./DashboardCommunities.styles";
 
 function sortCommunitiesForDisplay(communities) {
   if (!communities?.length) return [];
@@ -23,7 +35,10 @@ function sortCommunitiesForDisplay(communities) {
       if (!community?.lastModified) {
         return { ...community, idle: null };
       }
-      const idle = differenceInDays(new Date(), parseISO(community.lastModified));
+      const idle = differenceInDays(
+        new Date(),
+        parseISO(community.lastModified)
+      );
       return { ...community, idle };
     })
     .sort((a, b) => (a.idle ?? 0) - (b.idle ?? 0));
@@ -32,7 +47,9 @@ function sortCommunitiesForDisplay(communities) {
 function formatLastActivity(lastModified) {
   if (!lastModified) return null;
   const d =
-    typeof lastModified === "string" ? parseISO(lastModified) : new Date(lastModified);
+    typeof lastModified === "string"
+      ? parseISO(lastModified)
+      : new Date(lastModified);
   if (!isValid(d)) return null;
   return format(d, "MMM d, yyyy · h:mm a");
 }
@@ -44,7 +61,7 @@ export const DashboardCommunities = ({ communities, fullsizeScreen }) => {
   );
 
   return (
-    <Stack spacing={1.5} sx={{ width: "100%" }}>
+    <Stack spacing={1.5} sx={roomListStackSx}>
       {sorted.length > 0 ? (
         sorted.map((community) => (
           <CommunityCard
@@ -61,40 +78,16 @@ export const DashboardCommunities = ({ communities, fullsizeScreen }) => {
 };
 
 export const CommunityCard = ({ community, fullsizeScreen }) => {
-  const theme = useTheme();
   const { idle } = community;
   const isIdle = Boolean(idle);
   const lastActivityLabel = formatLastActivity(community?.lastModified);
 
   return (
-    <Card
-      elevation={0}
-      sx={{
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: "divider",
-        background: alpha(theme.palette.background.paper, 0.55),
-        backdropFilter: "blur(8px)",
-        transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.35)}`,
-          borderColor: alpha(theme.palette.primary.main, 0.45),
-        },
-      }}
-    >
+    <Card elevation={0} sx={roomCardSx}>
       <CardActionArea
         component={NavLink}
         to={`/communities/${community.id}`}
-        sx={{
-          textAlign: "left",
-          px: 2,
-          py: 1.75,
-          "&.Mui-focusVisible": {
-            outline: `2px solid ${theme.palette.primary.main}`,
-            outlineOffset: 2,
-          },
-        }}
+        sx={roomCardActionSx}
       >
         <Stack
           direction={{ xs: "column", sm: "row" }}
@@ -102,27 +95,16 @@ export const CommunityCard = ({ community, fullsizeScreen }) => {
           alignItems={{ xs: "flex-start", sm: "center" }}
           justifyContent="space-between"
         >
-          <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Box sx={roomNameBoxSx}>
             <Typography
               variant="h6"
               component="span"
-              sx={{
-                fontWeight: 600,
-                fontSize: fullsizeScreen ? "1.1rem" : "1rem",
-                color: "text.primary",
-                display: "block",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: { xs: "normal", sm: "nowrap" },
-              }}
+              sx={roomNameSx(fullsizeScreen)}
             >
               {community.name}
             </Typography>
             {fullsizeScreen && lastActivityLabel && (
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", mt: 0.5 }}
-              >
+              <Typography variant="body2" sx={lastActivitySx}>
                 Last activity {lastActivityLabel}
               </Typography>
             )}
@@ -130,17 +112,10 @@ export const CommunityCard = ({ community, fullsizeScreen }) => {
           {fullsizeScreen && isIdle && (
             <Tooltip placement="top" arrow title="No recent activity">
               <Chip
-                icon={
-                  <Schedule sx={{ fontSize: "1rem !important", opacity: 0.9 }} />
-                }
+                icon={<Schedule sx={idleChipIconSx} />}
                 label={`${idle}d idle`}
                 size="small"
-                sx={{
-                  flexShrink: 0,
-                  borderColor: alpha(theme.palette.warning.main, 0.5),
-                  color: "warning.light",
-                  bgcolor: alpha(theme.palette.warning.dark, 0.2),
-                }}
+                sx={idleChipSx}
                 variant="outlined"
               />
             </Tooltip>
@@ -152,35 +127,15 @@ export const CommunityCard = ({ community, fullsizeScreen }) => {
 };
 
 export const EmptyDash = () => {
-  const theme = useTheme();
   return (
-    <Stack
-      alignItems="center"
-      justifyContent="center"
-      spacing={2}
-      sx={{
-        py: 4,
-        px: 2,
-        textAlign: "center",
-      }}
-    >
-      <Box
-        component="img"
-        src={emptyImgUrl}
-        alt=""
-        sx={{
-          height: { xs: 100, sm: 120 },
-          width: { xs: 100, sm: 120 },
-          borderRadius: "50%",
-          objectFit: "contain",
-          opacity: 0.85,
-        }}
-      />
-      <Typography variant="h6" sx={{ color: "text.secondary", fontWeight: 500 }}>
+    <Stack alignItems="center" justifyContent="center" spacing={2} sx={emptyDashSx}>
+      <Box component="img" src={emptyImgUrl} alt="" sx={emptyDashImageSx} />
+      <Typography variant="h6" sx={emptyDashTitleSx}>
         No rooms here yet
       </Typography>
-      <Typography variant="body2" sx={{ color: "text.disabled", maxWidth: 280 }}>
-        Create a room with <strong>New room</strong> and it will show up in this list.
+      <Typography variant="body2" sx={emptyDashHintSx}>
+        Create a room with <strong>New room</strong> and it will show up in
+        this list.
       </Typography>
     </Stack>
   );

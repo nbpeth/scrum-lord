@@ -1,29 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
-import { VoteOptionsLabels } from "../components/EditPointSchemeModal/EditPointSchemeModal";
-import { getSocketBaseUrl, socketOptions } from "../util/config";
-// import { Web } from "@mui/icons-material";
 import * as uuid from "uuid";
+import { getSocketBaseUrl, socketOptions } from "../util/config";
+import { reactionEmojiFor } from "../util/reactions";
+import { VoteOptionsLabels } from "../util/voteOptions";
 import { useSettings } from "./useSettings";
 
 export default function useCommunity() {
-  const params = useParams();
-  const communityId = params.communityId;
+  const { communityId } = useParams();
+  const navigate = useNavigate();
+  const { removePrivateRoom } = useSettings();
+
   const [socketUrl, setSocketUrl] = useState(null);
   const [reconnection, setReconnection] = useState({
     attempts: 15,
     interval: 5,
     reconnecting: false,
-  });
-
-  const { removePrivateRoom } = useSettings();
-
-  const processMessageRef = useRef(() => {});
-
-  const { sendMessage, readyState } = useWebSocket(socketUrl, {
-    ...socketOptions({ setReconnection }),
-    onMessage: (event) => processMessageRef.current(event.data),
   });
   const [community, setCommunity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
@@ -31,254 +24,136 @@ export default function useCommunity() {
   const [lastReaction, setLastReaction] = useState();
   const [roomEvents, setRoomEvents] = useState({});
 
-  const navigate = useNavigate();
+  const processMessageRef = useRef(() => {});
 
-  // configure the socket url to target the community id
+  const { sendMessage, readyState } = useWebSocket(socketUrl, {
+    ...socketOptions({ setReconnection }),
+    onMessage: (event) => processMessageRef.current(event.data),
+  });
+
   useEffect(() => {
-    const baseUrl = `${getSocketBaseUrl()}/socket`;
-
-    setSocketUrl(`${baseUrl}?communityId=${communityId}`);
+    setSocketUrl(`${getSocketBaseUrl()}/socket?communityId=${communityId}`);
   }, [communityId]);
 
-  // get community data on mount
+  const send = useCallback(
+    (type, payload) => sendMessage(JSON.stringify({ type, payload })),
+    [sendMessage]
+  );
+
   useEffect(() => {
-    sendMessage(
-      JSON.stringify({ type: "get-community", payload: { communityId } })
-    );
-  }, [communityId]);
+    send("get-community", { communityId });
+  }, [communityId, send]);
 
-  const handleCommunityJoinedReply = (payload) => {
-    try {
-      const { joinedUser, community } = payload;
-
-      // const { citizens: updatedCitizens, id } = community;
-
-      const messageText = [`"${joinedUser.username}" has joined`];
-      if (!joinedUser.votingMember) {
-        messageText.push("as a spectator");
-      }
-      messageText.push("!");
-
-      setCommunity(community);
-      // pretty sure shouldn't use two sets on state in the same function
-      // setAlertMessage({ message: `"${joinedUser.username}" joined!` });
-      setMessageHistory([
-        ...messageHistory,
-        {
-          communityId,
-          text: messageText.join(" "),
-          userColor: joinedUser.userColor,
-        },
-      ]);
-    } catch (e) {
-      console.error(e);
-    }
+  const appendMessage = (message) => {
+    setMessageHistory((prev) => [
+      ...prev,
+      { id: uuid.v4(), communityId, ...message },
+    ]);
   };
 
-  const handleCommunityLeftReply = (payload) => {
-    const { leftUser, community } = payload;
-    // const { citizens: updatedCitizens, id } = community;
+  const setHotdogAlert = (active) => (payload) => {
+    setRoomEvents((prev) => ({
+      ...prev,
+      alerts: {
+        ...prev?.alerts,
+        hotdog: { active, userId: payload.userId, username: payload.username },
+      },
+    }));
+  };
 
-    setCommunity(community);
-    // setAlertMessage({ message: `${leftUser.username} left the community` });
-    setMessageHistory([
-      ...messageHistory,
-      {
-        communityId,
+  const replyHandlers = {
+    "get-community-reply": (payload) => {
+      if (!payload.community) {
+        removePrivateRoom(communityId);
+        navigate("/?error=404");
+        return;
+      }
+      setCommunity(payload.community);
+    },
+
+    "community-joined-reply": ({ joinedUser, community: updated }) => {
+      setCommunity(updated);
+      const spectator = joinedUser.votingMember ? "" : " as a spectator";
+      appendMessage({
+        text: `"${joinedUser.username}" has joined${spectator}!`,
+        userColor: joinedUser.userColor,
+      });
+    },
+
+    "community-left-reply": ({ leftUser, community: updated }) => {
+      setCommunity(updated);
+      appendMessage({
         text: `"${leftUser.username}" left the community`,
         userColor: leftUser.userColor,
-      },
-    ]);
-  };
+      });
+    },
 
-  // blanket holistic updates for now, duplicated but unsure where to go in the future
-  const handleSubmittedVoteReply = (payload) => {
-    const { community, username, userColor, doubleVote } = payload;
-
-    setCommunity(community);
-
-    const message = () => {
-      if (doubleVote) {
-        return `"${username}" changed their vote after the reveal!`;
-      }
-
-      return `"${username}" has voted`;
-    };
-
-    setMessageHistory([
-      ...messageHistory,
-      { communityId, text: message(), userColor },
-    ]);
-  };
-
-  const handleCommunityReactionReply = (payload) => {
-    const { event, username, userColor } = payload;
-
-    let message;
-    switch (event) {
-      case "lightning":
-        message = "⚡";
-        break;
-      case "party":
-        message = "🎉";
-        break;
-      case "thinking":
-        message = "🤔";
-        break;
-      case "upvote":
-        message = "👍";
-        break;
-      case "downvote":
-        message = "👎";
-        break;
-      case "love":
-        message = "❤️‍🔥";
-        break;
-      case "heartbreak":
-        message = "💔";
-        break;
-      case "hotdog":
-        message = "🌭";
-        break;
-      case "shrug":
-        message = "🤷";
-        break;
-      default:
-        message = "🤷";
-    }
-
-    // Used by ReactionMachine, probably overkill
-    setLastReaction({ id: uuid.v4(), message });
-
-    // setAlertMessage({ message: `"${username}" - ${message}` });
-    setMessageHistory([
-      ...messageHistory,
-      {
-        communityId,
-        text: `"${username}" - ${message}`,
+    "submit-vote-reply": ({ community: updated, username, userColor, doubleVote }) => {
+      setCommunity(updated);
+      appendMessage({
+        text: doubleVote
+          ? `"${username}" changed their vote after the reveal!`
+          : `"${username}" has voted`,
         userColor,
-        rawText: message,
+      });
+    },
+
+    "reveal-reply": ({ community: updated, username, userColor }) => {
+      setCommunity(updated);
+      appendMessage({ text: `"${username}" revealed the votes`, userColor });
+    },
+
+    "reset-reply": ({ community: updated, username, userColor }) => {
+      setCommunity(updated);
+      appendMessage({ text: `"${username}" reset the vote`, userColor });
+    },
+
+    "community-reaction-reply": ({ event, username, userColor }) => {
+      const emoji = reactionEmojiFor(event);
+      setLastReaction({ id: uuid.v4(), message: emoji });
+      appendMessage({
+        text: `"${username}" - ${emoji}`,
+        rawText: emoji,
         type: "reaction",
-      },
-    ]);
-  };
+        userColor,
+      });
+    },
 
-  const handleResetReply = (payload) => {
-    const { community, username, userColor } = payload;
-
-    setCommunity(community);
-
-    setMessageHistory([
-      ...messageHistory,
-      { communityId, text: `"${username}" reset the vote`, userColor },
-    ]);
-  };
-
-  const handleRevealReply = (payload) => {
-    const { community, username, userColor } = payload;
-
-    setCommunity(community);
-
-    setMessageHistory([
-      ...messageHistory,
-      { communityId, text: `"${username}" revealed the votes`, userColor },
-    ]);
-  };
-
-  const handleEditPointSchemeReply = (payload) => {
-    const { community, username, userColor, scheme } = payload;
-
-    setCommunity(community);
-
-    setMessageHistory([
-      ...messageHistory,
-      {
-        communityId,
+    "edit-point-scheme-reply": ({ community: updated, username, userColor, scheme }) => {
+      setCommunity(updated);
+      appendMessage({
         text: `"${username}" has changed the point scheme to "${VoteOptionsLabels[scheme]}"`,
         userColor,
-      },
-    ]);
-  };
+      });
+    },
 
-  const handleStartTimerReply = (payload) => {
-    const { community, username, userColor, timerLength } = payload;
-    setCommunity(community);
-
-    setMessageHistory([
-      ...messageHistory,
-      {
-        communityId,
+    "start-timer-reply": ({ community: updated, username, userColor, timerLength }) => {
+      setCommunity(updated);
+      appendMessage({
         text: `⏰ "${username}" started the voting timer! ${timerLength} seconds ⏰`,
         userColor,
-      },
-    ]);
-  };
+      });
+    },
 
-  const handleTimerFinishedReply = (payload) => {
-    const { community, userColor } = payload;
-    setCommunity(community);
+    "timer-finished-reply": ({ community: updated, userColor }) => {
+      setCommunity(updated);
+      appendMessage({ text: "⏰ Time's up! ⏰", userColor });
+    },
 
-    setMessageHistory([
-      ...messageHistory,
-      {
-        communityId,
-        text: "⏰ Time's up! ⏰",
-        userColor,
-      },
-    ]);
-  };
+    "cancel-timer-reply": ({ community: updated, username, userColor }) => {
+      setCommunity(updated);
+      appendMessage({ text: `⏰ "${username}" cancelled the timer ⏰`, userColor });
+    },
 
-  const handleCancelTimerReply = (payload) => {
-    const { community, username, userColor } = payload;
-    setCommunity(community);
+    "delete-community-reply": (payload) => {
+      setRoomEvents((prev) => ({
+        ...prev,
+        communityDeleted: { [payload.id]: { deleted: payload.deleted } },
+      }));
+    },
 
-    setMessageHistory([
-      ...messageHistory,
-      {
-        communityId,
-        text: `⏰ "${username}" cancelled the timer ⏰`,
-        userColor,
-      },
-    ]);
-  };
-
-  const handleHotDogAlertReply = (payload) => {
-    setRoomEvents((prev) => ({
-      ...prev,
-      alerts: {
-        ...prev?.alerts,
-        hotdog: {
-          active: true,
-          userId: payload.userId,
-          username: payload.username,
-        },
-      },
-    }));
-  };
-
-  const handleHotDogAlertInactiveReply = (payload) => {
-    setRoomEvents((prev) => ({
-      ...prev,
-      alerts: {
-        ...prev?.alerts,
-        hotdog: {
-          active: false,
-          userId: payload.userId,
-          username: payload.username,
-        },
-      },
-    }));
-  };
-
-  const handleCommunityDeletedReply = (payload) => {
-    setRoomEvents({
-      ...roomEvents,
-      communityDeleted: {
-        [payload.id]: {
-          deleted: payload.deleted,
-        },
-      },
-    });
+    "community-alerts.hotdog.active": setHotdogAlert(true),
+    "community-alerts.hotdog.inactive": setHotdogAlert(false),
   };
 
   processMessageRef.current = (rawData) => {
@@ -286,223 +161,87 @@ export default function useCommunity() {
       return;
     }
     try {
-      const messageData = JSON.parse(rawData);
-      const { type, payload } = messageData;
-
-      switch (type) {
-        case "get-community-reply":
-          if (!payload.community) {
-            removePrivateRoom(communityId);
-            navigate("/?error=404");
-          } else {
-            setCommunity(payload.community);
-          }
-          break;
-        case "community-joined-reply":
-          handleCommunityJoinedReply(payload);
-          break;
-        case "community-left-reply":
-          handleCommunityLeftReply(payload);
-          break;
-        case "submit-vote-reply":
-          handleSubmittedVoteReply(payload);
-          break;
-        case "reveal-reply":
-          handleRevealReply(payload);
-          break;
-        case "reset-reply":
-          handleResetReply(payload);
-          break;
-        case "community-reaction-reply":
-          handleCommunityReactionReply(payload);
-          break;
-        case "delete-community-reply":
-          handleCommunityDeletedReply(payload);
-          break;
-        case "edit-point-scheme-reply":
-          handleEditPointSchemeReply(payload);
-          break;
-        case "start-timer-reply":
-          handleStartTimerReply(payload);
-          break;
-        case "timer-finished-reply":
-          handleTimerFinishedReply(payload);
-          break;
-        case "cancel-timer-reply":
-          handleCancelTimerReply(payload);
-          break;
-        case "community-alerts.hotdog.active":
-          handleHotDogAlertReply(payload);
-          break;
-        case "community-alerts.hotdog.inactive":
-          handleHotDogAlertInactiveReply(payload);
-          break;
-        default:
-          console.log("unknown message type", type);
+      const { type, payload } = JSON.parse(rawData);
+      const handler = replyHandlers[type];
+      if (handler) {
+        handler(payload);
+      } else {
+        console.log("unknown message type", type);
       }
     } catch (e) {
       console.log("error parsing message", e);
     }
   };
 
-  const handleReveal = ({ username, userId, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "reveal",
-        payload: {
-          community: { id: communityId },
-          username,
-          userId,
-          userColor,
-        },
-      })
-    );
-  };
-
-  const handleReset = ({ username, userId, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "reset",
-        payload: {
-          community: { id: communityId },
-          username,
-          userId,
-          userColor,
-        },
-      })
-    );
-  };
-
-  const startTimer = ({ timerLength, username, userId, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "start-timer",
-        payload: {
-          community: { id: communityId },
-          timerLength: timerLength ?? 5,
-          username,
-          userId,
-          userColor,
-        },
-      })
-    );
-  };
-
-  const cancelTimer = ({ username, userId, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "cancel-timer",
-        payload: {
-          community: { id: communityId },
-          username,
-          userId,
-          userColor,
-        },
-      })
-    );
-  };
-
-  const joinCommunity = ({
-    communityId,
+  const userFields = ({ username, userId, userColor } = {}) => ({
     username,
     userId,
     userColor,
-    votingMember,
-  }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "join-community",
-        payload: {
-          community: {
-            id: communityId,
-            username,
-            userId,
-            userColor,
-            votingMember,
-          },
-        },
-      })
-    );
+  });
+
+  const handleReveal = (user) =>
+    send("reveal", { community: { id: communityId }, ...userFields(user) });
+
+  const handleReset = (user) =>
+    send("reset", { community: { id: communityId }, ...userFields(user) });
+
+  const startTimer = ({ timerLength, ...user }) =>
+    send("start-timer", {
+      community: { id: communityId },
+      timerLength: timerLength ?? 5,
+      ...userFields(user),
+    });
+
+  const cancelTimer = (user) =>
+    send("cancel-timer", { community: { id: communityId }, ...userFields(user) });
+
+  const joinCommunity = ({ communityId: id, username, userId, userColor, votingMember }) =>
+    send("join-community", {
+      community: { id, username, userId, userColor, votingMember },
+    });
+
+  const leaveCommunity = ({ communityId: id, userId, username, userColor }) => {
+    removePrivateRoom(id);
+    send("leave-community", {
+      community: { id, userId, username },
+      userColor,
+      userId,
+      username,
+    });
   };
 
-  const leaveCommunity = ({ communityId, userId, username, userColor }) => {
-    removePrivateRoom(communityId);
-    sendMessage(
-      JSON.stringify({
-        type: "leave-community",
-        payload: {
-          community: { id: communityId, userId, username },
-          userColor,
-          userId,
-          username,
-        },
-      })
-    );
-  };
+  const submitVote = ({ communityId: id, username, userId, userColor, vote }) =>
+    send("submit-vote", {
+      community: { id, username, userId, vote },
+      userColor,
+      username,
+      userId,
+      vote,
+    });
 
-  const submitVote = ({ communityId, username, userId, userColor, vote }) => {
-    // debugger;
-    sendMessage(
-      JSON.stringify({
-        type: "submit-vote",
-        payload: {
-          community: { id: communityId, username, userId, vote },
-          userColor,
-          username,
-          userId,
-          vote,
-        },
-      })
-    );
-  };
+  const deleteCommunity = ({ communityId: id, userId, username, userColor }) =>
+    send("delete-community", {
+      community: { id },
+      userId,
+      username,
+      userColor,
+    });
 
-  const deleteCommunity = ({ communityId, userId, username, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "delete-community",
-        payload: {
-          community: { id: communityId },
-          userId,
-          username,
-          userColor,
-        },
-      })
-    );
-  };
+  const communityReaction = ({ event, ...user }) =>
+    send("community-reaction", {
+      community: { id: communityId },
+      ...userFields(user),
+      event,
+    });
 
-  const communityReaction = ({ event, userId, username, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "community-reaction",
-        payload: {
-          community: { id: communityId },
-          userId,
-          username,
-          userColor,
-          event,
-        },
-      })
-    );
-  };
+  const editPointScheme = ({ scheme, ...user }) =>
+    send("edit-point-scheme", {
+      community: { id: communityId },
+      ...userFields(user),
+      scheme,
+    });
 
-  const editPointScheme = ({ scheme, userId, username, userColor }) => {
-    sendMessage(
-      JSON.stringify({
-        type: "edit-point-scheme",
-        payload: {
-          community: { id: communityId },
-          userId,
-          username,
-          userColor,
-          scheme,
-        },
-      })
-    );
-  };
-
-  const clearAlertMessage = () => {
-    setAlertMessage(null);
-  };
+  const clearAlertMessage = () => setAlertMessage(null);
 
   return {
     alertMessage,

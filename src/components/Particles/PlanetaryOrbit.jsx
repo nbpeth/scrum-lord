@@ -1,5 +1,5 @@
 import { memo, useEffect, useId, useMemo, useRef, useState } from "react";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { useMediaQuery } from "@mui/material";
 import { Particles } from "@tsparticles/react";
 import { initAppParticlesEngine } from "../../initParticles";
 import "./particles.css";
@@ -938,17 +938,7 @@ export const PlanetaryOrbit = memo(function PlanetaryOrbit({
     emitterBehindRingsEnabled && emitterEngineReady && !reduceMotion;
 
   return (
-    <div
-      className="planetary-orbit-root"
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 0,
-        pointerEvents: "none",
-      }}
-    >
+    <div className="planetary-orbit-root">
       {showBehindRingsEmitter && (
         <div className="planetary-orbit-emitter-layer">
           <Particles

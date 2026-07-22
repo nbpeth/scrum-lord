@@ -9,14 +9,32 @@ import {
   Stack,
   TextField,
   Typography,
-  alpha,
-  useTheme,
 } from "@mui/material";
-import { useState } from "react";
-import * as React from "react";
-import { VoteOptions } from "../EditPointSchemeModal/EditPointSchemeModal";
+import { useEffect, useState } from "react";
+import { VoteOptions } from "../../util/voteOptions";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 import { CommunityReactionButtons } from "./CommunityReactionButtons";
+import {
+  controlsLayoutSx,
+  controlsPanelSx,
+  mainControlsSx,
+  resetButtonSx,
+  revealButtonSx,
+  timerButtonSx,
+  timerDisplayBoxSx,
+  timerErrorSx,
+  timerGroupSx,
+  timerInputProps,
+  timerInputSx,
+  voteButtonSx,
+  voteGroupSx,
+  voteMenuProps,
+  voteSelectFormControlSx,
+  voteSelectSx,
+} from "./CommunityControls.styles";
+
+const MAX_TIMER_SECONDS = 600;
+const DEFAULT_TIMER_SECONDS = 60;
 
 export const CommunityControls = ({
   handleReveal,
@@ -29,276 +47,167 @@ export const CommunityControls = ({
   communityReaction,
   settings,
 }) => {
-  const theme = useTheme();
   const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
 
-  const handleVoteChange = (event) => {
-    setSelectedVote(event.target.value);
-  };
-
-  const onVoteSubmit = () => {
-    submitVote({
-      communityId,
-      ...iAmCitizen,
-      vote: selectedVote,
-    });
-  };
-
-  const onReaction = ({ event }) => {
-    communityReaction({
-      event,
-      userId: iAmCitizen.userId,
-      username: iAmCitizen.username,
-      ...iAmCitizen,
-    });
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (community) {
       setSelectOptions(
         VoteOptions[community?.pointScheme]?.values ??
-          VoteOptions["fibonacci"].values
+          VoteOptions.fibonacci.values
       );
     }
   }, [community]);
 
-  const panelSx = {
-    py: 0.75,
-    px: { xs: 1, sm: 1.25 },
-    borderRadius: 2,
-    border: "1px solid",
-    borderColor: "divider",
-    background: (t) => alpha(t.palette.background.paper, 0.5),
-    backdropFilter: "blur(10px)",
-    boxShadow: (t) => `0 2px 12px ${alpha(t.palette.common.black, 0.08)}`,
+  if (!iAmCitizen) {
+    return null;
+  }
+
+  const onVoteSubmit = () => {
+    submitVote({ communityId, ...iAmCitizen, vote: selectedVote });
+  };
+
+  const onReaction = ({ event }) => {
+    communityReaction({ event, ...iAmCitizen });
   };
 
   const showReactions = settings?.reactionsVisible;
-  const showVote = iAmCitizen && iAmCitizen.votingMember;
+  const showVote = iAmCitizen.votingMember;
   const showTimer = settings?.timerVisible;
 
-  const roomButtons = (
-    <Stack direction="row" spacing={0.75} flexShrink={0}>
-      <Button
-        disabled={community && !community.revealed}
-        size="small"
-        variant="outlined"
-        color="warning"
-        onClick={() => handleReset({ ...iAmCitizen, communityId })}
-        sx={{
-          textTransform: "none",
-          fontWeight: 600,
-          px: 1.25,
-          py: 0.35,
-          borderColor: (t) => alpha(t.palette.warning.main, 0.55),
-          "&:hover": {
-            borderColor: "warning.main",
-            backgroundColor: (t) => alpha(t.palette.warning.main, 0.08),
-          },
-        }}
-      >
-        Reset
-      </Button>
-      <Button
-        disabled={community && community.revealed}
-        size="small"
-        variant="contained"
-        color="success"
-        onClick={() => handleReveal({ ...iAmCitizen, communityId })}
-        sx={{
-          textTransform: "none",
-          fontWeight: 600,
-          px: 1.25,
-          py: 0.35,
-          boxShadow: "none",
-          "&:hover": {
-            boxShadow: (t) =>
-              `0 2px 10px ${alpha(t.palette.success.main, 0.35)}`,
-          },
-        }}
-      >
-        Reveal
-      </Button>
-    </Stack>
-  );
+  return (
+    <Paper elevation={0} sx={controlsPanelSx}>
+      <Box sx={controlsLayoutSx(showReactions)}>
+        {showReactions && <CommunityReactionButtons onReaction={onReaction} />}
 
-  const mainControls = (
-    <Stack
-      direction="row"
-      alignItems="center"
-      flexWrap="wrap"
-      useFlexGap
-      spacing={1}
-      sx={{
-        justifyContent: { xs: "flex-start", sm: "flex-end" },
-        flex: { sm: showReactions ? "1 1 auto" : "0 1 auto" },
-        minWidth: 0,
-        columnGap: 1,
-        rowGap: 1,
-      }}
-    >
-      {showVote && (
         <Stack
           direction="row"
-          spacing={0.75}
           alignItems="center"
-          sx={{ flexShrink: 0 }}
+          flexWrap="wrap"
+          useFlexGap
+          spacing={1}
+          sx={mainControlsSx(showReactions)}
         >
-          <FormControl size="small" sx={{ minWidth: 76, maxWidth: 110 }}>
-            <InputLabel id="vote-selector-label">Pts</InputLabel>
-            <Select
-              labelId="vote-selector-label"
-              id="vote-selector"
-              value={selectedVote}
-              label="Pts"
-              onChange={handleVoteChange}
-              MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
-              sx={{
-                borderRadius: 1,
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: alpha(theme.palette.divider, 0.85),
-                },
-                "& .MuiSelect-select": { py: 0.45 },
-              }}
+          {showVote && (
+            <Stack
+              direction="row"
+              spacing={0.75}
+              alignItems="center"
+              sx={voteGroupSx}
             >
-              {selectOptions?.map((option) => (
-                <MenuItem key={option} value={option} dense>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={onVoteSubmit}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              px: 1.5,
-              py: 0.35,
-              boxShadow: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Vote
-          </Button>
+              <FormControl size="small" sx={voteSelectFormControlSx}>
+                <InputLabel id="vote-selector-label">Pts</InputLabel>
+                <Select
+                  labelId="vote-selector-label"
+                  id="vote-selector"
+                  value={selectedVote}
+                  label="Pts"
+                  onChange={(event) => setSelectedVote(event.target.value)}
+                  MenuProps={voteMenuProps}
+                  sx={voteSelectSx}
+                >
+                  {selectOptions?.map((option) => (
+                    <MenuItem key={option} value={option} dense>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Button
+                size="small"
+                variant="contained"
+                color="primary"
+                onClick={onVoteSubmit}
+                sx={voteButtonSx}
+              >
+                Vote
+              </Button>
+            </Stack>
+          )}
+
+          {showTimer && (
+            <TimerControl
+              community={community}
+              handleTimerClicked={handleTimerClicked}
+            />
+          )}
+
+          <Stack direction="row" spacing={0.75} flexShrink={0}>
+            <Button
+              disabled={community && !community.revealed}
+              size="small"
+              variant="outlined"
+              color="warning"
+              onClick={() => handleReset({ ...iAmCitizen, communityId })}
+              sx={resetButtonSx}
+            >
+              Reset
+            </Button>
+            <Button
+              disabled={community && community.revealed}
+              size="small"
+              variant="contained"
+              color="success"
+              onClick={() => handleReveal({ ...iAmCitizen, communityId })}
+              sx={revealButtonSx}
+            >
+              Reveal
+            </Button>
+          </Stack>
         </Stack>
-      )}
-
-      {showTimer && (
-        <TimerControl
-          community={community}
-          handleTimerClicked={handleTimerClicked}
-          dense
-        />
-      )}
-
-      {roomButtons}
-    </Stack>
-  );
-
-  return (
-    <>
-      {iAmCitizen && (
-        <Paper elevation={0} sx={panelSx}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "stretch", sm: "center" },
-              justifyContent: showReactions
-                ? { xs: "flex-start", sm: "space-between" }
-                : { xs: "flex-start", sm: "flex-end" },
-              gap: { xs: 1.25, sm: 2 },
-              width: "100%",
-              flexWrap: "wrap",
-            }}
-          >
-            {showReactions && (
-              <CommunityReactionButtons onReaction={onReaction} />
-            )}
-
-            {mainControls}
-          </Box>
-        </Paper>
-      )}
-    </>
+      </Box>
+    </Paper>
   );
 };
 
-export const TimerControl = ({
-  community,
-  handleTimerClicked,
-  dense = false,
-}) => {
-  const [timerValue, setTimerValue] = useState(60);
+export const TimerControl = ({ community, handleTimerClicked }) => {
+  const [timerValue, setTimerValue] = useState(DEFAULT_TIMER_SECONDS);
   const [error, setError] = useState(undefined);
 
   const onTimerValueChanged = (event) => {
     event.preventDefault();
-    const cleanseValue = event.target.value.replace(/\D/g, "");
+    const cleansedValue = event.target.value.replace(/\D/g, "");
 
-    if (cleanseValue > 600) {
-      setError("Max timer value is 600 seconds");
+    if (cleansedValue > MAX_TIMER_SECONDS) {
+      setError(`Max timer value is ${MAX_TIMER_SECONDS} seconds`);
     } else if (error) {
       setError(undefined);
     }
 
-    setTimerValue(cleanseValue);
+    setTimerValue(cleansedValue);
   };
 
   const onTimerClicked = () => {
     handleTimerClicked({
-      timerValue: timerValue || 60,
+      timerValue: timerValue || DEFAULT_TIMER_SECONDS,
       communityId: community.id,
     });
   };
-
-  const btnSize = dense ? "small" : "medium";
-  const tfSize = dense ? "small" : "small";
 
   return (
     <Stack
       direction="row"
       alignItems="center"
-      spacing={dense ? 0.75 : 1.25}
+      spacing={0.75}
       flexWrap="wrap"
-      sx={{ flexShrink: 0 }}
+      sx={timerGroupSx}
     >
       <Button
-        disabled={timerValue > 600}
-        size={btnSize}
+        disabled={timerValue > MAX_TIMER_SECONDS}
+        size="small"
         variant="contained"
         color="secondary"
         onClick={onTimerClicked}
-        sx={{
-          textTransform: "none",
-          fontWeight: 600,
-          px: dense ? 1.25 : 2,
-          py: dense ? 0.35 : 0.75,
-          boxShadow: "none",
-          whiteSpace: "nowrap",
-          "&:hover": {
-            boxShadow: (t) =>
-              `0 2px 10px ${alpha(t.palette.secondary.main, 0.3)}`,
-          },
-        }}
+        sx={timerButtonSx}
       >
         {community?.timer?.running ? "Cancel" : "Timer"}
       </Button>
       <TextField
         type="number"
-        size={tfSize}
+        size="small"
         error={Boolean(error)}
         placeholder="Sec"
-        inputProps={{
-          style: { textAlign: "center" },
-          min: 1,
-          max: 600,
-        }}
+        inputProps={timerInputProps}
         disabled={community?.timer?.running}
         variant="outlined"
         value={timerValue}
@@ -308,27 +217,13 @@ export const TimerControl = ({
             onTimerClicked();
           }
         }}
-        sx={{
-          width: dense ? 64 : 88,
-          flexShrink: 0,
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 1,
-            ...(dense && { "& input": { py: 0.65 } }),
-          },
-        }}
+        sx={timerInputSx}
       />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minWidth: dense ? 40 : 48,
-        }}
-      >
+      <Box sx={timerDisplayBoxSx}>
         <TimerDisplay community={community} />
       </Box>
       {error && (
-        <Typography variant="caption" color="error" sx={{ width: "100%" }}>
+        <Typography variant="caption" color="error" sx={timerErrorSx}>
           {error}
         </Typography>
       )}

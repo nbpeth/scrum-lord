@@ -1,113 +1,14 @@
-import * as uuid from "uuid";
-import { makeStyles } from "@mui/styles";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+import * as uuid from "uuid";
 import useCommunity from "../../hooks/useCommunity";
+import {
+  TRAJECTORIES,
+  floatingReactionSx,
+  reactionOverlaySx,
+} from "./ReactionMachine.styles";
 
-// some day, styled components
-const useStyles = makeStyles({
-  moveit1: {
-    animation: `$move-it-1 3s ease-in-out`,
-  },
-  moveit2: {
-    animation: `$move-it-2 3s ease-in-out`,
-  },
-  moveit3: {
-    animation: `$move-it-3 3s ease-in-out`,
-  },
-  moveit4: {
-    animation: `$move-it-4 3s ease-in-out`,
-  },
-  moveit5: {
-    animation: `$move-it-5 3s ease-in-out`,
-  },
-  moveit6: {
-    animation: `$move-it-6 3s ease-in-out`,
-  },
-  "@keyframes move-it-1": {
-    "0%": {
-      top: "90%",
-      opacity: 1,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    "100%": {
-      top: "0%",
-      opacity: 0,
-      left: "40%",
-      transform: "translate(-50%, -50%) scale(7)",
-    },
-  },
-  "@keyframes move-it-2": {
-    "0%": {
-      top: "90%",
-      opacity: 1,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    "100%": {
-      top: "0%",
-      opacity: 0,
-      left: "30%",
-      transform: "translate(-50%, -50%) scale(6)",
-    },
-  },
-  "@keyframes move-it-3": {
-    "0%": {
-      top: "90%",
-      opacity: 1,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    "100%": {
-      top: "0%",
-      opacity: 0,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(5)",
-    },
-  },
-  "@keyframes move-it-4": {
-    "0%": {
-      top: "90%",
-      opacity: 1,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    "100%": {
-      top: "0%",
-      opacity: 0,
-      left: "60%",
-      transform: "translate(-50%, -50%) scale(4)",
-    },
-  },
-  "@keyframes move-it-5": {
-    "0%": {
-      top: "90%",
-      opacity: 1,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    "100%": {
-      top: "0%",
-      opacity: 0,
-      left: "70%",
-      transform: "translate(-50%, -50%) scale(5)",
-    },
-  },
-  "@keyframes move-it-6": {
-    "0%": {
-      top: "90%",
-      opacity: 1,
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    "100%": {
-      top: "0%",
-      opacity: 0,
-      left: "20%",
-      transform: "translate(-50%, -50%) scale(6)",
-    },
-  },
-});
+const REACTION_LIFETIME_MS = 2500;
 
 export const ReactionMachine = () => {
   const [reactions, setReactions] = useState([]);
@@ -116,27 +17,11 @@ export const ReactionMachine = () => {
   useEffect(() => {
     if (!lastReaction) return;
 
-    const newReaction = { ...lastReaction, id: uuid.v4() };
-    setReactions((prevReactions) => [...prevReactions, newReaction]);
+    setReactions((prev) => [...prev, { ...lastReaction, id: uuid.v4() }]);
   }, [lastReaction]);
 
-  // useEffect(() => {
-  //   console.log(reactions.length);
-  // }, [reactions])
-
   return (
-    <div
-      id="reaction-container"
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-        pointerEvents: "none",
-        zIndex: 8,
-      }}
-    >
+    <Box id="reaction-container" sx={reactionOverlaySx}>
       {reactions.map((reaction) => (
         <Reaction
           key={reaction.id}
@@ -145,36 +30,22 @@ export const ReactionMachine = () => {
           setReactions={setReactions}
         />
       ))}
-    </div>
+    </Box>
   );
 };
 
 const Reaction = ({ id, message, setReactions }) => {
-  const classes = useStyles({});
-  const [x, _] = useState(Math.floor(Math.random() * (6-1 + 1)) + 1);
-  const classX = classes[`moveit${x}`]
+  const [variant] = useState(() =>
+    Math.floor(Math.random() * TRAJECTORIES.length)
+  );
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setReactions((prevReactions) =>
-        prevReactions.filter((reaction) => reaction.id !== id)
-      );
-    }, 2500);
+      setReactions((prev) => prev.filter((reaction) => reaction.id !== id));
+    }, REACTION_LIFETIME_MS);
 
     return () => clearTimeout(timeoutId);
   }, [id, setReactions]);
 
-  return (
-    <div
-      className={classX}
-      style={{
-        position: "absolute",
-        left: "50%",
-        top: "90%",
-        fontSize: "3rem",
-      }}
-    >
-      {message}
-    </div>
-  );
+  return <Box sx={floatingReactionSx(variant)}>{message}</Box>;
 };

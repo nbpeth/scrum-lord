@@ -1,14 +1,15 @@
-import { Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { CitizenCard } from "../../components/CitizenCard/CitizenCard";
+import { Grid, Typography, useMediaQuery } from "@mui/material";
+import { useEffect, useState } from "react";
+import { CitizenCard } from "../CitizenCard/CitizenCard";
+import { REVEAL_VARIANT_COUNT } from "../CitizenCard/CitizenCard.styles";
+import {
+  citizensContainerSx,
+  emptyRoomSx,
+  voteCardContainerSx,
+} from "./CommunityCitizens.styles";
 
-import * as React from "react";
-import { PointChart } from "../PointChart/PointChart";
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const randomRevealVariant = () =>
+  Math.floor(Math.random() * REVEAL_VARIANT_COUNT);
 
 export const CommunityCitizens = ({
   citizens,
@@ -16,120 +17,59 @@ export const CommunityCitizens = ({
   handleDeleteUser,
   currentCommunity,
 }) => {
-  const [containerWidth, setContainerWidth] = React.useState(0);
-  const [containerDimensions, setContainerDimensions] = React.useState({
-    containerWidth: 0,
-    containerHeight: 0,
-  });
-  const containerRef = React.useRef(null);
-  const theme = useTheme();
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
-  const pointScheme = currentCommunity?.pointScheme ?? "fibonacci";
-  const votes = currentCommunity?.citizens?.map((c) => c.vote);
   const { revealed } = currentCommunity;
 
-  React.useLayoutEffect(() => {
-    function handleResize() {
-      if (containerRef.current) {
-        setContainerDimensions({
-          containerWidth: containerRef.current.clientWidth,
-          containerHeight: containerRef.current.offsetHeight,
-        });
-      }
-    }
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const [animationClassPosition, setAnimationClassPosition] = React.useState(0);
-
-  React.useEffect(() => {
+  const [animationClassPosition, setAnimationClassPosition] = useState(0);
+  useEffect(() => {
     if (!revealed) {
-      setAnimationClassPosition(getRandomInt(0, 4));
+      setAnimationClassPosition(randomRevealVariant());
     }
   }, [revealed]);
+
+  const votingCitizens = citizens.filter((c) => c.votingMember);
 
   return (
     <Grid
       id="community-citizens-container"
       container
       direction="column"
-      xs={12}
       spacing={2}
-      sx={{
-        width: "100%",
-        minWidth: 0,
-        maxWidth: "100%",
-        alignItems: "stretch",
-        justifyContent: "flex-start",
-      }}
+      sx={citizensContainerSx}
     >
-      {/* <Grid xs={2} item id="point-chart-container">
-        {currentCommunity?.revealed && (
-          <div ref={containerRef} style={{ height: "100%" }}>
-            <PointChart
-              votes={votes}
-              pointScheme={pointScheme}
-              containerWidth={containerWidth}
-              containerDimensions={containerDimensions}
-            />
-          </div>
-        )}
-      </Grid> */}
-
       <Grid
-        xs={12}
         id="vote-card-container"
         item
         container
         spacing={1}
         alignContent="flex-start"
         alignItems="flex-start"
-        sx={{
-          mt: 1.25,
-          mx: 0,
-          width: "100%",
-          minWidth: 0,
-          maxWidth: "100%",
-        }}
         justifyContent="center"
+        sx={voteCardContainerSx}
       >
         {citizens.length ? (
-          citizens
-            ?.filter((c) => c.votingMember)
-            .map((citizen, i) => {
-              return (
-                <Grid
-                  item
-                  xs={fullsizeScreen ? 6 : 12}
-                  md={fullsizeScreen ? 4 : 12}
-                  lg={fullsizeScreen ? 3 : 12}
-                  key={citizen.userId}
-                  // spacing={1}
-                  // sx={{margin: "5px"}}
-                >
-                  <CitizenCard
-                    animationClassPosition={animationClassPosition}
-                    fullsizeScreen={fullsizeScreen}
-                    position={i}
-                    currentCommunity={currentCommunity}
-                    handleDeleteUser={handleDeleteUser}
-                    iAmCitizen={iAmCitizen}
-                    citizen={citizen}
-                  />
-                </Grid>
-              );
-            })
+          votingCitizens.map((citizen, i) => (
+            <Grid
+              item
+              xs={fullsizeScreen ? 6 : 12}
+              md={fullsizeScreen ? 4 : 12}
+              lg={fullsizeScreen ? 3 : 12}
+              key={citizen.userId}
+            >
+              <CitizenCard
+                animationClassPosition={animationClassPosition}
+                fullsizeScreen={fullsizeScreen}
+                position={i}
+                currentCommunity={currentCommunity}
+                handleDeleteUser={handleDeleteUser}
+                iAmCitizen={iAmCitizen}
+                citizen={citizen}
+              />
+            </Grid>
+          ))
         ) : (
           <Grid item xs={12}>
-            <Typography
-              color={theme.palette.grey[700]}
-              variant="h5"
-              sx={{ fontStyle: "italic" }}
-            >
+            <Typography variant="h5" sx={emptyRoomSx}>
               No one is here
             </Typography>
           </Grid>

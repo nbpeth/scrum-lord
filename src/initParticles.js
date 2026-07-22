@@ -4,7 +4,6 @@ import { loadExternalPushInteraction } from "@tsparticles/interaction-external-p
 import { loadExternalRepulseInteraction } from "@tsparticles/interaction-external-repulse";
 import { loadEmojiShape } from "@tsparticles/shape-emoji";
 import { loadFireworksPreset } from "@tsparticles/preset-fireworks";
-import { loadHyperspacePreset } from "@tsparticles/preset-hyperspace";
 import { loadStarsPreset } from "@tsparticles/preset-stars";
 
 let engineInitPromise = null;
@@ -13,7 +12,6 @@ let engineInitPromise = null;
 export function initAppParticlesEngine() {
   if (!engineInitPromise) {
     engineInitPromise = initParticlesEngine(async (engine) => {
-      await loadHyperspacePreset(engine);
       await loadStarsPreset(engine);
       await loadFireworksPreset(engine);
       await loadParticlesLinksInteraction(engine);

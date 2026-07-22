@@ -1,99 +1,61 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+
+const readJson = (key) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeJson = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
 
 export const useSettings = () => {
-  const [settings, setSettings] = useState(
-    (localStorage.getItem("settings") &&
-      JSON.parse(localStorage.getItem("settings"))) ||
-      {}
-  );
-  const [yourPrivateRooms, setYourPrivateRooms] = useState(
-    (localStorage.getItem("privateRooms") &&
-      JSON.parse(localStorage.getItem("privateRooms"))) ||
-      {}
+  const [settings, setSettings] = useState(() => readJson("settings"));
+  const [yourPrivateRooms, setYourPrivateRooms] = useState(() =>
+    readJson("privateRooms")
   );
 
-  const setSettingsGuard = (newSettings) => {
-    const updatedSettings = { ...settings, ...newSettings };
-    localStorage.setItem("settings", JSON.stringify(updatedSettings));
-    setSettings(updatedSettings);
+  const updateSettings = (patch) => {
+    const updated = { ...settings, ...patch };
+    writeJson("settings", updated);
+    setSettings(updated);
   };
 
-  const toggleMessageBoard = (enabled) => {
-    setSettingsGuard({ messageBoardVisible: enabled });
-  };
+  const toggleSetting = (key) => (enabled) => updateSettings({ [key]: enabled });
 
-  const toggleCommunityAnimation = (enabled) => {
-    setSettingsGuard({
-      communityAnimation: enabled,
-    });
-  };
-
-  const toggleReactions = (enabled) => {
-    setSettingsGuard({ reactionsVisible: enabled });
-  };
-
-  const toggleLurkerBox = (enabled) => {
-    setSettingsGuard({ lurkerBoxVisible: enabled });
-  };
-
-  const toggleTimerVisible = (enabled) => {
-    setSettingsGuard({ timerVisible: enabled });
-  };
-
-  //   const recoverUserFromStorage = () => {
-  //     const userstate = localStorage.getItem("userstate") ?? "{}";
-  //     const userstateObj = JSON.parse(userstate);
-  //     const cachedUserIdForCommunity = userstateObj[communityId];
-  //     const citizens = currentCommunity?.citizens || [];
-
-  //     if (cachedUserIdForCommunity && citizens.length) {
-  //       const user = citizens.find(
-  //         (citizen) => citizen.userId === cachedUserIdForCommunity
-  //       );
-  //       setIAmCitizen(user);
-  //     }
-  //   };
-
-  //   // when a user joins, save their id to local storage for this session so they can reclaim their user if they return
-  //   const saveUserToStorage = (userId) => {
-  //     const userState = localStorage.getItem("userstate") || "{}";
-  //     const userStateObj = JSON.parse(userState);
-  //     userStateObj[communityId] = userId;
-
-  //     localStorage.setItem("userstate", JSON.stringify(userStateObj));
-  //   };
-
-  const updatePrivateRooms = (community) => {
+  const updatePrivateRooms = useCallback((community) => {
     if (!community) {
       return;
     }
-    
-    const updatedRooms = { ...yourPrivateRooms, [community.id]: community };
+    setYourPrivateRooms((prev) => {
+      const updated = { ...prev, [community.id]: community };
+      writeJson("privateRooms", updated);
+      return updated;
+    });
+  }, []);
 
-    setYourPrivateRooms(updatedRooms);
-
-    localStorage.setItem("privateRooms", JSON.stringify(updatedRooms));
-  };
-
-  const removePrivateRoom = (communityId) => {
-    const updatedRooms = { ...yourPrivateRooms };
-
-    delete updatedRooms[communityId];
-
-    localStorage.setItem("privateRooms", JSON.stringify(updatedRooms));
-
-    setYourPrivateRooms(updatedRooms);
-  };
+  const removePrivateRoom = useCallback((communityId) => {
+    setYourPrivateRooms((prev) => {
+      const updated = { ...prev };
+      delete updated[communityId];
+      writeJson("privateRooms", updated);
+      return updated;
+    });
+  }, []);
 
   return {
-    removePrivateRoom,
     settings,
-    toggleCommunityAnimation,
-    toggleMessageBoard,
-    toggleReactions,
-    toggleLurkerBox,
-    toggleTimerVisible,
     yourPrivateRooms,
     updatePrivateRooms,
+    removePrivateRoom,
+    toggleCommunityAnimation: toggleSetting("communityAnimation"),
+    toggleMessageBoard: toggleSetting("messageBoardVisible"),
+    toggleReactions: toggleSetting("reactionsVisible"),
+    toggleLurkerBox: toggleSetting("lurkerBoxVisible"),
+    toggleTimerVisible: toggleSetting("timerVisible"),
   };
 };

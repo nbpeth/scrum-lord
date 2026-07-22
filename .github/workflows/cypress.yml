@@ -1,0 +1,79 @@
+name: Tests
+
+on:
+  push:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install API dependencies
+        run: yarn --cwd api install --frozen-lockfile
+
+      - name: UI unit tests
+        run: yarn test
+
+      - name: API unit tests
+        run: yarn --cwd api test
+
+  cypress:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: secrets
+          POSTGRES_DB: scrumlord
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user -d scrumlord"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install API dependencies
+        run: yarn --cwd api install --frozen-lockfile
+
+      - name: Initialize database schema
+        run: PGPASSWORD=secrets psql -h localhost -U user -d scrumlord -f api/db-ddl.sql
+
+      - name: Run Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          start: yarn --cwd api startlocal, yarn start:ui:ci
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 240
+          browser: chrome
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore

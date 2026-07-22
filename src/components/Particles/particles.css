@@ -1,9 +1,10 @@
-/* tsParticles container must fill the fixed wrapper or the canvas can be 0×0 */
-.hyperspace-canvas-host,
-.modal-radial-emitter-host,
-.stellar-orbit-host {
+.planetary-orbit-root {
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .planetary-orbit-emitter-layer {

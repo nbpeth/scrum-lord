@@ -1,58 +1,43 @@
-import { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { differenceInSeconds } from "date-fns";
+import { useEffect, useState } from "react";
+import { timerValueSx } from "./TimerDisplay.styles";
 
 export const TimerDisplay = ({ community }) => {
-  const diff = (startDate, endDate) => {
-    const diffInSeconds = differenceInSeconds(startDate, endDate);
-
-    return diffInSeconds;
-  };
-
   const [timerEndDate, setTimerEndDate] = useState();
   const [timeRemaining, setTimeRemaining] = useState();
 
+  const timerRunning = Boolean(community?.timer?.running);
 
   useEffect(() => {
-    if (community?.timer?.running) {
+    if (timerRunning) {
       setTimerEndDate(community?.timer?.timerEnd);
     }
-  }, [community]);
+  }, [community, timerRunning]);
 
   useEffect(() => {
-    const differenceInSeconds = diff(timerEndDate, new Date());
-    setTimeRemaining(differenceInSeconds);
+    setTimeRemaining(differenceInSeconds(timerEndDate, new Date()));
   }, [timerEndDate]);
 
-
-  const timerWasStarted = community?.timer?.running && community?.timer?.value;
-    const timerWasCancelled = timerEndDate && !community?.timer?.running;
-
-  const getTimerDisplay = () => {
-    return timeRemaining && timeRemaining > 0 ? timeRemaining : "-";
-  };
-
   useEffect(() => {
+    const timerWasStarted = timerRunning && community?.timer?.value;
+    const timerWasCancelled = timerEndDate && !timerRunning;
+
     if (timerWasStarted) {
       const countdown = setInterval(() => {
-        const now = new Date();
-        
-        const differenceInSeconds = diff(timerEndDate, now);
-
-        setTimeRemaining(differenceInSeconds);
+        setTimeRemaining(differenceInSeconds(timerEndDate, new Date()));
       }, 1000);
-    
 
       return () => clearInterval(countdown);
     }
-    else if (timerWasCancelled) {
+    if (timerWasCancelled) {
       setTimeRemaining(undefined);
     }
-  }, [community, timerEndDate]);
+  }, [community, timerEndDate, timerRunning]);
 
   return (
-    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-      {getTimerDisplay()}
+    <Typography variant="h6" component="div" sx={timerValueSx}>
+      {timeRemaining > 0 ? timeRemaining : "-"}
     </Typography>
   );
 };

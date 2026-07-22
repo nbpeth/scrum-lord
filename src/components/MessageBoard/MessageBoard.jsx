@@ -1,56 +1,36 @@
-import { Box, List, ListItem, Typography, useTheme } from "@mui/material";
+import { Box, List, ListItem, Typography } from "@mui/material";
+import {
+  boardSx,
+  messageBodySx,
+  messageItemSx,
+  messageListSx,
+  messagePrefixSx,
+  messageTextSx,
+} from "./MessageBoard.styles";
+
+const MAX_MESSAGES = 100;
 
 export const MessageBoard = ({ messageHistory, communityId }) => {
   const messages = messageHistory
-    ?.filter((x) => x.communityId === communityId)
+    ?.filter((message) => message.communityId === communityId)
     .reverse()
-    .slice(0, 100);
-
-  const theme = useTheme();
+    .slice(0, MAX_MESSAGES);
 
   return (
-    <Box
-      id="community-message-board"
-      sx={{
-        width: "100%",
-        height: "100%",
-        minHeight: 0,
-        minWidth: 0,
-        maxWidth: "100%",
-        overflow: "hidden",
-        position: "relative",
-        isolation: "isolate",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <List
-        sx={{
-          flex: 1,
-          minHeight: 0,
-          padding: "10px",
-          overflowX: "hidden",
-          overflowY: "auto",
-          maxHeight: { xs: 300, md: "none" },
-        }}
-      >
-        {messages?.map((message) => {
-          return (
-            <ListItem sx={{ padding: 0 }} key={message.id}>
-              <Typography
-                fontSize="small"
-                variant="body2"
-                sx={{
-                  wordBreak: "break-word",
-                  overflowWrap: "anywhere",
-                }}
-              >
-                <span style={{ color: theme.palette.grey[500] }}>~</span>{" "}
-                <span style={{ color: message.userColor }}>{message.text}</span>
-              </Typography>
-            </ListItem>
-          );
-        })}
+    <Box id="community-message-board" sx={boardSx}>
+      <List sx={messageListSx}>
+        {messages?.map((message) => (
+          <ListItem sx={messageItemSx} key={message.id}>
+            <Typography fontSize="small" variant="body2" sx={messageTextSx}>
+              <Box component="span" sx={messagePrefixSx}>
+                ~
+              </Box>{" "}
+              <Box component="span" sx={messageBodySx(message.userColor)}>
+                {message.text}
+              </Box>
+            </Typography>
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
