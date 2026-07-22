@@ -1,4 +1,4 @@
-name: Cypress
+name: Tests
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
       - name: API unit tests
         run: yarn --cwd api test
 
-  e2e:
+  cypress:
     runs-on: ubuntu-latest
 
     services:
