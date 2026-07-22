@@ -1,6 +1,5 @@
 import { GroupAdd, HelpOutline, Refresh } from "@mui/icons-material";
 import {
-  alpha,
   Box,
   Button,
   MenuItem,
@@ -11,11 +10,30 @@ import {
   TextField,
   Tooltip,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { generate } from "random-words";
 import { useState } from "react";
 import * as uuid from "uuid";
+import {
+  actionRowSx,
+  backdropSx,
+  cancelButtonSx,
+  colorMenuSx,
+  colorSwatchSx,
+  dialogBodySx,
+  dialogPaperSx,
+  dialogTitleSx,
+  fieldStackSx,
+  joinButtonIconSx,
+  joinButtonSx,
+  modalViewportSx,
+  refreshNameIconSx,
+  usernameFieldSx,
+  usernameRowSx,
+  votingMemberHelpIconSx,
+  votingMemberHelpSx,
+  votingMemberRowSx,
+} from "./JoinCommunityModal.styles";
 
 const USER_COLORS = [
   "#AD28FC",
@@ -51,33 +69,7 @@ const randomUserName = () =>
 const randomUserColor = () =>
   USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)];
 
-/**
- * Join dialog surface: no backdrop-filter so tsParticles behind the panel stay
- * sharp (frosted glass would blur whatever is drawn under it).
- */
-const dialogPaperSx = (theme) => ({
-  position: "relative",
-  zIndex: 1,
-  pointerEvents: "auto",
-  width: { xs: "calc(100% - 32px)", sm: 420 },
-  maxWidth: "100%",
-  maxHeight: "90vh",
-  overflow: "auto",
-  p: 3,
-  borderRadius: 2,
-  border: "1px solid",
-  borderColor: "divider",
-  background: alpha(theme.palette.background.default, 0.92),
-  boxShadow: `0 16px 48px ${alpha(theme.palette.common.black, 0.45)}`,
-  outline: "none",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "stretch",
-});
-
 export const JoinCommunityModal = ({ open, handleClose }) => {
-  const theme = useTheme();
-
   const newRandomUser = () => ({
     username: randomUserName(),
     userColor: randomUserColor(),
@@ -102,42 +94,27 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
     <Modal
       open={open}
       onClose={() => onClose()}
-      BackdropProps={{
-        sx: {
-          backgroundColor: alpha(theme.palette.common.black, 0.48),
-        },
-      }}
+      BackdropProps={{ sx: backdropSx }}
     >
-      <Box
-        sx={{
-          position: "fixed",
-          inset: 0,
-          outline: "none",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          pointerEvents: "none",
-          p: { xs: 1.5, sm: 2 },
-        }}
-      >
-        <Box sx={dialogPaperSx(theme)}>
-          <Stack spacing={2.5} sx={{ width: "100%", boxSizing: "border-box" }}>
+      <Box sx={modalViewportSx}>
+        <Box sx={dialogPaperSx}>
+          <Stack spacing={2.5} sx={dialogBodySx}>
             <Typography
               variant="subtitle1"
               component="h2"
               fontWeight={600}
-              sx={{ width: "100%", textAlign: "left" }}
+              sx={dialogTitleSx}
             >
               Join room
             </Typography>
 
-            <Stack spacing={2} sx={{ width: "100%" }}>
+            <Stack spacing={2} sx={fieldStackSx}>
               {votingMemberChecked && (
                 <Stack
                   direction="row"
                   spacing={1}
                   alignItems="center"
-                  sx={{ width: "100%" }}
+                  sx={usernameRowSx}
                 >
                   <TextField
                     fullWidth
@@ -148,18 +125,13 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                     label="User name"
                     id="username"
                     size="small"
-                    sx={{ flex: 1, minWidth: 0 }}
+                    sx={usernameFieldSx}
                   />
                   <Refresh
                     onClick={() =>
                       setNewUser({ ...newUser, username: randomUserName() })
                     }
-                    sx={{
-                      flexShrink: 0,
-                      cursor: "pointer",
-                      color: "text.secondary",
-                      "&:hover": { color: "primary.main" },
-                    }}
+                    sx={refreshNameIconSx}
                     aria-label="Generate random name"
                   />
                 </Stack>
@@ -176,7 +148,7 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                 direction="row"
                 alignItems="center"
                 spacing={1}
-                sx={{ width: "100%", flexWrap: "wrap" }}
+                sx={votingMemberRowSx}
               >
                 <Switch
                   checked={votingMemberChecked}
@@ -195,18 +167,9 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                   placement="top"
                   arrow
                 >
-                  <Box
-                    component="span"
-                    sx={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      color: "text.secondary",
-                      cursor: "default",
-                      ml: 0.25,
-                    }}
-                  >
+                  <Box component="span" sx={votingMemberHelpSx}>
                     <HelpOutline
-                      sx={{ fontSize: 16 }}
+                      sx={votingMemberHelpIconSx}
                       aria-label="About non-voting members"
                     />
                   </Box>
@@ -218,32 +181,13 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                 justifyContent="space-between"
                 alignItems="center"
                 gap={1.5}
-                sx={{
-                  width: "100%",
-                  pt: 2.5,
-                  mt: 0.5,
-                  borderTop: "1px solid",
-                  borderColor: "divider",
-                  boxSizing: "border-box",
-                }}
+                sx={actionRowSx}
               >
                 <Button
                   variant="outlined"
                   color="error"
                   onClick={() => onClose()}
-                  sx={(t) => ({
-                    textTransform: "none",
-                    fontWeight: 600,
-                    px: 2,
-                    py: 0.875,
-                    borderRadius: 1.5,
-                    borderColor: alpha(t.palette.error.main, 0.65),
-                    color: "error.main",
-                    "&:hover": {
-                      borderColor: "error.main",
-                      backgroundColor: alpha(t.palette.error.main, 0.08),
-                    },
-                  })}
+                  sx={cancelButtonSx}
                 >
                   Cancel
                 </Button>
@@ -252,25 +196,8 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                   color="primary"
                   onClick={onJoin}
                   disabled={votingMemberChecked && !newUser?.username}
-                  startIcon={<GroupAdd sx={{ fontSize: 18 }} />}
-                  sx={(t) => ({
-                    textTransform: "none",
-                    fontWeight: 600,
-                    px: 2.25,
-                    py: 0.875,
-                    borderRadius: 1.5,
-                    boxShadow: "none",
-                    minWidth: 120,
-                    "&:hover": {
-                      boxShadow: `0 4px 16px ${alpha(
-                        t.palette.primary.main,
-                        0.42
-                      )}`,
-                    },
-                    "&.Mui-disabled": {
-                      boxShadow: "none",
-                    },
-                  })}
+                  startIcon={<GroupAdd sx={joinButtonIconSx} />}
+                  sx={joinButtonSx}
                 >
                   Join
                 </Button>
@@ -284,8 +211,6 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
 };
 
 export const ColorSelector = ({ value, onColorChange }) => {
-  const theme = useTheme();
-
   return (
     <Select
       fullWidth
@@ -293,31 +218,12 @@ export const ColorSelector = ({ value, onColorChange }) => {
       id="color-selector"
       value={value}
       onChange={(e) => onColorChange(e.target.value)}
-      MenuProps={{
-        PaperProps: {
-          sx: {
-            maxHeight: 360,
-            background: alpha(theme.palette.background.default, 0.95),
-            backdropFilter: "blur(12px)",
-            border: "1px solid",
-            borderColor: "divider",
-          },
-        },
-      }}
+      MenuProps={{ PaperProps: { sx: colorMenuSx } }}
     >
       {USER_COLORS.map((color) => (
         <MenuItem key={color} value={color}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <Box
-              sx={{
-                height: 12,
-                width: 12,
-                borderRadius: 0.5,
-                backgroundColor: color,
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-            />
+            <Box sx={colorSwatchSx(color)} />
             <Typography variant="body2" color="text.secondary">
               {color}
             </Typography>

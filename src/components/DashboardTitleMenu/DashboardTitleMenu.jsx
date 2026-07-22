@@ -10,10 +10,17 @@ import {
   MenuList,
   Paper,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  appTitleSx,
+  homeLinkStyle,
+  menuIconSx,
+  menuIconWrapperSx,
+  menuPaperSx,
+  versionItemSx,
+} from "./DashboardTitleMenu.styles";
 
 const openInNewTab = (url) => window.open(url, "_blank", "noopener,noreferrer");
 
@@ -24,7 +31,7 @@ export const DashboardTitleMenu = ({ version }) => {
     <>
       <MenuIcon
         onClick={(event) => setAnchorEl(event.currentTarget)}
-        sx={{ cursor: "pointer" }}
+        sx={menuIconSx}
       />
 
       <Menu
@@ -33,9 +40,9 @@ export const DashboardTitleMenu = ({ version }) => {
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        <Paper sx={{ background: "none" }}>
+        <Paper sx={menuPaperSx}>
           <MenuList>
-            <MenuItem sx={{ cursor: "default" }}>{version}</MenuItem>
+            <MenuItem sx={versionItemSx}>{version}</MenuItem>
             <Divider />
             <MenuItem
               onClick={() =>
@@ -79,15 +86,14 @@ export const DashboardTitleMenu = ({ version }) => {
 
 export const ScrumLordMenu = ({ children }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const theme = useTheme();
 
   return (
     <Grid item>
       <Grid container alignItems="center" spacing={2}>
-        <Grid item sx={{ marginTop: "5px" }}>
+        <Grid item sx={menuIconWrapperSx}>
           <MenuIcon
             onClick={(event) => setAnchorEl(event.currentTarget)}
-            sx={{ cursor: "pointer" }}
+            sx={menuIconSx}
           />
           <Menu
             id="room-menu"
@@ -99,13 +105,8 @@ export const ScrumLordMenu = ({ children }) => {
           </Menu>
         </Grid>
         <Grid item>
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-            <Typography
-              fontFamily="monospace"
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, color: theme.palette.secondary.dark }}
-            >
+          <Link to="/" style={homeLinkStyle}>
+            <Typography fontFamily="monospace" variant="h6" component="div" sx={appTitleSx}>
               Scrum Lord
             </Typography>
           </Link>

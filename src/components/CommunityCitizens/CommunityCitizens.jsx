@@ -1,9 +1,15 @@
-import { Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Grid, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { CitizenCard } from "../CitizenCard/CitizenCard";
+import { REVEAL_VARIANT_COUNT } from "../CitizenCard/CitizenCard.styles";
+import {
+  citizensContainerSx,
+  emptyRoomSx,
+  voteCardContainerSx,
+} from "./CommunityCitizens.styles";
 
-const getRandomInt = (min, max) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const randomRevealVariant = () =>
+  Math.floor(Math.random() * REVEAL_VARIANT_COUNT);
 
 export const CommunityCitizens = ({
   citizens,
@@ -11,14 +17,13 @@ export const CommunityCitizens = ({
   handleDeleteUser,
   currentCommunity,
 }) => {
-  const theme = useTheme();
   const fullsizeScreen = useMediaQuery("(min-width:800px)");
   const { revealed } = currentCommunity;
 
   const [animationClassPosition, setAnimationClassPosition] = useState(0);
   useEffect(() => {
     if (!revealed) {
-      setAnimationClassPosition(getRandomInt(0, 4));
+      setAnimationClassPosition(randomRevealVariant());
     }
   }, [revealed]);
 
@@ -30,13 +35,7 @@ export const CommunityCitizens = ({
       container
       direction="column"
       spacing={2}
-      sx={{
-        width: "100%",
-        minWidth: 0,
-        maxWidth: "100%",
-        alignItems: "stretch",
-        justifyContent: "flex-start",
-      }}
+      sx={citizensContainerSx}
     >
       <Grid
         id="vote-card-container"
@@ -46,13 +45,7 @@ export const CommunityCitizens = ({
         alignContent="flex-start"
         alignItems="flex-start"
         justifyContent="center"
-        sx={{
-          mt: 1.25,
-          mx: 0,
-          width: "100%",
-          minWidth: 0,
-          maxWidth: "100%",
-        }}
+        sx={voteCardContainerSx}
       >
         {citizens.length ? (
           votingCitizens.map((citizen, i) => (
@@ -76,11 +69,7 @@ export const CommunityCitizens = ({
           ))
         ) : (
           <Grid item xs={12}>
-            <Typography
-              color={theme.palette.grey[700]}
-              variant="h5"
-              sx={{ fontStyle: "italic" }}
-            >
+            <Typography variant="h5" sx={emptyRoomSx}>
               No one is here
             </Typography>
           </Grid>

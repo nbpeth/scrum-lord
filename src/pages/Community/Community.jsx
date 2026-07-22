@@ -1,4 +1,4 @@
-import { Box, Grid, alpha, useTheme } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -13,6 +13,16 @@ import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachine";
 import useCommunity from "../../hooks/useCommunity";
 import { useSettings } from "../../hooks/useSettings";
+import {
+  activityPanelSx,
+  citizensColumnSx,
+  communityPageSx,
+  controlsBarInnerSx,
+  controlsBarSx,
+  lurkerColumnSx,
+  mainGridSx,
+  stickyHeaderSx,
+} from "./Community.styles";
 
 const USER_STATE_STORAGE_KEY = "userstate";
 
@@ -59,8 +69,6 @@ export const Community = ({
     toggleTimerVisible,
     updatePrivateRooms,
   } = useSettings();
-
-  const theme = useTheme();
 
   const citizens = currentCommunity?.citizens || [];
   const [iAmCitizen, setIAmCitizen] = useState(null);
@@ -180,47 +188,8 @@ export const Community = ({
   const activityMd = showActivity ? Math.floor(mainRowMd / 4) : 0;
   const citizensMd = showActivity ? mainRowMd - activityMd : mainRowMd;
 
-  const activityPanelSx = {
-    background: alpha(
-      theme.palette.background.default,
-      settings?.communityAnimationEnabled ? 0.38 : 0.52
-    ),
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "divider",
-    borderRadius: {
-      xs: 2,
-      md: `${theme.shape.borderRadius}px 0 0 ${theme.shape.borderRadius}px`,
-    },
-    borderRight: { md: "none" },
-    borderBottom: { md: "none" },
-    minWidth: 0,
-    maxWidth: "100%",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-    alignSelf: "stretch",
-    minHeight: { xs: 280, md: 0 },
-    height: { xs: "auto", md: "100%" },
-    maxHeight: { xs: "none", md: "100%" },
-  };
-
   return (
-    <Box
-      sx={{
-        minHeight: "100dvh",
-        height: "100%",
-        width: "100%",
-        maxWidth: "100%",
-        boxSizing: "border-box",
-        display: "grid",
-        gridTemplateRows: "auto 1fr",
-        overflowX: "hidden",
-        textAlign: "initial",
-      }}
-    >
+    <Box sx={communityPageSx}>
       {currentCommunity ? <ReactionMachine /> : null}
       <Box>
         <JoinCommunityModal
@@ -242,7 +211,7 @@ export const Community = ({
           community={currentCommunity}
         />
 
-        <Box sx={{ position: "sticky", top: 0, zIndex: 10, width: "100%" }}>
+        <Box sx={stickyHeaderSx}>
           <CommunityHeader
             embedded
             navigate={navigate}
@@ -265,17 +234,8 @@ export const Community = ({
             toggleTimerVisible={toggleTimerVisible}
           />
           {iAmCitizen && (
-            <Box
-              sx={{
-                px: { xs: 1.5, sm: 2 },
-                py: 1.5,
-                borderBottom: "1px solid",
-                borderColor: "divider",
-                background: alpha(theme.palette.background.default, 0.72),
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <Box sx={{ maxWidth: 1200, mx: "auto", width: "100%" }}>
+            <Box sx={controlsBarSx}>
+              <Box sx={controlsBarInnerSx}>
                 <CommunityControls
                   handleTimerClicked={handleTimerClicked}
                   community={currentCommunity}
@@ -297,33 +257,12 @@ export const Community = ({
         container
         rowSpacing={2}
         columnSpacing={{ xs: 2, md: showActivity ? 0 : 2 }}
-        sx={{
-          minHeight: 0,
-          height: "100%",
-          pt: 2,
-          width: "100%",
-          maxWidth: "100%",
-          overflow: "hidden",
-          flexWrap: "wrap",
-          alignItems: "stretch",
-          alignContent: "stretch",
-        }}
+        sx={mainGridSx}
       >
         {currentCommunity ? (
           <>
             {showLurkerColumn && (
-              <Grid
-                item
-                xs={12}
-                md={2}
-                sx={{
-                  paddingTop: { md: "10px" },
-                  pr: { md: showActivity ? 2 : undefined },
-                  minWidth: 0,
-                  maxWidth: "100%",
-                  height: { md: "100%" },
-                }}
-              >
+              <Grid item xs={12} md={2} sx={lurkerColumnSx(showActivity)}>
                 <LurkerBox
                   lurkers={lurkers}
                   handleDeleteUser={handleDeleteUser}
@@ -334,17 +273,7 @@ export const Community = ({
               item
               xs={12}
               md={citizensMd}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-start",
-                alignItems: "stretch",
-                minWidth: 0,
-                maxWidth: "100%",
-                overflow: "hidden",
-                height: { md: "100%" },
-                pr: { md: showActivity ? 2 : undefined },
-              }}
+              sx={citizensColumnSx(showActivity)}
             >
               <CommunityCitizens
                 citizens={citizens}
@@ -358,12 +287,7 @@ export const Community = ({
                 item
                 xs={12}
                 md={activityMd}
-                sx={{
-                  ...activityPanelSx,
-                  pr: { md: 0 },
-                  mr: { md: 0 },
-                  alignSelf: { md: "stretch" },
-                }}
+                sx={activityPanelSx(settings?.communityAnimationEnabled)}
               >
                 <MessageBoard
                   messageHistory={messageHistory}

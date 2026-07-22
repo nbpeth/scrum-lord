@@ -8,12 +8,20 @@ import {
   Paper,
   Stack,
   Typography,
-  alpha,
-  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { DashboardCommunities } from "../DashboardCommunities/DashboardCommunities";
 import { SearchInput } from "../SearchInput/SearchInput";
+import {
+  closeButtonSx,
+  headerStackSx,
+  newRoomButtonSx,
+  roomListSx,
+  searchRowSx,
+  startModalPaperSx,
+  subtitleSx,
+  titleRowSx,
+} from "./StartModal.styles";
 
 export const StartModal = ({
   open,
@@ -22,7 +30,6 @@ export const StartModal = ({
   fullsizeScreen,
   yourPrivateRooms,
 }) => {
-  const theme = useTheme();
   const [query, setQuery] = useState("");
 
   const privateRooms = Object.values(yourPrivateRooms ?? {});
@@ -37,38 +44,20 @@ export const StartModal = ({
 
   return (
     <Modal id="modal" open={open} onClose={handleClose}>
-      <Paper
-        elevation={12}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          maxHeight: "min(78vh, 720px)",
-          width: "min(92vw, 520px)",
-          maxWidth: "100%",
-          borderRadius: 3,
-          overflow: "hidden",
-          border: "1px solid",
-          borderColor: alpha(theme.palette.divider, 0.9),
-          background: alpha(theme.palette.background.paper, 0.92),
-          backdropFilter: "blur(12px)",
-          boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.45)}`,
-        }}
-      >
-        <Stack sx={{ p: 2.5, pb: 2 }}>
+      <Paper elevation={12} sx={startModalPaperSx}>
+        <Stack sx={headerStackSx}>
           <Stack
             direction="row"
             alignItems="flex-start"
             justifyContent="space-between"
             spacing={1}
-            sx={{ mb: 2 }}
+            sx={titleRowSx}
           >
             <Box>
-              <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+              <Typography variant="h5" component="h2" fontWeight={700}>
                 Your rooms
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography variant="body2" color="text.secondary" sx={subtitleSx}>
                 Jump back in or open a new space
               </Typography>
             </Box>
@@ -76,13 +65,13 @@ export const StartModal = ({
               aria-label="Close"
               size="small"
               onClick={handleClose}
-              sx={{ color: "text.secondary", mt: -0.5 }}
+              sx={closeButtonSx}
             >
               <Close />
             </IconButton>
           </Stack>
 
-          <Grid container spacing={1.5} alignItems="stretch" sx={{ mb: 2 }}>
+          <Grid container spacing={1.5} alignItems="stretch" sx={searchRowSx}>
             <Grid item xs={12} sm={8}>
               <SearchInput onChange={searchValueChanged} />
             </Grid>
@@ -92,7 +81,7 @@ export const StartModal = ({
                 fullWidth
                 variant="contained"
                 onClick={() => setCreateRoomModalOpen(true)}
-                sx={{ height: "100%", py: 1.25, fontWeight: 600 }}
+                sx={newRoomButtonSx}
               >
                 New room
               </Button>
@@ -100,15 +89,7 @@ export const StartModal = ({
           </Grid>
         </Stack>
 
-        <Box
-          id="dashboard-your-rooms"
-          sx={{
-            px: 2.5,
-            pb: 2.5,
-            overflow: "auto",
-            maxHeight: "min(52vh, 440px)",
-          }}
-        >
+        <Box id="dashboard-your-rooms" sx={roomListSx}>
           <DashboardCommunities
             communities={filteredRooms}
             fullsizeScreen={fullsizeScreen}

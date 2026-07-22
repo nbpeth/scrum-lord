@@ -1,11 +1,15 @@
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import "./App.css";
+import {
+  appContentStyle,
+  appStyle,
+  dashboardMainSx,
+  roomPageSx,
+} from "./App.styles";
 import { Fireworks } from "./components/Particles/Fireworks";
 import { HotDogAlertParticles } from "./components/Particles/HotDogAlert";
 import { PlanetaryOrbit } from "./components/Particles/PlanetaryOrbit";
@@ -30,7 +34,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="App" style={{ height: "100vh" }}>
+    <div className="App" style={appStyle}>
       <AppContent version={version} />
     </div>
   );
@@ -56,17 +60,7 @@ const AppContent = ({ version }) => {
   }, []);
 
   const roomComponent = (
-    <Box
-      sx={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        minHeight: "100%",
-        m: 0,
-        p: 0,
-        boxSizing: "border-box",
-      }}
-    >
+    <Box sx={roomPageSx}>
       <Community
         version={version}
         handleCelebrationChange={setIsCelebrating}
@@ -94,10 +88,7 @@ const AppContent = ({ version }) => {
               { speed: 0.19, bodies: 2, bodySize: 10 },
             ]}
           />
-          <Box
-            component="main"
-            sx={{ position: "relative", zIndex: 2, minHeight: "100vh" }}
-          >
+          <Box component="main" sx={dashboardMainSx}>
             <Dashboard version={version} />
           </Box>
         </>
@@ -110,7 +101,7 @@ const AppContent = ({ version }) => {
   ]);
 
   return (
-    <div style={{ height: "100%" }}>
+    <div style={appContentStyle}>
       <ThemeProvider theme={darkTheme}>
         <CssBaseline />
         <RouterProvider router={router} />

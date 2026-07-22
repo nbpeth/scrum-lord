@@ -15,7 +15,7 @@ const PING_INTERVAL_MS = 30000;
 const CONNECTION_TIMEOUT_MS = 40000;
 
 const authConfig = {
-  apiKey: process.env.REACT_APP_API_KEY,
+  apiKey: process.env.API_KEY,
   isProd: process.env.ENV === "production",
   allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",")?.map((x) => x.trim()),
 };

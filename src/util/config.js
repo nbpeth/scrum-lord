@@ -1,11 +1,12 @@
-const { WebSocketReadyState } = require("./websocketUtils");
-const apiKey = process.env.REACT_APP_API_KEY;
+import { WebSocketReadyState } from "./websocketUtils";
 
-const getSocketBaseUrl = () => {
+const apiKey = import.meta.env.VITE_API_KEY;
+
+export const getSocketBaseUrl = () => {
   const host = window.location.host;
   const hostname = window.location.hostname;
   const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-  const serverPort = process.env.REACT_APP_SERVER_PORT;
+  const serverPort = import.meta.env.VITE_SERVER_PORT;
 
   if (serverPort) {
     return `${wsProtocol}://${hostname}:${serverPort}`;
@@ -14,25 +15,21 @@ const getSocketBaseUrl = () => {
   return `${wsProtocol}://${host}`;
 };
 
-const socketOptions = ({ setReconnection }) => ({
+export const socketOptions = ({ setReconnection }) => ({
   queryParams: { token: apiKey },
   onOpen: () => {
     setReconnection({ reconnecting: false });
   },
   shouldReconnect: (closeEvent) => {
-    // these should be graceful exits like an unmount
-    if (
+    const isGracefulExit =
       closeEvent.code === WebSocketReadyState.CLOSED ||
-      closeEvent.code === WebSocketReadyState.ABNORMAL_CLOSURE
-    ) {
+      closeEvent.code === WebSocketReadyState.ABNORMAL_CLOSURE;
+
+    if (isGracefulExit) {
       setReconnection({ reconnecting: false });
       return false;
     }
 
-    // setInterval(() => {
-    //   const attempts = reconnection.attempts;
-    //   setReconnection({ reconnecting: true, attempts: attempts - 1, interval: 5 });
-    // }, 1000)
     return true;
   },
   heartBeat: true,
@@ -40,8 +37,3 @@ const socketOptions = ({ setReconnection }) => ({
   reconnectInterval: 5000,
   reconnectAttempts: 15,
 });
-
-module.exports = {
-  getSocketBaseUrl,
-  socketOptions,
-};

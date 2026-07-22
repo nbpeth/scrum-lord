@@ -9,14 +9,29 @@ import {
   Stack,
   TextField,
   Typography,
-  alpha,
-  useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { controlButtonSx } from "../../theme";
 import { VoteOptions } from "../../util/voteOptions";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 import { CommunityReactionButtons } from "./CommunityReactionButtons";
+import {
+  controlsLayoutSx,
+  controlsPanelSx,
+  mainControlsSx,
+  resetButtonSx,
+  revealButtonSx,
+  timerButtonSx,
+  timerDisplayBoxSx,
+  timerErrorSx,
+  timerGroupSx,
+  timerInputProps,
+  timerInputSx,
+  voteButtonSx,
+  voteGroupSx,
+  voteMenuProps,
+  voteSelectFormControlSx,
+  voteSelectSx,
+} from "./CommunityControls.styles";
 
 const MAX_TIMER_SECONDS = 600;
 const DEFAULT_TIMER_SECONDS = 60;
@@ -32,7 +47,6 @@ export const CommunityControls = ({
   communityReaction,
   settings,
 }) => {
-  const theme = useTheme();
   const [selectOptions, setSelectOptions] = useState(null);
   const [selectedVote, setSelectedVote] = useState(0);
 
@@ -62,32 +76,8 @@ export const CommunityControls = ({
   const showTimer = settings?.timerVisible;
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        py: 0.75,
-        px: { xs: 1, sm: 1.25 },
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: "divider",
-        background: alpha(theme.palette.background.paper, 0.5),
-        backdropFilter: "blur(10px)",
-        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
-          justifyContent: showReactions
-            ? { xs: "flex-start", sm: "space-between" }
-            : { xs: "flex-start", sm: "flex-end" },
-          gap: { xs: 1.25, sm: 2 },
-          width: "100%",
-          flexWrap: "wrap",
-        }}
-      >
+    <Paper elevation={0} sx={controlsPanelSx}>
+      <Box sx={controlsLayoutSx(showReactions)}>
         {showReactions && <CommunityReactionButtons onReaction={onReaction} />}
 
         <Stack
@@ -96,22 +86,16 @@ export const CommunityControls = ({
           flexWrap="wrap"
           useFlexGap
           spacing={1}
-          sx={{
-            justifyContent: { xs: "flex-start", sm: "flex-end" },
-            flex: { sm: showReactions ? "1 1 auto" : "0 1 auto" },
-            minWidth: 0,
-            columnGap: 1,
-            rowGap: 1,
-          }}
+          sx={mainControlsSx(showReactions)}
         >
           {showVote && (
             <Stack
               direction="row"
               spacing={0.75}
               alignItems="center"
-              sx={{ flexShrink: 0 }}
+              sx={voteGroupSx}
             >
-              <FormControl size="small" sx={{ minWidth: 76, maxWidth: 110 }}>
+              <FormControl size="small" sx={voteSelectFormControlSx}>
                 <InputLabel id="vote-selector-label">Pts</InputLabel>
                 <Select
                   labelId="vote-selector-label"
@@ -119,14 +103,8 @@ export const CommunityControls = ({
                   value={selectedVote}
                   label="Pts"
                   onChange={(event) => setSelectedVote(event.target.value)}
-                  MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
-                  sx={{
-                    borderRadius: 1,
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: alpha(theme.palette.divider, 0.85),
-                    },
-                    "& .MuiSelect-select": { py: 0.45 },
-                  }}
+                  MenuProps={voteMenuProps}
+                  sx={voteSelectSx}
                 >
                   {selectOptions?.map((option) => (
                     <MenuItem key={option} value={option} dense>
@@ -140,7 +118,7 @@ export const CommunityControls = ({
                 variant="contained"
                 color="primary"
                 onClick={onVoteSubmit}
-                sx={{ ...controlButtonSx, px: 1.5 }}
+                sx={voteButtonSx}
               >
                 Vote
               </Button>
@@ -161,14 +139,7 @@ export const CommunityControls = ({
               variant="outlined"
               color="warning"
               onClick={() => handleReset({ ...iAmCitizen, communityId })}
-              sx={{
-                ...controlButtonSx,
-                borderColor: alpha(theme.palette.warning.main, 0.55),
-                "&:hover": {
-                  borderColor: "warning.main",
-                  backgroundColor: alpha(theme.palette.warning.main, 0.08),
-                },
-              }}
+              sx={resetButtonSx}
             >
               Reset
             </Button>
@@ -178,15 +149,7 @@ export const CommunityControls = ({
               variant="contained"
               color="success"
               onClick={() => handleReveal({ ...iAmCitizen, communityId })}
-              sx={{
-                ...controlButtonSx,
-                "&:hover": {
-                  boxShadow: `0 2px 10px ${alpha(
-                    theme.palette.success.main,
-                    0.35
-                  )}`,
-                },
-              }}
+              sx={revealButtonSx}
             >
               Reveal
             </Button>
@@ -198,7 +161,6 @@ export const CommunityControls = ({
 };
 
 export const TimerControl = ({ community, handleTimerClicked }) => {
-  const theme = useTheme();
   const [timerValue, setTimerValue] = useState(DEFAULT_TIMER_SECONDS);
   const [error, setError] = useState(undefined);
 
@@ -228,7 +190,7 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
       alignItems="center"
       spacing={0.75}
       flexWrap="wrap"
-      sx={{ flexShrink: 0 }}
+      sx={timerGroupSx}
     >
       <Button
         disabled={timerValue > MAX_TIMER_SECONDS}
@@ -236,12 +198,7 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
         variant="contained"
         color="secondary"
         onClick={onTimerClicked}
-        sx={{
-          ...controlButtonSx,
-          "&:hover": {
-            boxShadow: `0 2px 10px ${alpha(theme.palette.secondary.main, 0.3)}`,
-          },
-        }}
+        sx={timerButtonSx}
       >
         {community?.timer?.running ? "Cancel" : "Timer"}
       </Button>
@@ -250,11 +207,7 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
         size="small"
         error={Boolean(error)}
         placeholder="Sec"
-        inputProps={{
-          style: { textAlign: "center" },
-          min: 1,
-          max: MAX_TIMER_SECONDS,
-        }}
+        inputProps={timerInputProps}
         disabled={community?.timer?.running}
         variant="outlined"
         value={timerValue}
@@ -264,27 +217,13 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
             onTimerClicked();
           }
         }}
-        sx={{
-          width: 64,
-          flexShrink: 0,
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 1,
-            "& input": { py: 0.65 },
-          },
-        }}
+        sx={timerInputSx}
       />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minWidth: 40,
-        }}
-      >
+      <Box sx={timerDisplayBoxSx}>
         <TimerDisplay community={community} />
       </Box>
       {error && (
-        <Typography variant="caption" color="error" sx={{ width: "100%" }}>
+        <Typography variant="caption" color="error" sx={timerErrorSx}>
           {error}
         </Typography>
       )}

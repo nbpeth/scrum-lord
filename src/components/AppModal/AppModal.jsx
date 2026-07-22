@@ -1,5 +1,5 @@
 import { Box, Modal, Stack } from "@mui/material";
-import { modalCardSx } from "../../theme";
+import { modalCardSx } from "./AppModal.styles";
 
 export const AppModal = ({ open, onClose, children, sx }) => (
   <Modal

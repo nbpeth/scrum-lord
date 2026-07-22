@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import { differenceInSeconds } from "date-fns";
 import { useEffect, useState } from "react";
+import { timerValueSx } from "./TimerDisplay.styles";
 
 export const TimerDisplay = ({ community }) => {
   const [timerEndDate, setTimerEndDate] = useState();
@@ -35,7 +36,7 @@ export const TimerDisplay = ({ community }) => {
   }, [community, timerEndDate, timerRunning]);
 
   return (
-    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+    <Typography variant="h6" component="div" sx={timerValueSx}>
       {timeRemaining > 0 ? timeRemaining : "-"}
     </Typography>
   );

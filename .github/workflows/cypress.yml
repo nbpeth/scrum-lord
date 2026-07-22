@@ -23,9 +23,7 @@ jobs:
         run: yarn --cwd api install --frozen-lockfile
 
       - name: UI unit tests
-        run: yarn test --watchAll=false
-        env:
-          CI: true
+        run: yarn test
 
       - name: API unit tests
         run: yarn --cwd api test
