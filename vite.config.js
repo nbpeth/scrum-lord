@@ -5,6 +5,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    proxy: {
+      "/socket": {
+        target: process.env.VITE_PROXY_TARGET || "http://localhost:8080",
+        ws: true,
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: "build",
