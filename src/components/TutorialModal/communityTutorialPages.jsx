@@ -116,24 +116,34 @@ const VoteControlsArt = () => (
   </Stack>
 );
 
+const CitizenTile = ({ username, vote, voted, doubleVote }) => (
+  <Box sx={citizenTileSx({ voted, doubleVote })}>
+    <Typography variant="caption" noWrap display="block">
+      {username}
+    </Typography>
+    <Typography variant="h6" sx={citizenTileVoteSx}>
+      {vote}
+    </Typography>
+  </Box>
+);
+
 const votedTiles = [
-  { username: "cheerfulOtter", voted: true },
-  { username: "quietFalcon", voted: true },
-  { username: "brightMoose", voted: false },
+  { username: "cheerfulOtter", vote: "?", voted: true },
+  { username: "quietFalcon", vote: "?", voted: true },
+  { username: "brightMoose", vote: "-", voted: false },
+];
+
+const revealedTiles = [
+  { username: "cheerfulOtter", vote: "8", voted: true },
+  { username: "quietFalcon", vote: "5", voted: true },
+  { username: "brightMoose", vote: "13", voted: true, doubleVote: true },
 ];
 
 const RevealArt = () => (
   <Stack spacing={2} alignItems="center" sx={mockPanelSx}>
     <Stack direction="row" spacing={1} sx={citizenTilesRowSx}>
-      {votedTiles.map(({ username, voted }) => (
-        <Box key={username} sx={citizenTileSx(voted)}>
-          <Typography variant="caption" noWrap display="block">
-            {username}
-          </Typography>
-          <Typography variant="h6" sx={citizenTileVoteSx}>
-            {voted ? "?" : "-"}
-          </Typography>
-        </Box>
+      {votedTiles.map((tile) => (
+        <CitizenTile key={tile.username} {...tile} />
       ))}
     </Stack>
     <Stack direction="row" spacing={1}>
@@ -144,6 +154,14 @@ const RevealArt = () => (
         Reveal
       </Typography>
     </Stack>
+  </Stack>
+);
+
+const DoubleVoteArt = () => (
+  <Stack direction="row" spacing={1} sx={citizenTilesRowSx}>
+    {revealedTiles.map((tile) => (
+      <CitizenTile key={tile.username} {...tile} />
+    ))}
   </Stack>
 );
 
@@ -250,6 +268,11 @@ export const communityTutorialPages = [
     title: "Reveal, then reset",
     body: "Tiles turn blue as people lock in their votes, but the numbers stay hidden. Once everyone is in, hit Reveal to flip them all, then Reset to clear the board for the next story.",
     art: <RevealArt />,
+  },
+  {
+    title: "Second thoughts show up orange",
+    body: "Voting stays open after the reveal. If someone changes their number once the cards are face up, their card switches from blue to orange and stays that way until the next reset, so a late change never slips by unnoticed.",
+    art: <DoubleVoteArt />,
   },
   {
     title: "Put a clock on it",

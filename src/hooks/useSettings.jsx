@@ -1,5 +1,13 @@
 import { useCallback, useState } from "react";
 
+const defaultSettings = {
+  communityAnimation: true,
+  messageBoardVisible: true,
+  reactionsVisible: true,
+  lurkerBoxVisible: true,
+  timerVisible: true,
+};
+
 const readJson = (key) => {
   try {
     const raw = localStorage.getItem(key);
@@ -14,7 +22,10 @@ const writeJson = (key, value) => {
 };
 
 export const useSettings = () => {
-  const [settings, setSettings] = useState(() => readJson("settings"));
+  const [settings, setSettings] = useState(() => ({
+    ...defaultSettings,
+    ...readJson("settings"),
+  }));
   const [yourPrivateRooms, setYourPrivateRooms] = useState(() =>
     readJson("privateRooms")
   );

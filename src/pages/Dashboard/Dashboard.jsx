@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionStatus";
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
-import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
+import { DashboardFooter } from "../../components/DashboardFooter/DashboardFooter";
 import { StartModal } from "../../components/StartModal/StartModal";
 import { dashboardTutorialPages } from "../../components/TutorialModal/dashboardTutorialPages";
 import { TutorialModal } from "../../components/TutorialModal/TutorialModal";
@@ -79,24 +79,22 @@ export const Dashboard = ({ version }) => {
       <Stack
         direction="row"
         alignItems="center"
-        justifyContent="space-between"
+        justifyContent="flex-end"
+        spacing={1.5}
         sx={topBarSx}
       >
-        <DashboardTitleMenu version={version} />
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          <Tooltip title="How this works" placement="bottom" arrow>
-            <IconButton
-              id="dashboard-tutorial-button"
-              aria-label="How this works"
-              size="small"
-              onClick={() => setTutorialModalOpen(true)}
-              sx={tutorialButtonSx}
-            >
-              <HelpOutline fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <ConnectionStatus readyState={readyState} size={12} />
-        </Stack>
+        <Tooltip title="Help me" placement="bottom" arrow>
+          <IconButton
+            id="dashboard-tutorial-button"
+            aria-label="Help me"
+            size="small"
+            onClick={() => setTutorialModalOpen(true)}
+            sx={tutorialButtonSx}
+          >
+            <HelpOutline fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <ConnectionStatus readyState={readyState} size={12} />
       </Stack>
 
       {errorMessage && (
@@ -131,6 +129,8 @@ export const Dashboard = ({ version }) => {
           <img src={logoUrl} alt="Scrum lord" style={startButtonLogoStyle} />
         </Button>
       </Box>
+
+      <DashboardFooter version={version} />
     </Box>
   );
 };

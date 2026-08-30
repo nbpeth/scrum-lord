@@ -48,7 +48,7 @@ describe("room management", () => {
   it("walks through the room tutorial and closes on the last page", () => {
     cy.get("#community-tutorial-button").click();
 
-    cy.contains("Step 1 of 9").should("be.visible");
+    cy.contains("Step 1 of 10").should("be.visible");
     cy.contains("Open the menu to join").should("be.visible");
     cy.get("#tutorial-back-button").should("be.disabled");
 
@@ -58,10 +58,10 @@ describe("room management", () => {
     cy.get("#tutorial-back-button").click();
     cy.contains("Open the menu to join").should("be.visible");
 
-    for (let step = 1; step < 9; step += 1) {
+    for (let step = 1; step < 10; step += 1) {
       cy.get("#tutorial-next-button").click();
     }
-    cy.contains("Step 9 of 9").should("be.visible");
+    cy.contains("Step 10 of 10").should("be.visible");
     cy.contains("Watch the status light").should("be.visible");
 
     cy.get("#tutorial-next-button").should("contain", "Done").click();

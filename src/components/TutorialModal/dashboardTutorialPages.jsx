@@ -1,4 +1,9 @@
-import { Search } from "@mui/icons-material";
+import {
+  BookmarkAdd,
+  ContentCopy,
+  Search,
+  WarningAmber,
+} from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
 import logoUrl from "../../scrum-lord.png";
 import { WebSocketReadyState } from "../../util/websocketUtils";
@@ -10,8 +15,12 @@ import {
   mockFieldSx,
   mockPanelSx,
   mockRoomRowSx,
+  mockUrlBarSx,
+  mockUrlTextSx,
   previewLogoStyle,
   startButtonPreviewSx,
+  warningCalloutIconSx,
+  warningCalloutSx,
 } from "./TutorialModal.styles";
 
 const StartButtonArt = () => (
@@ -73,6 +82,34 @@ const NewRoomArt = () => (
   </Stack>
 );
 
+const SaveTheUrlArt = () => (
+  <Stack spacing={1.5} sx={mockPanelSx}>
+    <Box>
+      <Typography variant="caption" color="text.secondary" sx={mockFieldLabelSx}>
+        Room address
+      </Typography>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        sx={mockUrlBarSx}
+      >
+        <Typography variant="caption" sx={mockUrlTextSx}>
+          https://s.crumlord.com/communities/3c6adf27-3a03-4056-91ee-21c361fae2ad
+        </Typography>
+        <ContentCopy fontSize="small" color="disabled" />
+        <BookmarkAdd fontSize="small" color="disabled" />
+      </Stack>
+    </Box>
+    <Stack direction="row" alignItems="center" spacing={1} sx={warningCalloutSx}>
+      <WarningAmber sx={warningCalloutIconSx} />
+      <Typography variant="body2" fontWeight={700}>
+        Lose the link, lose the room
+      </Typography>
+    </Stack>
+  </Stack>
+);
+
 const connectionStates = [
   { readyState: WebSocketReadyState.OPEN, description: "Connected and live" },
   {
@@ -117,6 +154,11 @@ export const dashboardTutorialPages = [
     title: "Name it and go",
     body: "New room lets you name your room, or keep the randomly generated one, and hit Create. Scrum Lord drops you straight into it, ready to point.",
     art: <NewRoomArt />,
+  },
+  {
+    title: "Save that URL now",
+    body: "There is no room discovery in Scrum Lord, and the address is a random ID rather than the name you picked, so nobody is guessing it or typing it from memory. Your rooms list only remembers what this browser has visited, so on another device or after clearing your data, the URL is the only way back in. Copy it or bookmark it as soon as you land, and share that same link with anyone you want in the room.",
+    art: <SaveTheUrlArt />,
   },
   {
     title: "Watch the status light",

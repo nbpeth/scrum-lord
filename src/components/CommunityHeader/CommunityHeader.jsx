@@ -25,7 +25,7 @@ import {
   Typography,
 } from "@mui/material";
 import { ConnectionStatus } from "../ConnectionStatus/ConnectionStatus";
-import { ScrumLordMenu } from "../DashboardTitleMenu/DashboardTitleMenu";
+import { ScrumLordMenu } from "../ScrumLordMenu/ScrumLordMenu";
 import {
   headerBarSx,
   menuActionRowSx,
@@ -203,10 +203,10 @@ export const CommunityHeader = ({
         {communityName}
       </Typography>
 
-      <Tooltip title="How this works" placement="bottom" arrow>
+      <Tooltip title="Help me" placement="bottom" arrow>
         <IconButton
           id="community-tutorial-button"
-          aria-label="How this works"
+          aria-label="Help me"
           size="small"
           onClick={onShowTutorial}
           sx={tutorialButtonSx}

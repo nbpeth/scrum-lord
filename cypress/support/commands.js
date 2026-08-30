@@ -5,14 +5,11 @@ Cypress.Commands.add("uniqueRoomName", () => {
   return cy.wrap(name);
 });
 
-Cypress.Commands.add("createRoom", (roomName, { isPrivate = true } = {}) => {
+Cypress.Commands.add("createRoom", (roomName) => {
   cy.visit("/");
   cy.get("#dashboard-start-button").click();
   cy.get("#new-room-button").click();
   cy.get("#new-room-name-text-input").clear().type(roomName);
-  if (!isPrivate) {
-    cy.get("#new-room-private-checkbox").click();
-  }
   cy.get("#new-room-create-button").click();
   cy.url({ timeout: 10000 }).should("include", "/communities/");
   cy.contains(roomName, { timeout: 10000 }).should("be.visible");

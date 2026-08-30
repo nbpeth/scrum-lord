@@ -52,11 +52,31 @@ describe("dashboard", () => {
     cy.get("#dashboard-your-rooms").should("not.contain", "beta-room");
   });
 
+  it("shows the version, repo links, and support button in the footer", () => {
+    cy.intercept("https://api.github.com/repos/nbpeth/scrum-lord/tags", {
+      body: [{ name: "v9.9.9" }],
+    });
+    cy.visit("/");
+
+    cy.contains("footer", "v9.9.9").should("be.visible");
+    cy.contains("footer a", "Change log").should(
+      "have.attr",
+      "href",
+      "https://github.com/nbpeth/scrum-lord/releases"
+    );
+    cy.contains("footer a", "Issues").should(
+      "have.attr",
+      "href",
+      "https://github.com/nbpeth/scrum-lord/issues"
+    );
+    cy.get('footer a[href*="buymeacoffee"]').should("exist");
+  });
+
   it("walks through the tutorial and closes on the last page", () => {
     cy.visit("/");
     cy.get("#dashboard-tutorial-button").click();
 
-    cy.contains("Step 1 of 4").should("be.visible");
+    cy.contains("Step 1 of 5").should("be.visible");
     cy.contains("Press the big button").should("be.visible");
     cy.get("#tutorial-back-button").should("be.disabled");
 
@@ -69,7 +89,10 @@ describe("dashboard", () => {
     cy.get("#tutorial-next-button").click();
     cy.get("#tutorial-next-button").click();
     cy.get("#tutorial-next-button").click();
-    cy.contains("Step 4 of 4").should("be.visible");
+    cy.contains("Save that URL now").should("be.visible");
+
+    cy.get("#tutorial-next-button").click();
+    cy.contains("Step 5 of 5").should("be.visible");
     cy.contains("Watch the status light").should("be.visible");
 
     cy.get("#tutorial-next-button").should("contain", "Done").click();

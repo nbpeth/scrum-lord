@@ -110,6 +110,32 @@ export const mockRoomRowSx = (theme) => ({
 
 export const mockFieldLabelSx = { display: "block", mb: 0.5 };
 
+export const mockUrlBarSx = (theme) => ({
+  px: 1.5,
+  py: 1,
+  borderRadius: 1,
+  border: "1px solid",
+  borderColor: alpha(theme.palette.warning.main, 0.7),
+  background: alpha(theme.palette.background.paper, 0.7),
+});
+
+export const mockUrlTextSx = {
+  fontFamily: "monospace",
+  overflowWrap: "anywhere",
+};
+
+export const warningCalloutSx = (theme) => ({
+  px: 1.5,
+  py: 1,
+  borderRadius: 1,
+  border: "1px solid",
+  borderColor: alpha(theme.palette.warning.main, 0.7),
+  background: alpha(theme.palette.warning.main, 0.12),
+  color: theme.palette.warning.main,
+});
+
+export const warningCalloutIconSx = { fontSize: 18, flexShrink: 0 };
+
 export const connectionRowSx = { py: 0.75 };
 
 export const mockMenuSx = (theme) => ({
@@ -142,15 +168,22 @@ export const toggleIconSx = (on) => ({
 
 export const citizenTilesRowSx = { justifyContent: "center", width: "100%" };
 
-export const citizenTileSx = (voted) => (theme) => ({
-  width: 78,
-  py: 1,
-  borderRadius: 1,
-  textAlign: "center",
-  border: "1px solid",
-  borderColor: voted ? theme.palette.primary.dark : theme.palette.grey[800],
-  bgcolor: voted ? alpha(theme.palette.primary.dark, 0.8) : "transparent",
-});
+export const citizenTileSx =
+  ({ voted, doubleVote }) =>
+  (theme) => ({
+    width: 78,
+    py: 1,
+    borderRadius: 1,
+    textAlign: "center",
+    border: "1px solid",
+    borderColor: voted ? theme.palette.primary.dark : theme.palette.grey[800],
+    bgcolor: voted
+      ? alpha(
+          doubleVote ? theme.palette.warning.dark : theme.palette.primary.dark,
+          0.8
+        )
+      : "transparent",
+  });
 
 export const citizenTileVoteSx = { fontWeight: 700, lineHeight: 1.2 };
 
