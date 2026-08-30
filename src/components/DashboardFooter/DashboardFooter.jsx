@@ -9,7 +9,7 @@ import {
 } from "./DashboardFooter.styles";
 
 const COFFEE_BUTTON_SRC =
-  "https://img.buymeacoffee.com/button-api/?text=Buy me pizza&emoji=🍕&slug=nbpetha&button_colour=BD5FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00";
+  "https://img.buymeacoffee.com/button-api/?text=Buy me a hotdog&emoji=🌭&slug=nbpetha&button_colour=BD5FFF&font_colour=000000&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff";
 
 const repoLinks = [
   { label: "Change log", href: "https://github.com/nbpeth/scrum-lord/releases" },
@@ -53,7 +53,11 @@ export const DashboardFooter = ({ version }) => (
       rel="noreferrer"
       style={coffeeLinkStyle}
     >
-      <img alt="Buy me pizza" src={COFFEE_BUTTON_SRC} style={coffeeImageStyle} />
+      <img
+        alt="Buy me a hotdog"
+        src={COFFEE_BUTTON_SRC}
+        style={coffeeImageStyle}
+      />
     </a>
   </Stack>
 );
