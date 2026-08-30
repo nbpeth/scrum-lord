@@ -21,13 +21,15 @@ describe("room management", () => {
 
   it("shows observers in the lurker box", () => {
     cy.joinRoom("cypress-observer", { voting: false });
-    cy.toggleRoomSetting("Observers");
 
     cy.get("#lurker-box", { timeout: 10000 }).should(
       "contain",
       "cypress-observer"
     );
     cy.get("#vote-card-container").should("not.contain", "cypress-observer");
+
+    cy.toggleRoomSetting("Observers");
+    cy.get("#lurker-box").should("not.exist");
   });
 
   it("changes the point scheme", () => {
