@@ -11,6 +11,8 @@ import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinComm
 import { LurkerBox } from "../../components/LurkerBox/LurkerBox";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachine";
+import { communityTutorialPages } from "../../components/TutorialModal/communityTutorialPages";
+import { TutorialModal } from "../../components/TutorialModal/TutorialModal";
 import useCommunity from "../../hooks/useCommunity";
 import { useSettings } from "../../hooks/useSettings";
 import {
@@ -77,6 +79,7 @@ export const Community = ({
     useState(false);
   const [deleteCommunityModalOpen, setDeleteCommunityModalOpen] =
     useState(false);
+  const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [hotdogAlert, setHotdogAlert] = useState(false);
 
   useEffect(() => {
@@ -211,6 +214,12 @@ export const Community = ({
           community={currentCommunity}
         />
 
+        <TutorialModal
+          open={tutorialModalOpen}
+          handleClose={() => setTutorialModalOpen(false)}
+          pages={communityTutorialPages}
+        />
+
         <Box sx={stickyHeaderSx}>
           <CommunityHeader
             embedded
@@ -226,6 +235,7 @@ export const Community = ({
             onLeave={handleLeave}
             onEditPointScheme={() => setEditPointSchemeModalOpen(true)}
             onDeleteRoom={() => setDeleteCommunityModalOpen(true)}
+            onShowTutorial={() => setTutorialModalOpen(true)}
             settings={settings}
             toggleReactions={toggleReactions}
             toggleCommunityAnimation={toggleCommunityAnimation}

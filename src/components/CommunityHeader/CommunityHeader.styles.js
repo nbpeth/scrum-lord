@@ -32,6 +32,11 @@ export const menuSectionLabelSx = {
 
 export const menuDividerSx = { my: 1 };
 
+export const tutorialButtonSx = {
+  color: "text.secondary",
+  "&:hover": { color: "text.primary" },
+};
+
 export const roomTitleSx = (hotdogOverload) => (theme) => ({
   flex: 1,
   textAlign: "center",

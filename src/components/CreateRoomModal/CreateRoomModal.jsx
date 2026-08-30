@@ -1,30 +1,27 @@
-import { WarningAmber } from "@mui/icons-material";
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Refresh } from "@mui/icons-material";
+import { Button, Stack, TextField, Typography } from "@mui/material";
 import { generate } from "random-words";
 import { useState } from "react";
 import { AppModal, AppModalActions } from "../AppModal/AppModal";
+import {
+  refreshNameIconSx,
+  roomNameFieldSx,
+  roomNameRowSx,
+} from "./CreateRoomModal.styles";
 
 const randomRoomName = () =>
   generate({ exactly: 3, minLength: 5, join: "-", camelCase: true });
 
 export const CreateRoomModal = ({ open, handleClose }) => {
   const [name, setName] = useState(randomRoomName);
-  const [isPrivate, setIsPrivate] = useState(true);
 
   const close = (newCommunity) => {
     setName(randomRoomName());
     handleClose(newCommunity);
   };
 
-  const onCreate = () => close({ name: name || randomRoomName(), isPrivate });
+  const onCreate = () =>
+    close({ name: name || randomRoomName(), isPrivate: true });
 
   return (
     <AppModal open={open} onClose={() => close()}>
@@ -32,29 +29,26 @@ export const CreateRoomModal = ({ open, handleClose }) => {
         Create a new community! No name provided will result in an
         auto-generated name.
       </Typography>
-      <TextField
-        fullWidth
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        label="Room Name"
-        id="new-room-name-text-input"
-      />
-      <Stack direction="row" alignItems="center" spacing={1}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              id="new-room-private-checkbox"
-              checked={isPrivate}
-              onChange={(e) => setIsPrivate(e.target.checked)}
-            />
-          }
-          label="Private"
+      <Stack
+        direction="row"
+        spacing={1}
+        alignItems="center"
+        sx={roomNameRowSx}
+      >
+        <TextField
+          fullWidth
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          label="Room Name"
+          id="new-room-name-text-input"
+          sx={roomNameFieldSx}
         />
-        {!isPrivate && (
-          <Tooltip title="Public communities are visible to all users on the dashboard">
-            <WarningAmber color="warning" />
-          </Tooltip>
-        )}
+        <Refresh
+          onClick={() => setName(randomRoomName())}
+          sx={refreshNameIconSx}
+          aria-label="Generate random room name"
+          id="new-room-name-refresh-icon"
+        />
       </Stack>
       <AppModalActions>
         <Button id="new-room-create-button" onClick={onCreate}>

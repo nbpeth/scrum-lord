@@ -34,7 +34,6 @@ describe("room voting", () => {
   });
 
   it("records room activity on the message board", () => {
-    cy.toggleRoomSetting("Activity");
     cy.get("#community-message-board", { timeout: 10000 }).should(
       "contain",
       `"${username}" has joined`
@@ -51,9 +50,6 @@ describe("room voting", () => {
   });
 
   it("sends reactions to the room", () => {
-    cy.toggleRoomSetting("Activity");
-    cy.toggleRoomSetting("Reactions");
-
     cy.get('button[title="party"]').click();
 
     cy.get("#community-message-board", { timeout: 10000 }).should(
@@ -63,8 +59,6 @@ describe("room voting", () => {
   });
 
   it("starts and cancels the voting timer", () => {
-    cy.toggleRoomSetting("Timer");
-
     cy.contains("button", "Timer").should("be.visible").click();
     cy.contains("button", "Cancel", { timeout: 10000 }).click();
     cy.contains("button", "Timer", { timeout: 10000 }).should("be.visible");

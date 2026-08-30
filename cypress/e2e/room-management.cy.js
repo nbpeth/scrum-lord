@@ -21,13 +21,15 @@ describe("room management", () => {
 
   it("shows observers in the lurker box", () => {
     cy.joinRoom("cypress-observer", { voting: false });
-    cy.toggleRoomSetting("Observers");
 
     cy.get("#lurker-box", { timeout: 10000 }).should(
       "contain",
       "cypress-observer"
     );
     cy.get("#vote-card-container").should("not.contain", "cypress-observer");
+
+    cy.toggleRoomSetting("Observers");
+    cy.get("#lurker-box").should("not.exist");
   });
 
   it("changes the point scheme", () => {
@@ -43,6 +45,29 @@ describe("room management", () => {
 
     cy.get("#vote-selector").click();
     cy.get('ul[role="listbox"]', { timeout: 10000 }).should("contain", "XS");
+  });
+
+  it("walks through the room tutorial and closes on the last page", () => {
+    cy.get("#community-tutorial-button").click();
+
+    cy.contains("Step 1 of 10").should("be.visible");
+    cy.contains("Open the menu to join").should("be.visible");
+    cy.get("#tutorial-back-button").should("be.disabled");
+
+    cy.get("#tutorial-next-button").click();
+    cy.contains("Set yourself up").should("be.visible");
+
+    cy.get("#tutorial-back-button").click();
+    cy.contains("Open the menu to join").should("be.visible");
+
+    for (let step = 1; step < 10; step += 1) {
+      cy.get("#tutorial-next-button").click();
+    }
+    cy.contains("Step 10 of 10").should("be.visible");
+    cy.contains("Watch the status light").should("be.visible");
+
+    cy.get("#tutorial-next-button").should("contain", "Done").click();
+    cy.contains("Watch the status light").should("not.exist");
   });
 
   it("deletes the room after name confirmation and returns to the dashboard", function () {
