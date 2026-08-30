@@ -52,6 +52,30 @@ describe("dashboard", () => {
     cy.get("#dashboard-your-rooms").should("not.contain", "beta-room");
   });
 
+  it("walks through the tutorial and closes on the last page", () => {
+    cy.visit("/");
+    cy.get("#dashboard-tutorial-button").click();
+
+    cy.contains("Step 1 of 4").should("be.visible");
+    cy.contains("Press the big button").should("be.visible");
+    cy.get("#tutorial-back-button").should("be.disabled");
+
+    cy.get("#tutorial-next-button").click();
+    cy.contains("Find a room, or start one").should("be.visible");
+
+    cy.get("#tutorial-back-button").click();
+    cy.contains("Press the big button").should("be.visible");
+
+    cy.get("#tutorial-next-button").click();
+    cy.get("#tutorial-next-button").click();
+    cy.get("#tutorial-next-button").click();
+    cy.contains("Step 4 of 4").should("be.visible");
+    cy.contains("Watch the status light").should("be.visible");
+
+    cy.get("#tutorial-next-button").should("contain", "Done").click();
+    cy.contains("Watch the status light").should("not.exist");
+  });
+
   it("shows an error banner when a room does not exist", () => {
     cy.visit("/communities/00000000-0000-0000-0000-000000000000");
     cy.url({ timeout: 10000 }).should("include", "error=404");

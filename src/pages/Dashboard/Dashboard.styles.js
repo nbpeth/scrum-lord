@@ -19,6 +19,11 @@ export const topBarSx = {
   "& > *": { pointerEvents: "auto" },
 };
 
+export const tutorialButtonSx = {
+  color: "text.secondary",
+  "&:hover": { color: "text.primary" },
+};
+
 export const errorAlertSx = {
   position: "fixed",
   top: 56,

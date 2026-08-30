@@ -45,6 +45,29 @@ describe("room management", () => {
     cy.get('ul[role="listbox"]', { timeout: 10000 }).should("contain", "XS");
   });
 
+  it("walks through the room tutorial and closes on the last page", () => {
+    cy.get("#community-tutorial-button").click();
+
+    cy.contains("Step 1 of 9").should("be.visible");
+    cy.contains("Open the menu to join").should("be.visible");
+    cy.get("#tutorial-back-button").should("be.disabled");
+
+    cy.get("#tutorial-next-button").click();
+    cy.contains("Set yourself up").should("be.visible");
+
+    cy.get("#tutorial-back-button").click();
+    cy.contains("Open the menu to join").should("be.visible");
+
+    for (let step = 1; step < 9; step += 1) {
+      cy.get("#tutorial-next-button").click();
+    }
+    cy.contains("Step 9 of 9").should("be.visible");
+    cy.contains("Watch the status light").should("be.visible");
+
+    cy.get("#tutorial-next-button").should("contain", "Done").click();
+    cy.contains("Watch the status light").should("not.exist");
+  });
+
   it("deletes the room after name confirmation and returns to the dashboard", function () {
     cy.joinRoom(username);
 

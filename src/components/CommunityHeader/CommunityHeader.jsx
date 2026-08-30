@@ -2,6 +2,7 @@ import {
   Celebration,
   ContentCopy,
   Edit,
+  HelpOutline,
   Home,
   ModeComment,
   Timer,
@@ -12,6 +13,7 @@ import {
   Box,
   Button,
   Divider,
+  IconButton,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -19,6 +21,7 @@ import {
   Paper,
   Stack,
   Switch,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { ConnectionStatus } from "../ConnectionStatus/ConnectionStatus";
@@ -31,6 +34,7 @@ import {
   menuPaperSx,
   menuSectionLabelSx,
   roomTitleSx,
+  tutorialButtonSx,
 } from "./CommunityHeader.styles";
 
 const displayToggles = [
@@ -52,6 +56,7 @@ export const CommunityHeader = ({
   onLeave,
   onEditPointScheme,
   onDeleteRoom,
+  onShowTutorial,
   settings,
   toggleReactions,
   toggleCommunityAnimation,
@@ -197,6 +202,18 @@ export const CommunityHeader = ({
       >
         {communityName}
       </Typography>
+
+      <Tooltip title="How this works" placement="bottom" arrow>
+        <IconButton
+          id="community-tutorial-button"
+          aria-label="How this works"
+          size="small"
+          onClick={onShowTutorial}
+          sx={tutorialButtonSx}
+        >
+          <HelpOutline fontSize="small" />
+        </IconButton>
+      </Tooltip>
 
       <ConnectionStatus readyState={readyState} size={12} />
     </Stack>

@@ -1,4 +1,13 @@
-import { Alert, Box, Button, Stack, useMediaQuery } from "@mui/material";
+import { HelpOutline } from "@mui/icons-material";
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  Tooltip,
+  useMediaQuery,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -6,6 +15,8 @@ import { ConnectionStatus } from "../../components/ConnectionStatus/ConnectionSt
 import { CreateRoomModal } from "../../components/CreateRoomModal/CreateRoomModal";
 import { DashboardTitleMenu } from "../../components/DashboardTitleMenu/DashboardTitleMenu";
 import { StartModal } from "../../components/StartModal/StartModal";
+import { dashboardTutorialPages } from "../../components/TutorialModal/dashboardTutorialPages";
+import { TutorialModal } from "../../components/TutorialModal/TutorialModal";
 import useDashboard from "../../hooks/useDashboard";
 import { useSettings } from "../../hooks/useSettings";
 import logoUrl from "../../scrum-lord.png";
@@ -15,6 +26,7 @@ import {
   startButtonLogoStyle,
   startButtonSx,
   startButtonWrapperSx,
+  tutorialButtonSx,
   topBarSx,
 } from "./Dashboard.styles";
 
@@ -32,6 +44,7 @@ export const Dashboard = ({ version }) => {
 
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
   const [startModalOpen, setStartModalOpen] = useState(false);
+  const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
   const errorFromQuery = new URLSearchParams(location.search).get("error");
@@ -70,7 +83,20 @@ export const Dashboard = ({ version }) => {
         sx={topBarSx}
       >
         <DashboardTitleMenu version={version} />
-        <ConnectionStatus readyState={readyState} size={12} />
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Tooltip title="How this works" placement="bottom" arrow>
+            <IconButton
+              id="dashboard-tutorial-button"
+              aria-label="How this works"
+              size="small"
+              onClick={() => setTutorialModalOpen(true)}
+              sx={tutorialButtonSx}
+            >
+              <HelpOutline fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <ConnectionStatus readyState={readyState} size={12} />
+        </Stack>
       </Stack>
 
       {errorMessage && (
@@ -89,6 +115,11 @@ export const Dashboard = ({ version }) => {
         yourPrivateRooms={yourPrivateRooms}
         setCreateRoomModalOpen={setCreateRoomModalOpen}
         fullsizeScreen={fullsizeScreen}
+      />
+      <TutorialModal
+        open={tutorialModalOpen}
+        handleClose={() => setTutorialModalOpen(false)}
+        pages={dashboardTutorialPages}
       />
 
       <Box sx={startButtonWrapperSx}>
