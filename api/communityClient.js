@@ -59,6 +59,7 @@ const joinCommunity = async ({
   username,
   userId,
   userColor,
+  userType,
   votingMember,
 }) => {
   const result = await postgresClient.joinCommunity({
@@ -66,13 +67,14 @@ const joinCommunity = async ({
     username,
     userId,
     userColor,
+    userType,
     votingMember,
   });
 
   if (!result || result.length === 0) {
     console.error(
       "unable to join community",
-      { communityId, username, userId, votingMember },
+      { communityId, username, userId, userType, votingMember },
       result
     );
   }

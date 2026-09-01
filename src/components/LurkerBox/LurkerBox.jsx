@@ -1,10 +1,12 @@
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Gavel, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Grid, Tooltip, Typography } from "@mui/material";
+import { isScrumLord } from "../../util/userTypes";
 import {
   deleteLurkerIconSx,
   lurkerBoxSx,
   lurkerNameSx,
+  scrumLordIconSx,
 } from "./LurkerBox.styles";
 
 export const LurkerBox = ({ lurkers, handleDeleteUser }) => {
@@ -40,6 +42,13 @@ export const LurkerBox = ({ lurkers, handleDeleteUser }) => {
                 onClick={() => handleDeleteUser(lurker)}
               />
             </Grid>
+            {isScrumLord(lurker) && (
+              <Grid item>
+                <Tooltip title="Scrum Lord" arrow placement="top">
+                  <Gavel fontSize="small" sx={scrumLordIconSx} />
+                </Tooltip>
+              </Grid>
+            )}
             <Grid item>
               <Typography variant="subtitle2" fontSize="small" sx={lurkerNameSx}>
                 {lurker.username}

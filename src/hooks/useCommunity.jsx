@@ -4,8 +4,17 @@ import useWebSocket from "react-use-websocket";
 import * as uuid from "uuid";
 import { getSocketBaseUrl, socketOptions } from "../util/config";
 import { reactionEmojiFor } from "../util/reactions";
+import { isScrumLord } from "../util/userTypes";
 import { VoteOptionsLabels } from "../util/voteOptions";
 import { useSettings } from "./useSettings";
+
+const joinedAs = (joinedUser) => {
+  if (isScrumLord(joinedUser)) {
+    return " as the Scrum Lord";
+  }
+
+  return joinedUser.votingMember ? "" : " as a spectator";
+};
 
 export default function useCommunity() {
   const { communityId } = useParams();
@@ -73,9 +82,8 @@ export default function useCommunity() {
 
     "community-joined-reply": ({ joinedUser, community: updated }) => {
       setCommunity(updated);
-      const spectator = joinedUser.votingMember ? "" : " as a spectator";
       appendMessage({
-        text: `"${joinedUser.username}" has joined${spectator}!`,
+        text: `"${joinedUser.username}" has joined${joinedAs(joinedUser)}!`,
         userColor: joinedUser.userColor,
       });
     },
@@ -195,9 +203,16 @@ export default function useCommunity() {
   const cancelTimer = (user) =>
     send("cancel-timer", { community: { id: communityId }, ...userFields(user) });
 
-  const joinCommunity = ({ communityId: id, username, userId, userColor, votingMember }) =>
+  const joinCommunity = ({
+    communityId: id,
+    username,
+    userId,
+    userColor,
+    userType,
+    votingMember,
+  }) =>
     send("join-community", {
-      community: { id, username, userId, userColor, votingMember },
+      community: { id, username, userId, userColor, userType, votingMember },
     });
 
   const leaveCommunity = ({ communityId: id, userId, username, userColor }) => {

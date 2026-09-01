@@ -138,11 +138,18 @@ export const Community = ({
       return;
     }
 
-    const { username, userId, votingMember, userColor } = newUser;
+    const { username, userId, userType, votingMember, userColor } = newUser;
     saveUserToStorage(userId);
 
-    joinCommunity({ communityId, userId, username, userColor, votingMember });
-    setIAmCitizen({ userId, username, votingMember, userColor });
+    joinCommunity({
+      communityId,
+      userId,
+      username,
+      userColor,
+      userType,
+      votingMember,
+    });
+    setIAmCitizen({ userId, username, userType, votingMember, userColor });
   };
 
   const handleTimerClicked = ({ timerValue }) => {

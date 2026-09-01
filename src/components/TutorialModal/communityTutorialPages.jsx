@@ -20,6 +20,7 @@ import {
   citizenTilesRowSx,
   colorSwatchPreviewSx,
   mockChipRowSx,
+  mockChipSelectedSx,
   mockChipSx,
   mockFieldLabelSx,
   mockFieldSx,
@@ -88,9 +89,14 @@ const JoinDialogArt = () => (
       <KeyboardArrowDown fontSize="small" color="disabled" />
     </Stack>
     <Stack direction="row" alignItems="center" spacing={1}>
-      <ToggleOn fontSize="small" sx={toggleIconSx(true)} />
       <Typography variant="body2" color="text.secondary" sx={mockMenuLabelSx}>
-        Voting member
+        Join as
+      </Typography>
+      <Typography variant="caption" sx={mockChipSelectedSx}>
+        Voter
+      </Typography>
+      <Typography variant="caption" sx={mockChipSx}>
+        Scrum Lord
       </Typography>
       <Typography variant="body2" sx={mockFilledButtonSx("primary")}>
         Join
@@ -256,7 +262,7 @@ export const communityTutorialPages = [
   },
   {
     title: "Set yourself up",
-    body: "Pick a user name and a color for your tile. Switch Voting member off to sit in without casting votes, handy if you are running the session rather than estimating. Then hit Join.",
+    body: "Pick a user name and a color for your tile, then choose how you are joining. Voters get a card and estimate. Scrum Lords run the session from the observers column without casting votes. Then hit Join.",
     art: <JoinDialogArt />,
   },
   {

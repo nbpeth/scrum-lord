@@ -19,8 +19,8 @@ describe("room management", () => {
     cy.contains("No one is here", { timeout: 10000 }).should("be.visible");
   });
 
-  it("shows observers in the lurker box", () => {
-    cy.joinRoom("cypress-observer", { voting: false });
+  it("shows scrum lords in the lurker box instead of the vote grid", () => {
+    cy.joinRoom("cypress-observer", { userType: "scrumlord" });
 
     cy.get("#lurker-box", { timeout: 10000 }).should(
       "contain",

@@ -52,9 +52,9 @@ export const refreshNameIconSx = {
   "&:hover": { color: "primary.main" },
 };
 
-export const votingMemberRowSx = { width: "100%", flexWrap: "wrap" };
+export const userTypeRowSx = { width: "100%", flexWrap: "wrap" };
 
-export const votingMemberHelpSx = {
+export const userTypeHelpSx = {
   display: "inline-flex",
   alignItems: "center",
   color: "text.secondary",
@@ -62,7 +62,45 @@ export const votingMemberHelpSx = {
   ml: 0.25,
 };
 
-export const votingMemberHelpIconSx = { fontSize: 16 };
+export const userTypeHelpIconSx = { fontSize: 16 };
+
+export const userTypeGroupSx = {
+  width: "100%",
+  gap: 1,
+  "& .MuiToggleButtonGroup-grouped": {
+    flex: 1,
+    minWidth: 0,
+    margin: 0,
+    border: "1px solid",
+    borderColor: "divider",
+    borderRadius: 1.5,
+    "&:not(:first-of-type)": {
+      borderLeft: "1px solid",
+      borderColor: "divider",
+    },
+  },
+};
+
+export const userTypeButtonSx = (theme) => ({
+  textTransform: "none",
+  display: "block",
+  textAlign: "left",
+  px: 1.5,
+  py: 1.125,
+  color: "text.secondary",
+  "&.Mui-selected": {
+    color: "text.primary",
+    borderColor: alpha(theme.palette.primary.main, 0.7),
+    backgroundColor: alpha(theme.palette.primary.main, 0.14),
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+    },
+  },
+});
+
+export const userTypeIconSx = { fontSize: 18 };
+
+export const userTypeDescriptionSx = { display: "block", lineHeight: 1.35 };
 
 export const actionRowSx = {
   width: "100%",

@@ -198,6 +198,13 @@ export const mockChipSx = (theme) => ({
 
 export const mockChipRowSx = { flexWrap: "wrap", gap: 0.75 };
 
+export const mockChipSelectedSx = (theme) => ({
+  ...mockChipSx(theme),
+  borderColor: alpha(theme.palette.primary.main, 0.7),
+  backgroundColor: alpha(theme.palette.primary.main, 0.14),
+  color: "text.primary",
+});
+
 export const colorSwatchPreviewSx = (color) => ({
   width: 16,
   height: 16,
