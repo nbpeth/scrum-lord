@@ -12,9 +12,7 @@ describe("room management", () => {
   it("lets a citizen leave the room", () => {
     cy.joinRoom(username);
 
-    cy.openRoomMenu();
-    cy.contains("button", "Leave").click();
-    cy.closeMenu();
+    cy.get("#room-leave-button").click();
 
     cy.contains("No one is here", { timeout: 10000 }).should("be.visible");
   });
@@ -32,33 +30,72 @@ describe("room management", () => {
     cy.get("#lurker-box").should("not.exist");
   });
 
-  it("changes the point scheme", () => {
-    cy.joinRoom(username);
-
+  it("offers the display toggles before joining, but not delete", () => {
     cy.openRoomMenu();
-    cy.contains("li", "Edit point scheme").click();
+    cy.contains("li", "Activity").should("be.visible");
+    cy.contains("li", "Scrumlords").should("be.visible");
+    cy.closeMenu();
+
+    cy.get("#community-message-board").should("exist");
+    cy.toggleRoomSetting("Activity");
+    cy.get("#community-message-board").should("not.exist");
+  });
+
+  it("collapses the room panel to a strip of icons", () => {
+    cy.joinRoom(username, { userType: "scrumlord" });
+
+    cy.get("#room-side-panel").should("contain", username);
+    cy.get("#room-side-panel").find("#room-point-scheme-button").should("be.visible");
+
+    cy.get("#room-side-panel-toggle").click();
+
+    cy.get("#room-side-panel").should("not.contain", "Joined as");
+    cy.get("#room-side-panel").find("#room-leave-button").should("be.visible");
+
+    cy.get("#room-side-panel-toggle").click();
+    cy.get("#room-side-panel").should("contain", username);
+  });
+
+  it("changes the point scheme", () => {
+    cy.joinRoom(username, { userType: "scrumlord" });
+
+    cy.get("#room-point-scheme-button").click();
 
     cy.get("#scheme-selector").click();
     cy.get('ul[role="listbox"]').contains("T-Shirt Sizes").click();
     cy.contains("button", "Update").click();
-    cy.closeMenu();
 
-    cy.get("#vote-selector").click();
-    cy.get('ul[role="listbox"]', { timeout: 10000 }).should("contain", "XS");
+    cy.get("#community-message-board", { timeout: 10000 }).should(
+      "contain",
+      "T-Shirt Sizes"
+    );
+  });
+
+  it("keeps point scheme and delete room to scrumlords", () => {
+    cy.joinRoom(username);
+
+    cy.get("#room-side-panel").should("contain", username);
+    cy.get("#room-leave-button").should("be.visible");
+    cy.get("#room-point-scheme-button").should("not.exist");
+    cy.get("#room-delete-button").should("not.exist");
+
+    cy.openRoomMenu();
+    cy.get("#room-menu").should("not.contain", "Delete room");
+    cy.closeMenu();
   });
 
   it("walks through the room tutorial and closes on the last page", () => {
     cy.get("#community-tutorial-button").click();
 
     cy.contains("Step 1 of 10").should("be.visible");
-    cy.contains("Open the menu to join").should("be.visible");
+    cy.contains("Join the room").should("be.visible");
     cy.get("#tutorial-back-button").should("be.disabled");
 
     cy.get("#tutorial-next-button").click();
     cy.contains("Set yourself up").should("be.visible");
 
     cy.get("#tutorial-back-button").click();
-    cy.contains("Open the menu to join").should("be.visible");
+    cy.contains("Join the room").should("be.visible");
 
     for (let step = 1; step < 10; step += 1) {
       cy.get("#tutorial-next-button").click();
@@ -71,10 +108,9 @@ describe("room management", () => {
   });
 
   it("deletes the room after name confirmation and returns to the dashboard", function () {
-    cy.joinRoom(username);
+    cy.joinRoom(username, { userType: "scrumlord" });
 
-    cy.openRoomMenu();
-    cy.contains("button", "Delete room").click();
+    cy.get("#room-delete-button").click();
 
     cy.contains("button", exactDeleteButton).should("be.disabled");
     cy.get("#name").type(this.roomName);

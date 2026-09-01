@@ -29,13 +29,11 @@ const typeUsernameThenSelectUserType = (username, userType) => {
 };
 
 Cypress.Commands.add("joinRoom", (username, { userType = "voter" } = {}) => {
-  cy.openRoomMenu();
-  cy.contains("button", "Join room").click();
+  cy.get("#room-join-button").click();
 
   typeUsernameThenSelectUserType(username, userType);
 
   cy.contains("button", /^Join$/).click();
-  cy.closeMenu();
 
   if (userType === "voter") {
     cy.get("#vote-card-container", { timeout: 10000 }).should(

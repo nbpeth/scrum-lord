@@ -148,6 +148,32 @@ export const mockMenuSx = (theme) => ({
   background: alpha(theme.palette.background.paper, 0.95),
 });
 
+export const mockSidePanelSx = (theme) => ({
+  width: 168,
+  borderRadius: 1,
+  border: "1px solid",
+  borderColor: alpha(theme.palette.divider, 0.9),
+  background: alpha(theme.palette.background.paper, 0.95),
+  overflow: "hidden",
+});
+
+export const mockSidePanelHeaderSx = (theme) => ({
+  px: 1.25,
+  py: 0.5,
+  borderBottom: "1px solid",
+  borderColor: alpha(theme.palette.divider, 0.7),
+  background: alpha(theme.palette.background.default, 0.5),
+});
+
+export const mockSidePanelTitleSx = {
+  flexGrow: 1,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  color: "text.secondary",
+};
+
+export const mockSidePanelBodySx = { px: 1.25, py: 1.25 };
+
 export const mockMenuRowSx = { px: 1.5, py: 0.4 };
 
 export const mockMenuLabelSx = { flexGrow: 1 };
