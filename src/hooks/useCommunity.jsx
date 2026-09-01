@@ -10,7 +10,7 @@ import { useSettings } from "./useSettings";
 
 const joinedAs = (joinedUser) => {
   if (isScrumLord(joinedUser)) {
-    return " as the Scrum Lord";
+    return " as a Scrumlord";
   }
 
   return joinedUser.votingMember ? "" : " as a spectator";

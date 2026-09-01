@@ -13,7 +13,7 @@ export const userTypeOptions = [
   },
   {
     value: UserTypes.scrumLord,
-    label: "Scrum Lord",
+    label: "Scrumlord",
     description: "Runs the room, sits out the vote",
   },
 ];

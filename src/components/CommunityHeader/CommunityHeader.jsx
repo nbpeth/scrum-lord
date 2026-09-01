@@ -2,11 +2,11 @@ import {
   Celebration,
   ContentCopy,
   Edit,
+  Gavel,
   HelpOutline,
   Home,
   ModeComment,
   Timer,
-  Visibility,
 } from "@mui/icons-material";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 import {
@@ -40,7 +40,7 @@ import {
 const displayToggles = [
   { label: "Reactions", icon: Celebration, settingKey: "reactionsVisible" },
   { label: "Stars", icon: ModeNightIcon, settingKey: "communityAnimation" },
-  { label: "Observers", icon: Visibility, settingKey: "lurkerBoxVisible" },
+  { label: "Scrumlords", icon: Gavel, settingKey: "lurkerBoxVisible" },
   { label: "Activity", icon: ModeComment, settingKey: "messageBoardVisible" },
   { label: "Timer", icon: Timer, settingKey: "timerVisible" },
 ];

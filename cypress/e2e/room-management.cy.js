@@ -28,7 +28,7 @@ describe("room management", () => {
     );
     cy.get("#vote-card-container").should("not.contain", "cypress-observer");
 
-    cy.toggleRoomSetting("Observers");
+    cy.toggleRoomSetting("Scrumlords");
     cy.get("#lurker-box").should("not.exist");
   });
 

@@ -176,7 +176,7 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                     Join as
                   </Typography>
                   <Tooltip
-                    title="Voters get a card and cast points. Scrum Lords run the session and take part without voting."
+                    title="Voters get a card and cast points. Scrumlords run the session and take part without voting."
                     placement="top"
                     arrow
                   >

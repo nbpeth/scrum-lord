@@ -2,6 +2,7 @@ import {
   Celebration,
   ContentCopy,
   Edit,
+  Gavel,
   Home,
   KeyboardArrowDown,
   ModeComment,
@@ -9,7 +10,6 @@ import {
   Timer,
   ToggleOff,
   ToggleOn,
-  Visibility,
 } from "@mui/icons-material";
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import { VoteOptionsLabels } from "../../util/voteOptions";
@@ -96,7 +96,7 @@ const JoinDialogArt = () => (
         Voter
       </Typography>
       <Typography variant="caption" sx={mockChipSx}>
-        Scrum Lord
+        Scrumlord
       </Typography>
       <Typography variant="body2" sx={mockFilledButtonSx("primary")}>
         Join
@@ -188,7 +188,7 @@ const TimerArt = () => (
 const displayToggles = [
   { icon: Celebration, label: "Reactions", toggledOn: true },
   { icon: ModeNight, label: "Stars", toggledOn: true },
-  { icon: Visibility, label: "Observers", toggledOn: false },
+  { icon: Gavel, label: "Scrumlords", toggledOn: false },
   { icon: ModeComment, label: "Activity", toggledOn: true },
   { icon: Timer, label: "Timer", toggledOn: false },
 ];
@@ -262,7 +262,7 @@ export const communityTutorialPages = [
   },
   {
     title: "Set yourself up",
-    body: "Pick a user name and a color for your tile, then choose how you are joining. Voters get a card and estimate. Scrum Lords run the session from the observers column without casting votes. Then hit Join.",
+    body: "Pick a user name and a color for your tile, then choose how you are joining. Voters get a card and estimate. Scrumlords run the session from their own panel without casting votes. Then hit Join.",
     art: <JoinDialogArt />,
   },
   {
@@ -287,7 +287,7 @@ export const communityTutorialPages = [
   },
   {
     title: "Show only what you need",
-    body: "The Display section of the menu switches each piece of the room on and off: the reactions bar, the animated background, the observers column, the activity log, and the voting timer.",
+    body: "The Display section of the menu switches each piece of the room on and off: the reactions bar, the animated background, the scrumlords panel, the activity log, and the voting timer.",
     art: <DisplayTogglesArt />,
   },
   {
