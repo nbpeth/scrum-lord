@@ -70,8 +70,20 @@ describe("room voting", () => {
   });
 
   it("starts and cancels the voting timer", () => {
-    cy.contains("button", "Timer").should("be.visible").click();
-    cy.contains("button", "Cancel", { timeout: 10000 }).click();
-    cy.contains("button", "Timer", { timeout: 10000 }).should("be.visible");
+    cy.get("#timer-button").should("contain", "1:00").click();
+
+    cy.get("#timer-countdown", { timeout: 10000 }).should("be.visible").click();
+
+    cy.get("#timer-button", { timeout: 10000 }).should("be.visible");
+  });
+
+  it("starts the timer from a preset", () => {
+    cy.get("#timer-presets-button").click();
+    cy.get("#timer-presets").contains("button", "0:30").click();
+
+    cy.get("#timer-countdown", { timeout: 10000 }).should("be.visible");
+    cy.get("#timer-countdown").click();
+
+    cy.get("#timer-button", { timeout: 10000 }).should("contain", "0:30");
   });
 });

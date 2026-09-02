@@ -1,15 +1,21 @@
-import { ExpandMore } from "@mui/icons-material";
+import { ExpandMore, TimerOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
   ButtonBase,
+  ButtonGroup,
   Paper,
   Popover,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useState } from "react";
+import {
+  DEFAULT_TIMER_SECONDS,
+  TIMER_PRESETS,
+  clampTimerSeconds,
+  formatCountdown,
+} from "../../util/timer";
 import { VoteOptions } from "../../util/voteOptions";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 import { CommunityReactionButtons } from "./CommunityReactionButtons";
@@ -19,12 +25,16 @@ import {
   mainControlsSx,
   resetButtonSx,
   revealButtonSx,
-  timerButtonSx,
-  timerDisplayBoxSx,
-  timerErrorSx,
+  timerCustomRowSx,
   timerGroupSx,
+  timerIconSx,
   timerInputProps,
   timerInputSx,
+  timerPresetRowSx,
+  timerPresetSx,
+  timerPresetsPaperSx,
+  timerPresetsToggleSx,
+  timerStartButtonSx,
   voteCardSx,
   voteDeckGridSx,
   voteDeckSx,
@@ -32,9 +42,6 @@ import {
   voteTriggerIconSx,
   voteTriggerSx,
 } from "./CommunityControls.styles";
-
-const MAX_TIMER_SECONDS = 600;
-const DEFAULT_TIMER_SECONDS = 60;
 
 export const CommunityControls = ({
   handleReveal,
@@ -175,72 +182,106 @@ export const VoteDeck = ({ options, currentVote, onVote }) => {
 };
 
 export const TimerControl = ({ community, handleTimerClicked }) => {
-  const [timerValue, setTimerValue] = useState(DEFAULT_TIMER_SECONDS);
-  const [error, setError] = useState(undefined);
+  const [duration, setDuration] = useState(DEFAULT_TIMER_SECONDS);
+  const [presetsAnchor, setPresetsAnchor] = useState(null);
+  const [customValue, setCustomValue] = useState("");
 
-  const onTimerValueChanged = (event) => {
-    event.preventDefault();
-    const cleansedValue = event.target.value.replace(/\D/g, "");
+  const running = Boolean(community?.timer?.running);
 
-    if (cleansedValue > MAX_TIMER_SECONDS) {
-      setError(`Max timer value is ${MAX_TIMER_SECONDS} seconds`);
-    } else if (error) {
-      setError(undefined);
+  const toggleTimer = (timerValue) =>
+    handleTimerClicked({ timerValue, communityId: community?.id });
+
+  const startWith = (seconds) => {
+    setDuration(seconds);
+    setPresetsAnchor(null);
+    setCustomValue("");
+    toggleTimer(seconds);
+  };
+
+  const startCustom = () => {
+    const seconds = clampTimerSeconds(customValue);
+    if (seconds) {
+      startWith(seconds);
     }
-
-    setTimerValue(cleansedValue);
   };
 
-  const onTimerClicked = () => {
-    handleTimerClicked({
-      timerValue: timerValue || DEFAULT_TIMER_SECONDS,
-      communityId: community.id,
-    });
-  };
+  if (running) {
+    return (
+      <Box sx={timerGroupSx}>
+        <TimerDisplay community={community} onCancel={() => toggleTimer()} />
+      </Box>
+    );
+  }
 
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      spacing={0.75}
-      flexWrap="wrap"
-      sx={timerGroupSx}
-    >
-      <Button
-        disabled={timerValue > MAX_TIMER_SECONDS}
-        size="small"
-        variant="contained"
-        color="secondary"
-        onClick={onTimerClicked}
-        sx={timerButtonSx}
+    <Box sx={timerGroupSx}>
+      <ButtonGroup size="small" variant="contained" color="secondary">
+        <Button
+          id="timer-button"
+          onClick={() => startWith(duration)}
+          startIcon={<TimerOutlined sx={timerIconSx} />}
+          sx={timerStartButtonSx}
+        >
+          {formatCountdown(duration)}
+        </Button>
+        <Button
+          id="timer-presets-button"
+          aria-label="Choose timer length"
+          onClick={(event) => setPresetsAnchor(event.currentTarget)}
+          sx={timerPresetsToggleSx}
+        >
+          <ExpandMore sx={timerIconSx} />
+        </Button>
+      </ButtonGroup>
+
+      <Popover
+        open={Boolean(presetsAnchor)}
+        anchorEl={presetsAnchor}
+        onClose={() => setPresetsAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{ paper: { sx: timerPresetsPaperSx } }}
       >
-        {community?.timer?.running ? "Cancel" : "Timer"}
-      </Button>
-      <TextField
-        type="number"
-        size="small"
-        error={Boolean(error)}
-        placeholder="Sec"
-        inputProps={timerInputProps}
-        disabled={community?.timer?.running}
-        variant="outlined"
-        value={timerValue}
-        onChange={onTimerValueChanged}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            onTimerClicked();
-          }
-        }}
-        sx={timerInputSx}
-      />
-      <Box sx={timerDisplayBoxSx}>
-        <TimerDisplay community={community} />
-      </Box>
-      {error && (
-        <Typography variant="caption" color="error" sx={timerErrorSx}>
-          {error}
-        </Typography>
-      )}
-    </Stack>
+        <Box id="timer-presets" sx={timerPresetRowSx}>
+          {TIMER_PRESETS.map((seconds) => (
+            <ButtonBase
+              key={seconds}
+              onClick={() => startWith(seconds)}
+              sx={timerPresetSx}
+            >
+              {formatCountdown(seconds)}
+            </ButtonBase>
+          ))}
+        </Box>
+
+        <Box sx={timerCustomRowSx}>
+          <TextField
+            type="number"
+            size="small"
+            id="timer-custom-input"
+            placeholder="Sec"
+            inputProps={timerInputProps}
+            value={customValue}
+            onChange={(event) => setCustomValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                startCustom();
+              }
+            }}
+            sx={timerInputSx}
+          />
+          <Button
+            id="timer-custom-start"
+            size="small"
+            variant="outlined"
+            color="secondary"
+            disabled={!clampTimerSeconds(customValue)}
+            onClick={startCustom}
+          >
+            Start
+          </Button>
+        </Box>
+      </Popover>
+    </Box>
   );
 };
