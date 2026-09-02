@@ -22,6 +22,9 @@ import {
   mockChipRowSx,
   mockChipSelectedSx,
   mockChipSx,
+  mockCountdownColumnSx,
+  mockDeckCardSx,
+  mockDeckSx,
   mockFieldLabelSx,
   mockFieldSx,
   mockFilledButtonSx,
@@ -30,7 +33,12 @@ import {
   mockMenuSectionLabelSx,
   mockMenuSx,
   mockOutlineButtonSx,
+  mockPanelButtonSx,
   mockPanelSx,
+  mockProgressFillSx,
+  mockProgressTrackSx,
+  mockSplitCaretSx,
+  mockSplitGroupSx,
   mockSidePanelBodySx,
   mockSidePanelHeaderSx,
   mockSidePanelSx,
@@ -120,20 +128,23 @@ const JoinDialogArt = () => (
   </Stack>
 );
 
+const deckPreview = [0, 1, 2, 3, 5, 8, 13, 21, 34];
+
 const VoteControlsArt = () => (
-  <Stack direction="row" alignItems="center" spacing={1.5} justifyContent="center">
-    <Box>
-      <Typography variant="caption" color="text.secondary" sx={mockFieldLabelSx}>
-        Pts
+  <Stack alignItems="center" spacing={1.25}>
+    <Stack direction="row" alignItems="center" spacing={0.5}>
+      <Typography variant="body2" sx={mockOutlineButtonSx("primary")}>
+        8
       </Typography>
-      <Stack direction="row" alignItems="center" spacing={2} sx={mockFieldSx}>
-        <Typography variant="body2">8</Typography>
-        <KeyboardArrowDown fontSize="small" color="disabled" />
-      </Stack>
+      <KeyboardArrowDown fontSize="small" color="disabled" />
+    </Stack>
+    <Box sx={mockDeckSx}>
+      {deckPreview.map((value) => (
+        <Box key={value} sx={mockDeckCardSx(value === 8)}>
+          <Typography variant="caption">{value}</Typography>
+        </Box>
+      ))}
     </Box>
-    <Typography variant="body2" sx={mockFilledButtonSx("primary")}>
-      Vote
-    </Typography>
   </Stack>
 );
 
@@ -187,16 +198,28 @@ const DoubleVoteArt = () => (
 );
 
 const TimerArt = () => (
-  <Stack direction="row" alignItems="center" spacing={1.5} justifyContent="center">
-    <Typography variant="body2" sx={mockFilledButtonSx("secondary")}>
-      Timer
+  <Stack direction="row" alignItems="center" spacing={2} justifyContent="center">
+    <Box sx={mockSplitGroupSx}>
+      <Typography variant="body2" sx={mockFilledButtonSx("secondary")}>
+        1:00
+      </Typography>
+      <Box sx={mockSplitCaretSx}>
+        <KeyboardArrowDown fontSize="small" />
+      </Box>
+    </Box>
+
+    <Typography variant="body2" color="text.disabled">
+      →
     </Typography>
-    <Typography variant="body2" sx={mockFieldSx}>
-      60
-    </Typography>
-    <Typography variant="body2" sx={timerReadoutSx}>
-      0:42
-    </Typography>
+
+    <Box sx={mockCountdownColumnSx}>
+      <Typography variant="body2" sx={timerReadoutSx}>
+        0:42
+      </Typography>
+      <Box sx={mockProgressTrackSx}>
+        <Box sx={mockProgressFillSx} />
+      </Box>
+    </Box>
   </Stack>
 );
 
@@ -263,17 +286,19 @@ const LeaveArt = () => (
       </Typography>
       <ChevronLeft fontSize="small" color="disabled" />
     </Stack>
-    <Stack spacing={1} sx={mockSidePanelBodySx}>
-      <Typography variant="caption" color="text.disabled">
-        Joined as
-      </Typography>
-      <Typography variant="body2" sx={mockOutlineButtonSx("secondary")}>
+    <Stack spacing={0.75} sx={mockSidePanelBodySx}>
+      <Box>
+        <Typography variant="caption" color="text.disabled" display="block">
+          Joined as
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          cheerfulOtter
+        </Typography>
+      </Box>
+      <Typography variant="body2" sx={mockPanelButtonSx("secondary")}>
         Leave
       </Typography>
-      <Typography variant="body2" sx={mockOutlineButtonSx("primary")}>
-        Point scheme
-      </Typography>
-      <Typography variant="body2" sx={mockOutlineButtonSx("error")}>
+      <Typography variant="body2" sx={mockPanelButtonSx("error")}>
         Delete room
       </Typography>
     </Stack>
@@ -293,7 +318,7 @@ export const communityTutorialPages = [
   },
   {
     title: "Cast your vote",
-    body: "Choose your points from the Pts dropdown and press Vote. Changed your mind? Vote again any time before the reveal.",
+    body: "Hit Vote to open the deck, then pick your number and it is cast straight away. The button then shows what you are holding, so you can always see your own estimate. Changed your mind? Open the deck and pick again any time before the reveal.",
     art: <VoteControlsArt />,
   },
   {
@@ -308,7 +333,7 @@ export const communityTutorialPages = [
   },
   {
     title: "Put a clock on it",
-    body: "The voting timer gives the room a deadline. Set the seconds, start it, and when it runs out the votes reveal themselves automatically. Cancel stops the clock without revealing.",
+    body: "The voting timer gives the room a deadline. Hit the clock to start it at the length shown, or use the chevron to pick another and start it right away. While it runs the button becomes a countdown that drains and turns amber, then red for the last ten seconds. Click it to cancel; let it finish and the votes reveal themselves.",
     art: <TimerArt />,
   },
   {
