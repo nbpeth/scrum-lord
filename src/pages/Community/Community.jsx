@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -46,6 +46,12 @@ export const Community = ({
 }) => {
   const { communityId } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+  // Below md the grid columns stack, so the activity pane has nowhere to go.
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
+  // The rail's fixed width sits outside the grid's column math, so it starts
+  // squeezing the cards well before the columns actually stack.
+  const isNarrow = useMediaQuery(theme.breakpoints.down("lg"), { noSsr: true });
 
   const {
     cancelTimer,
@@ -83,7 +89,7 @@ export const Community = ({
     useState(false);
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [hotdogAlert, setHotdogAlert] = useState(false);
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useState(false);
+  const [collapsedOverride, setCollapsedOverride] = useState(null);
 
   useEffect(() => {
     const cachedUserId = readUserState()[communityId];
@@ -192,10 +198,13 @@ export const Community = ({
     setDeleteCommunityModalOpen(false);
   };
 
+  // Collapsed by default on mobile, expanded on desktop, until you say otherwise.
+  const sidePanelCollapsed = collapsedOverride ?? isNarrow;
+
   const lurkers = citizens.filter((c) => !c?.votingMember);
 
   const showLurkerColumn = Boolean(settings?.lurkerBoxVisible);
-  const showActivity = Boolean(settings?.messageBoardVisible);
+  const showActivity = Boolean(settings?.messageBoardVisible) && !isMobile;
   const lurkerMd = showLurkerColumn ? 2 : 0;
   const mainRowMd = 12 - lurkerMd;
   const activityMd = showActivity ? Math.floor(mainRowMd / 4) : 0;
@@ -271,7 +280,7 @@ export const Community = ({
       <Box sx={mainRegionSx}>
         <RoomSidePanel
           collapsed={sidePanelCollapsed}
-          onToggleCollapsed={() => setSidePanelCollapsed((prev) => !prev)}
+          onToggleCollapsed={() => setCollapsedOverride(!sidePanelCollapsed)}
           iAmCitizen={iAmCitizen}
           onJoin={() => setJoinCommunityModalOpen(true)}
           onLeave={handleLeave}

@@ -42,6 +42,18 @@ describe("room management", () => {
     cy.get("#community-message-board").should("not.exist");
   });
 
+  it("collapses the panel and drops the activity pane on mobile", () => {
+    cy.viewport("iphone-x");
+    cy.joinRoom(username, { userType: "scrumlord" });
+
+    cy.get("#room-side-panel").should("be.visible");
+    cy.get("#room-side-panel").should("not.contain", "Joined as");
+    cy.get("#community-message-board").should("not.exist");
+
+    cy.viewport(1280, 800);
+    cy.get("#community-message-board", { timeout: 10000 }).should("exist");
+  });
+
   it("collapses the room panel to a strip of icons", () => {
     cy.joinRoom(username, { userType: "scrumlord" });
 
