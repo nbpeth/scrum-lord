@@ -4,20 +4,11 @@ export const reactionRowSx = (theme) => ({
   display: "flex",
   flexWrap: "wrap",
   alignItems: "center",
-  alignSelf: { xs: "flex-start", sm: "center" },
   gap: 0.25,
   flexShrink: 0,
-  pb: { xs: 1, sm: 0 },
-  mb: { xs: 0.25, sm: 0 },
-  pr: { sm: 1.5 },
-  mr: { sm: 0.5 },
-  borderBottom: {
-    xs: `1px solid ${alpha(theme.palette.divider, 0.45)}`,
-    sm: "none",
-  },
-  borderRight: {
-    sm: `1px solid ${alpha(theme.palette.divider, 0.45)}`,
-  },
+  pr: 1,
+  mr: 0.25,
+  borderRight: `1px solid ${alpha(theme.palette.divider, 0.45)}`,
 });
 
 export const reactionButtonSx = (theme) => ({

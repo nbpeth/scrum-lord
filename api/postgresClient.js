@@ -130,9 +130,6 @@ const resetCommunity = async ({ communityId }) => {
 };
 
 const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
-  // Pair each citizen with their array index using WITH ORDINALITY — do not
-  // cross join jsonb_array_elements with generate_series (that returns many
-  // rows per user and breaks scalar subqueries on idx).
   const query = `
       WITH to_update AS (
         SELECT
@@ -177,7 +174,6 @@ const submitVote = async ({ communityId, userId, vote, doubleVote }) => {
 };
 
 const revealCommunity = async ({ communityId }) => {
-  // Show all votes and increment synergy total votes.
   const query = `
     UPDATE communities
     SET data = jsonb_set(
@@ -250,7 +246,6 @@ const cancelTimer = async ({ communityId }) => {
 };
 
 const synergizeCommunity = async ({ communityId }) => {
-  // Increment synergy hits.
   const query = `
     UPDATE communities
     SET data =

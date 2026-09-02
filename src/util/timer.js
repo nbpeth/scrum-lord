@@ -11,8 +11,6 @@ export const formatCountdown = (totalSeconds) => {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 };
 
-// How urgent the countdown looks: calm, then warning in the last quarter,
-// then error for the final ten seconds.
 export const countdownTone = (secondsRemaining, totalSeconds) => {
   if (secondsRemaining <= 10) {
     return "error";

@@ -5,6 +5,7 @@ import {
   OVERFLOW_REACTIONS,
   PINNED_REACTIONS,
   REACTION_EMOJI,
+  REACTION_EVENTS,
 } from "../../util/reactions";
 import {
   moreReactionsIconSx,
@@ -15,8 +16,11 @@ import {
   reactionTraySx,
 } from "./CommunityReactionButtons.styles";
 
-export const CommunityReactionButtons = ({ onReaction }) => {
+export const CommunityReactionButtons = ({ onReaction, compact = false }) => {
   const [trayAnchor, setTrayAnchor] = useState(null);
+
+  const inline = compact ? [] : PINNED_REACTIONS;
+  const trayed = compact ? REACTION_EVENTS : OVERFLOW_REACTIONS;
 
   const react = (event) => {
     onReaction({ event });
@@ -25,7 +29,7 @@ export const CommunityReactionButtons = ({ onReaction }) => {
 
   return (
     <Box sx={reactionRowSx}>
-      {PINNED_REACTIONS.map((event) => (
+      {inline.map((event) => (
         <ReactionButton key={event} event={event} onReact={react} />
       ))}
 
@@ -50,7 +54,7 @@ export const CommunityReactionButtons = ({ onReaction }) => {
         slotProps={{ paper: { sx: reactionTraySx } }}
       >
         <Box id="reaction-tray" sx={reactionTrayGridSx}>
-          {OVERFLOW_REACTIONS.map((event) => (
+          {trayed.map((event) => (
             <ReactionButton key={event} event={event} onReact={react} />
           ))}
         </Box>

@@ -1,13 +1,11 @@
 import { ThemeProvider } from "@mui/material";
 import { renderToString } from "react-dom/server";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { darkTheme } from "../../theme";
 import { CommunityControls } from "./CommunityControls";
 
 const noop = () => {};
 
-// MUI's ThemeProvider and ButtonBase use useLayoutEffect, which React always
-// warns about under renderToString. Keep that noise out without hiding real errors.
 const SSR_LAYOUT_EFFECT_WARNING = "useLayoutEffect does nothing on the server";
 
 beforeAll(() => {
@@ -53,6 +51,20 @@ const idleCommunity = {
   revealed: false,
   citizens: [voter],
   timer: { running: false },
+};
+
+const stubWidth = (width) => {
+  window.matchMedia = vi.fn().mockImplementation((query) => {
+    const max = /max-width:\s*([\d.]+)px/.exec(query);
+    return {
+      matches: max ? width <= Number(max[1]) : true,
+      media: query,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    };
+  });
 };
 
 describe("CommunityControls", () => {
@@ -106,5 +118,46 @@ describe("CommunityControls", () => {
     });
 
     expect(html).not.toContain('id="vote-button"');
+  });
+
+  describe("when the viewport is narrow", () => {
+    afterEach(() => {
+      delete window.matchMedia;
+    });
+
+    it("drops the labels on reset and reveal", () => {
+      stubWidth(390);
+      const html = render({ iAmCitizen: voter, community: idleCommunity });
+
+      expect(html).toContain('aria-label="Reset"');
+      expect(html).toContain('aria-label="Reveal"');
+      expect(html).not.toContain(">Reset<");
+      expect(html).not.toContain(">Reveal<");
+    });
+
+    it("folds every reaction into the tray", () => {
+      stubWidth(390);
+      const html = render({ iAmCitizen: voter, community: idleCommunity });
+
+      expect(html).toContain('id="more-reactions-button"');
+      expect(html).not.toContain('title="hotdog"');
+    });
+
+    it("shrinks the timer to a single icon", () => {
+      stubWidth(390);
+      const html = render({ iAmCitizen: voter, community: idleCommunity });
+
+      expect(html).toContain('id="timer-presets-button"');
+      expect(html).not.toContain('id="timer-button"');
+    });
+
+    it("keeps the labels at desktop width", () => {
+      stubWidth(1440);
+      const html = render({ iAmCitizen: voter, community: idleCommunity });
+
+      expect(html).toContain(">Reset<");
+      expect(html).toContain('id="timer-button"');
+      expect(html).toContain('title="hotdog"');
+    });
   });
 });

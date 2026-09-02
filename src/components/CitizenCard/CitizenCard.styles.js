@@ -37,13 +37,20 @@ export const citizenVoteBackground = ({ theme, hasVoted, doubleVote }) => {
 };
 
 export const citizenCardSx =
-  ({ isMyCard, backgroundColor, cardAnimating, animationClassPosition }) =>
+  ({
+    isMyCard,
+    backgroundColor,
+    userColor,
+    cardAnimating,
+    animationClassPosition,
+  }) =>
   (theme) => ({
-    padding: "10px",
-    minWidth: "100px",
+    padding: { xs: "5px 3px 4px", sm: "9px 10px 10px" },
+    minWidth: 0,
     border: `1px solid ${
       isMyCard ? theme.palette.primary.dark : theme.palette.grey[800]
     }`,
+    borderTop: `4px solid ${userColor ?? theme.palette.grey[700]}`,
     backgroundColor,
     cursor: "pointer",
     transition: "background .5s ease-in-out",
@@ -57,20 +64,46 @@ export const citizenCardSx =
     }),
   });
 
-export const cardContentVisibilitySx = (contentHidden) =>
-  contentHidden
-    ? { visibility: "hidden" }
-    : {
-        animation: "citizen-card-content-show 500ms ease-in forwards",
-        "@keyframes citizen-card-content-show": {
-          "0%": { opacity: 0 },
-          "100%": { opacity: 1 },
-        },
-      };
+export const cardContentVisibilitySx = (contentHidden) => ({
+  display: "block",
+  opacity: contentHidden ? 0 : 1,
+  visibility: contentHidden ? "hidden" : "visible",
+  transition: "opacity 500ms ease-in",
+});
 
-export const desktopCardContentSx = { padding: "5px", textAlign: "center" };
+export const cardContentSx = {
+  padding: { xs: "2px", sm: "5px" },
+  "&:last-child": { paddingBottom: { xs: "2px", sm: "5px" } },
+  textAlign: "center",
+  minWidth: 0,
+};
 
-export const deleteIconSx = (isMyCard) =>
-  isMyCard ? { cursor: "none", opacity: 0 } : { cursor: "pointer" };
+export const citizenNameSx = (userColor) => (theme) => ({
+  display: { xs: "none", sm: "block" },
+  fontWeight: "bold",
+  color: userColor ?? theme.palette.grey[100],
+  fontSize: { xs: "0.75rem", sm: "1rem" },
+  lineHeight: 1.4,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+});
 
-export const voteValueSx = { fontWeight: "bold" };
+export const cardActionsRowSx = {
+  display: "flex",
+  justifyContent: "center",
+  pt: { xs: 0, sm: 0.25 },
+};
+
+export const deleteIconSx = (isMyCard) => ({
+  fontSize: { xs: 15, sm: 20 },
+  ...(isMyCard
+    ? { cursor: "default", opacity: 0, pointerEvents: "none" }
+    : { cursor: "pointer" }),
+});
+
+export const voteValueSx = {
+  fontWeight: "bold",
+  lineHeight: 1.1,
+  fontSize: { xs: "1.5rem", sm: "3rem" },
+};

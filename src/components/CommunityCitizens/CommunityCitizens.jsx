@@ -1,5 +1,5 @@
 import { GroupAdd, HowToVote } from "@mui/icons-material";
-import { Box, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { CitizenCard } from "../CitizenCard/CitizenCard";
 import { REVEAL_VARIANT_COUNT } from "../CitizenCard/CitizenCard.styles";
@@ -23,7 +23,6 @@ export const CommunityCitizens = ({
   handleDeleteUser,
   currentCommunity,
 }) => {
-  const fullsizeScreen = useMediaQuery("(min-width:800px)");
   const { revealed } = currentCommunity;
 
   const [animationClassPosition, setAnimationClassPosition] = useState(0);
@@ -55,16 +54,9 @@ export const CommunityCitizens = ({
           sx={voteCardContainerSx}
         >
           {votingCitizens.map((citizen, i) => (
-            <Grid
-              item
-              xs={fullsizeScreen ? 6 : 12}
-              md={fullsizeScreen ? 4 : 12}
-              lg={fullsizeScreen ? 3 : 12}
-              key={citizen.userId}
-            >
+            <Grid item xs={4} sm={3} md={4} lg={3} key={citizen.userId}>
               <CitizenCard
                 animationClassPosition={animationClassPosition}
-                fullsizeScreen={fullsizeScreen}
                 position={i}
                 currentCommunity={currentCommunity}
                 handleDeleteUser={handleDeleteUser}
