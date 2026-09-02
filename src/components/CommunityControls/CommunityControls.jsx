@@ -1,16 +1,15 @@
+import { ExpandMore } from "@mui/icons-material";
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
+  ButtonBase,
   Paper,
-  Select,
+  Popover,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { VoteOptions } from "../../util/voteOptions";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 import { CommunityReactionButtons } from "./CommunityReactionButtons";
@@ -26,11 +25,12 @@ import {
   timerGroupSx,
   timerInputProps,
   timerInputSx,
-  voteButtonSx,
+  voteCardSx,
+  voteDeckGridSx,
+  voteDeckSx,
   voteGroupSx,
-  voteMenuProps,
-  voteSelectFormControlSx,
-  voteSelectSx,
+  voteTriggerIconSx,
+  voteTriggerSx,
 } from "./CommunityControls.styles";
 
 const MAX_TIMER_SECONDS = 600;
@@ -47,24 +47,19 @@ export const CommunityControls = ({
   communityReaction,
   settings,
 }) => {
-  const [selectOptions, setSelectOptions] = useState(null);
-  const [selectedVote, setSelectedVote] = useState(0);
-
-  useEffect(() => {
-    if (community) {
-      setSelectOptions(
-        VoteOptions[community?.pointScheme]?.values ??
-          VoteOptions.fibonacci.values
-      );
-    }
-  }, [community]);
-
   if (!iAmCitizen) {
     return null;
   }
 
-  const onVoteSubmit = () => {
-    submitVote({ communityId, ...iAmCitizen, vote: selectedVote });
+  const voteOptions =
+    VoteOptions[community?.pointScheme]?.values ?? VoteOptions.fibonacci.values;
+
+  const myVote = community?.citizens?.find(
+    (citizen) => citizen.userId === iAmCitizen.userId
+  )?.vote;
+
+  const onVoteSubmit = (vote) => {
+    submitVote({ communityId, ...iAmCitizen, vote });
   };
 
   const onReaction = ({ event }) => {
@@ -89,40 +84,11 @@ export const CommunityControls = ({
           sx={mainControlsSx(showReactions)}
         >
           {showVote && (
-            <Stack
-              direction="row"
-              spacing={0.75}
-              alignItems="center"
-              sx={voteGroupSx}
-            >
-              <FormControl size="small" sx={voteSelectFormControlSx}>
-                <InputLabel id="vote-selector-label">Pts</InputLabel>
-                <Select
-                  labelId="vote-selector-label"
-                  id="vote-selector"
-                  value={selectedVote}
-                  label="Pts"
-                  onChange={(event) => setSelectedVote(event.target.value)}
-                  MenuProps={voteMenuProps}
-                  sx={voteSelectSx}
-                >
-                  {selectOptions?.map((option) => (
-                    <MenuItem key={option} value={option} dense>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <Button
-                size="small"
-                variant="contained"
-                color="primary"
-                onClick={onVoteSubmit}
-                sx={voteButtonSx}
-              >
-                Vote
-              </Button>
-            </Stack>
+            <VoteDeck
+              options={voteOptions}
+              currentVote={myVote}
+              onVote={onVoteSubmit}
+            />
           )}
 
           {showTimer && (
@@ -157,6 +123,54 @@ export const CommunityControls = ({
         </Stack>
       </Box>
     </Paper>
+  );
+};
+
+export const VoteDeck = ({ options, currentVote, onVote }) => {
+  const [deckAnchor, setDeckAnchor] = useState(null);
+  const hasVoted = currentVote !== undefined && currentVote !== null;
+
+  const pick = (vote) => {
+    onVote(vote);
+    setDeckAnchor(null);
+  };
+
+  return (
+    <Box sx={voteGroupSx}>
+      <Button
+        id="vote-button"
+        size="small"
+        color="primary"
+        variant={hasVoted ? "outlined" : "contained"}
+        onClick={(event) => setDeckAnchor(event.currentTarget)}
+        endIcon={<ExpandMore sx={voteTriggerIconSx} />}
+        sx={voteTriggerSx}
+      >
+        {hasVoted ? currentVote : "Vote"}
+      </Button>
+
+      <Popover
+        open={Boolean(deckAnchor)}
+        anchorEl={deckAnchor}
+        onClose={() => setDeckAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{ paper: { sx: voteDeckSx } }}
+      >
+        <Box id="vote-deck" sx={voteDeckGridSx}>
+          {options.map((option) => (
+            <ButtonBase
+              key={option}
+              onClick={() => pick(option)}
+              aria-pressed={option === currentVote}
+              sx={voteCardSx(option === currentVote)}
+            >
+              {option}
+            </ButtonBase>
+          ))}
+        </Box>
+      </Popover>
+    </Box>
   );
 };
 

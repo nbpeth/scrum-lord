@@ -42,19 +42,62 @@ export const mainControlsSx = (showReactions) => ({
 
 export const voteGroupSx = { flexShrink: 0 };
 
-export const voteSelectFormControlSx = { minWidth: 76, maxWidth: 110 };
+export const voteTriggerSx = {
+  ...controlButtonSx,
+  minWidth: 72,
+  px: 1.5,
+  fontSize: "0.95rem",
+  fontWeight: 700,
+};
 
-export const voteSelectSx = (theme) => ({
-  borderRadius: 1,
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: alpha(theme.palette.divider, 0.85),
-  },
-  "& .MuiSelect-select": { py: 0.45 },
+export const voteTriggerIconSx = { fontSize: 16 };
+
+export const voteDeckSx = (theme) => ({
+  mt: 0.75,
+  p: 1,
+  maxHeight: 300,
+  overflowY: "auto",
+  borderRadius: 2,
+  border: "1px solid",
+  borderColor: "divider",
+  background: alpha(theme.palette.background.paper, 0.95),
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  backgroundImage: "none",
 });
 
-export const voteMenuProps = { PaperProps: { style: { maxHeight: 320 } } };
+export const voteDeckGridSx = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 52px)",
+  gap: 0.75,
+};
 
-export const voteButtonSx = { ...controlButtonSx, px: 1.5 };
+export const voteCardSx = (selected) => (theme) => ({
+  height: 44,
+  borderRadius: 1.5,
+  fontWeight: 700,
+  fontSize: "0.95rem",
+  lineHeight: 1,
+  border: "1px solid",
+  borderColor: selected ? theme.palette.primary.main : alpha(theme.palette.divider, 0.85),
+  backgroundColor: selected
+    ? alpha(theme.palette.primary.main, 0.22)
+    : alpha(theme.palette.background.default, 0.5),
+  color: selected ? theme.palette.primary.light : theme.palette.text.primary,
+  transition: theme.transitions.create(
+    ["transform", "background-color", "border-color"],
+    { duration: theme.transitions.duration.shortest }
+  ),
+  "&:hover": {
+    transform: "translateY(-2px)",
+    borderColor: theme.palette.primary.main,
+    backgroundColor: alpha(theme.palette.primary.main, 0.14),
+  },
+  "&.Mui-focusVisible": {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: alpha(theme.palette.primary.main, 0.14),
+  },
+});
 
 export const resetButtonSx = (theme) => ({
   ...controlButtonSx,
