@@ -50,11 +50,23 @@ describe("room voting", () => {
   });
 
   it("sends reactions to the room", () => {
-    cy.get('button[title="party"]').click();
+    cy.get('button[title="hotdog"]').click();
 
     cy.get("#community-message-board", { timeout: 10000 }).should(
       "contain",
-      "🎉"
+      "🌭"
+    );
+  });
+
+  it("sends an overflow reaction from the tray", () => {
+    cy.get('button[title="shrug"]').should("not.exist");
+
+    cy.get("#more-reactions-button").click();
+    cy.get("#reaction-tray").find('button[title="shrug"]').click();
+
+    cy.get("#community-message-board", { timeout: 10000 }).should(
+      "contain",
+      "🤷"
     );
   });
 
