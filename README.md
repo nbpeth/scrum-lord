@@ -6,16 +6,15 @@ Experience the real thing at https://s.crumlord.com
 
 ## Press
 Scrumlord is a lightweight, ad-free story point estimation tool featuring:
-* Private and public team rooms
-* Lurker mode
+* Scrumlord mode
 * Real-time voting and reactions
 * Flexible voting schemes
-* Kick-ass animated backgrounds
+* Stars
 * Voting timer
 * Fireworks
 
-<img width="1418" alt="image" src="https://github.com/nbpeth/scrum-lord/assets/10249534/ca9c1fc5-9c4a-4b4e-88bc-47fe26765039">
-<img width="1433" alt="image" src="https://github.com/nbpeth/scrum-lord/assets/10249534/a40d5be8-4824-474d-900e-9b929f583aaf">
+<img width="640" height="452" alt="scrumlord-dash" src="https://github.com/user-attachments/assets/ab32dce8-fc7e-4512-b623-5d8183c21633" />
+<img width="640" height="444" alt="scrumlord-vote" src="https://github.com/user-attachments/assets/b0b47f0b-858c-403a-8a3b-607d0d35f6f6" />
 
 ## What's inside
 Scrumlord is as simple as I could think to make it. It's a monorepo with two pieces:
