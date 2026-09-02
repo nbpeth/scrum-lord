@@ -1,4 +1,10 @@
-import { GroupAdd, HelpOutline, Refresh } from "@mui/icons-material";
+import {
+  Gavel,
+  GroupAdd,
+  HelpOutline,
+  HowToVote,
+  Refresh,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -6,14 +12,21 @@ import {
   Modal,
   Select,
   Stack,
-  Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { generate } from "random-words";
 import { useState } from "react";
 import * as uuid from "uuid";
+import {
+  DEFAULT_USER_TYPE,
+  UserTypes,
+  userTypeOptions,
+  votingMemberFor,
+} from "../../util/userTypes";
 import {
   actionRowSx,
   backdropSx,
@@ -30,9 +43,13 @@ import {
   refreshNameIconSx,
   usernameFieldSx,
   usernameRowSx,
-  votingMemberHelpIconSx,
-  votingMemberHelpSx,
-  votingMemberRowSx,
+  userTypeButtonSx,
+  userTypeDescriptionSx,
+  userTypeGroupSx,
+  userTypeHelpIconSx,
+  userTypeHelpSx,
+  userTypeIconSx,
+  userTypeRowSx,
 } from "./JoinCommunityModal.styles";
 
 const USER_COLORS = [
@@ -63,6 +80,11 @@ const USER_COLORS = [
   "#CC5B6A",
 ];
 
+const USER_TYPE_ICONS = {
+  [UserTypes.voter]: HowToVote,
+  [UserTypes.scrumLord]: Gavel,
+};
+
 const randomUserName = () =>
   generate({ exactly: 2, minLength: 5, join: " ", camelCase: true });
 
@@ -76,10 +98,11 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
   });
 
   const [newUser, setNewUser] = useState(newRandomUser);
-  const [votingMemberChecked, setVotingMemberChecked] = useState(true);
+  const [userType, setUserType] = useState(DEFAULT_USER_TYPE);
 
   const onClose = (user) => {
     setNewUser(newRandomUser());
+    setUserType(DEFAULT_USER_TYPE);
     handleClose(user);
   };
 
@@ -87,7 +110,8 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
     onClose({
       ...newUser,
       userId: uuid.v4(),
-      votingMember: votingMemberChecked,
+      userType,
+      votingMember: votingMemberFor(userType),
     });
 
   return (
@@ -109,33 +133,31 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
             </Typography>
 
             <Stack spacing={2} sx={fieldStackSx}>
-              {votingMemberChecked && (
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  sx={usernameRowSx}
-                >
-                  <TextField
-                    fullWidth
-                    value={newUser?.username}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, username: e.target.value })
-                    }
-                    label="User name"
-                    id="username"
-                    size="small"
-                    sx={usernameFieldSx}
-                  />
-                  <Refresh
-                    onClick={() =>
-                      setNewUser({ ...newUser, username: randomUserName() })
-                    }
-                    sx={refreshNameIconSx}
-                    aria-label="Generate random name"
-                  />
-                </Stack>
-              )}
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={usernameRowSx}
+              >
+                <TextField
+                  fullWidth
+                  value={newUser?.username}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, username: e.target.value })
+                  }
+                  label="User name"
+                  id="username"
+                  size="small"
+                  sx={usernameFieldSx}
+                />
+                <Refresh
+                  onClick={() =>
+                    setNewUser({ ...newUser, username: randomUserName() })
+                  }
+                  sx={refreshNameIconSx}
+                  aria-label="Generate random name"
+                />
+              </Stack>
 
               <ColorSelector
                 value={newUser.userColor}
@@ -144,36 +166,32 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                 }
               />
 
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={1}
-                sx={votingMemberRowSx}
-              >
-                <Switch
-                  checked={votingMemberChecked}
-                  onChange={(e) => setVotingMemberChecked(e.target.checked)}
-                  size="small"
+              <Stack spacing={1} sx={userTypeRowSx}>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    component="span"
+                  >
+                    Join as
+                  </Typography>
+                  <Tooltip
+                    title="Voters get a card and cast points. Scrumlords run the session and take part without voting."
+                    placement="top"
+                    arrow
+                  >
+                    <Box component="span" sx={userTypeHelpSx}>
+                      <HelpOutline
+                        sx={userTypeHelpIconSx}
+                        aria-label="About user types"
+                      />
+                    </Box>
+                  </Tooltip>
+                </Stack>
+                <UserTypeSelector
+                  value={userType}
+                  onUserTypeChange={setUserType}
                 />
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  component="span"
-                >
-                  Voting member
-                </Typography>
-                <Tooltip
-                  title="Non-voting members will be able to participate in the session without needing to cast a vote"
-                  placement="top"
-                  arrow
-                >
-                  <Box component="span" sx={votingMemberHelpSx}>
-                    <HelpOutline
-                      sx={votingMemberHelpIconSx}
-                      aria-label="About non-voting members"
-                    />
-                  </Box>
-                </Tooltip>
               </Stack>
 
               <Stack
@@ -195,7 +213,7 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
                   variant="contained"
                   color="primary"
                   onClick={onJoin}
-                  disabled={votingMemberChecked && !newUser?.username}
+                  disabled={!newUser?.username}
                   startIcon={<GroupAdd sx={joinButtonIconSx} />}
                   sx={joinButtonSx}
                 >
@@ -231,5 +249,46 @@ export const ColorSelector = ({ value, onColorChange }) => {
         </MenuItem>
       ))}
     </Select>
+  );
+};
+
+export const UserTypeSelector = ({ value, onUserTypeChange }) => {
+  return (
+    <ToggleButtonGroup
+      exclusive
+      fullWidth
+      id="user-type-selector"
+      value={value}
+      onChange={(_, selected) => selected && onUserTypeChange(selected)}
+      sx={userTypeGroupSx}
+    >
+      {userTypeOptions.map(({ value: userType, label, description }) => {
+        const Icon = USER_TYPE_ICONS[userType];
+
+        return (
+          <ToggleButton
+            key={userType}
+            value={userType}
+            id={`user-type-${userType}`}
+            aria-label={label}
+            sx={userTypeButtonSx}
+          >
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              <Icon sx={userTypeIconSx} />
+              <Typography variant="body2" fontWeight={600}>
+                {label}
+              </Typography>
+            </Stack>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={userTypeDescriptionSx}
+            >
+              {description}
+            </Typography>
+          </ToggleButton>
+        );
+      })}
+    </ToggleButtonGroup>
   );
 };

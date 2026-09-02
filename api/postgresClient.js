@@ -48,6 +48,7 @@ const joinCommunity = async ({
   username,
   userId,
   userColor,
+  userType,
   votingMember,
 }) => {
   const query = `
@@ -58,7 +59,7 @@ const joinCommunity = async ({
     RETURNING data;
   `;
   const citizen = JSON.stringify([
-    { username, userId, votingMember, userColor },
+    { username, userId, userType, votingMember, userColor },
   ]);
 
   return executeQuery({ query, values: [citizen, communityId] });

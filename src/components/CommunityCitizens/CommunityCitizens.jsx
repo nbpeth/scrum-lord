@@ -1,10 +1,16 @@
-import { Grid, Typography, useMediaQuery } from "@mui/material";
+import { GroupAdd, HowToVote } from "@mui/icons-material";
+import { Box, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { CitizenCard } from "../CitizenCard/CitizenCard";
 import { REVEAL_VARIANT_COUNT } from "../CitizenCard/CitizenCard.styles";
 import {
   citizensContainerSx,
+  emptyRoomCardSx,
+  emptyRoomHintSx,
+  emptyRoomIconSx,
+  emptyRoomIconWrapSx,
   emptyRoomSx,
+  emptyRoomTitleSx,
   voteCardContainerSx,
 } from "./CommunityCitizens.styles";
 
@@ -37,18 +43,18 @@ export const CommunityCitizens = ({
       spacing={2}
       sx={citizensContainerSx}
     >
-      <Grid
-        id="vote-card-container"
-        item
-        container
-        spacing={1}
-        alignContent="flex-start"
-        alignItems="flex-start"
-        justifyContent="center"
-        sx={voteCardContainerSx}
-      >
-        {citizens.length ? (
-          votingCitizens.map((citizen, i) => (
+      {votingCitizens.length ? (
+        <Grid
+          id="vote-card-container"
+          item
+          container
+          spacing={1}
+          alignContent="flex-start"
+          alignItems="flex-start"
+          justifyContent="center"
+          sx={voteCardContainerSx}
+        >
+          {votingCitizens.map((citizen, i) => (
             <Grid
               item
               xs={fullsizeScreen ? 6 : 12}
@@ -66,15 +72,33 @@ export const CommunityCitizens = ({
                 citizen={citizen}
               />
             </Grid>
-          ))
-        ) : (
-          <Grid item xs={12}>
-            <Typography variant="h5" sx={emptyRoomSx}>
-              No one is here
-            </Typography>
-          </Grid>
-        )}
-      </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <EmptyRoom watchersPresent={citizens.length > 0} />
+      )}
+    </Grid>
+  );
+};
+
+const EmptyRoom = ({ watchersPresent }) => {
+  const Icon = watchersPresent ? HowToVote : GroupAdd;
+
+  return (
+    <Grid item id="empty-room" sx={emptyRoomSx}>
+      <Stack spacing={1.5} alignItems="center" sx={emptyRoomCardSx}>
+        <Box sx={emptyRoomIconWrapSx}>
+          <Icon sx={emptyRoomIconSx} />
+        </Box>
+        <Typography variant="h6" sx={emptyRoomTitleSx}>
+          {watchersPresent ? "Nobody is holding a card" : "No one is here"}
+        </Typography>
+        <Typography variant="body2" sx={emptyRoomHintSx}>
+          {watchersPresent
+            ? "The room is watched over, but no one has joined as a Voter yet."
+            : "Copy the room link from the menu and bring your friends"}
+        </Typography>
+      </Stack>
     </Grid>
   );
 };

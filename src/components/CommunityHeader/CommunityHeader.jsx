@@ -1,17 +1,15 @@
 import {
   Celebration,
   ContentCopy,
-  Edit,
+  Gavel,
   HelpOutline,
   Home,
   ModeComment,
   Timer,
-  Visibility,
 } from "@mui/icons-material";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 import {
   Box,
-  Button,
   Divider,
   IconButton,
   ListItemIcon,
@@ -28,7 +26,6 @@ import { ConnectionStatus } from "../ConnectionStatus/ConnectionStatus";
 import { ScrumLordMenu } from "../ScrumLordMenu/ScrumLordMenu";
 import {
   headerBarSx,
-  menuActionRowSx,
   menuCaptionRowSx,
   menuDividerSx,
   menuPaperSx,
@@ -40,7 +37,7 @@ import {
 const displayToggles = [
   { label: "Reactions", icon: Celebration, settingKey: "reactionsVisible" },
   { label: "Stars", icon: ModeNightIcon, settingKey: "communityAnimation" },
-  { label: "Observers", icon: Visibility, settingKey: "lurkerBoxVisible" },
+  { label: "Scrumlords", icon: Gavel, settingKey: "lurkerBoxVisible" },
   { label: "Activity", icon: ModeComment, settingKey: "messageBoardVisible" },
   { label: "Timer", icon: Timer, settingKey: "timerVisible" },
 ];
@@ -51,11 +48,6 @@ export const CommunityHeader = ({
   hotdogOverload = false,
   readyState,
   version,
-  iAmCitizen,
-  onJoin,
-  onLeave,
-  onEditPointScheme,
-  onDeleteRoom,
   onShowTutorial,
   settings,
   toggleReactions,
@@ -102,87 +94,23 @@ export const CommunityHeader = ({
 
             <Divider sx={menuDividerSx} />
 
-            {!iAmCitizen ? (
-              <Box sx={menuActionRowSx}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="success"
+            <Typography variant="overline" sx={menuSectionLabelSx}>
+              Display
+            </Typography>
+            {displayToggles.map(({ label, icon: Icon, settingKey }) => (
+              <MenuItem key={settingKey}>
+                <ListItemIcon>
+                  <Icon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{label}</ListItemText>
+                <Switch
+                  edge="end"
                   size="small"
-                  onClick={onJoin}
-                >
-                  Join room
-                </Button>
-              </Box>
-            ) : (
-              <>
-                <Box sx={menuCaptionRowSx}>
-                  <Typography variant="caption" color="text.secondary">
-                    Joined as &quot;{iAmCitizen.username}&quot;
-                  </Typography>
-                </Box>
-                <Box sx={menuActionRowSx}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    color="secondary"
-                    size="small"
-                    onClick={onLeave}
-                  >
-                    Leave
-                  </Button>
-                </Box>
-              </>
-            )}
-
-            {iAmCitizen && (
-              <>
-                <Divider sx={menuDividerSx} />
-
-                <MenuItem onClick={onEditPointScheme}>
-                  <ListItemIcon>
-                    <Edit fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Edit point scheme</ListItemText>
-                </MenuItem>
-
-                <Divider sx={menuDividerSx} />
-
-                <Typography variant="overline" sx={menuSectionLabelSx}>
-                  Display
-                </Typography>
-                {displayToggles.map(({ label, icon: Icon, settingKey }) => (
-                  <MenuItem key={settingKey}>
-                    <ListItemIcon>
-                      <Icon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>{label}</ListItemText>
-                    <Switch
-                      edge="end"
-                      size="small"
-                      checked={settings?.[settingKey]}
-                      onChange={(e) =>
-                        toggleHandlers[settingKey](e.target.checked)
-                      }
-                    />
-                  </MenuItem>
-                ))}
-
-                <Divider sx={menuDividerSx} />
-
-                <Box sx={menuActionRowSx}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={onDeleteRoom}
-                  >
-                    Delete room
-                  </Button>
-                </Box>
-              </>
-            )}
+                  checked={settings?.[settingKey]}
+                  onChange={(e) => toggleHandlers[settingKey](e.target.checked)}
+                />
+              </MenuItem>
+            ))}
 
             <Divider sx={menuDividerSx} />
             <Box sx={menuCaptionRowSx}>

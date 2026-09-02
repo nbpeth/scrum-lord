@@ -1,17 +1,16 @@
 import {
   Celebration,
-  ContentCopy,
+  ChevronLeft,
   Edit,
-  Home,
+  Gavel,
   KeyboardArrowDown,
   ModeComment,
   ModeNight,
   Timer,
   ToggleOff,
   ToggleOn,
-  Visibility,
 } from "@mui/icons-material";
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { VoteOptionsLabels } from "../../util/voteOptions";
 import { ConnectionStatusArt } from "./dashboardTutorialPages";
 import {
@@ -20,18 +19,21 @@ import {
   citizenTilesRowSx,
   colorSwatchPreviewSx,
   mockChipRowSx,
+  mockChipSelectedSx,
   mockChipSx,
   mockFieldLabelSx,
   mockFieldSx,
   mockFilledButtonSx,
-  mockMenuActionRowSx,
-  mockMenuDividerSx,
   mockMenuLabelSx,
   mockMenuRowSx,
   mockMenuSectionLabelSx,
   mockMenuSx,
   mockOutlineButtonSx,
   mockPanelSx,
+  mockSidePanelBodySx,
+  mockSidePanelHeaderSx,
+  mockSidePanelSx,
+  mockSidePanelTitleSx,
   timerReadoutSx,
   toggleIconSx,
 } from "./TutorialModal.styles";
@@ -50,12 +52,15 @@ const MenuRow = ({ icon: Icon, label, toggledOn }) => (
   </Stack>
 );
 
-const JoinMenuArt = () => (
-  <Box sx={mockMenuSx}>
-    <MenuRow icon={Home} label="Home" />
-    <MenuRow icon={ContentCopy} label="Copy room link" />
-    <Divider sx={mockMenuDividerSx} />
-    <Box sx={mockMenuActionRowSx}>
+const JoinPanelArt = () => (
+  <Box sx={mockSidePanelSx}>
+    <Stack direction="row" alignItems="center" sx={mockSidePanelHeaderSx}>
+      <Typography variant="overline" sx={mockSidePanelTitleSx}>
+        Room
+      </Typography>
+      <ChevronLeft fontSize="small" color="disabled" />
+    </Stack>
+    <Box sx={mockSidePanelBodySx}>
       <Typography variant="body2" sx={mockFilledButtonSx("success")}>
         Join room
       </Typography>
@@ -88,9 +93,14 @@ const JoinDialogArt = () => (
       <KeyboardArrowDown fontSize="small" color="disabled" />
     </Stack>
     <Stack direction="row" alignItems="center" spacing={1}>
-      <ToggleOn fontSize="small" sx={toggleIconSx(true)} />
       <Typography variant="body2" color="text.secondary" sx={mockMenuLabelSx}>
-        Voting member
+        Join as
+      </Typography>
+      <Typography variant="caption" sx={mockChipSelectedSx}>
+        Voter
+      </Typography>
+      <Typography variant="caption" sx={mockChipSx}>
+        Scrumlord
       </Typography>
       <Typography variant="body2" sx={mockFilledButtonSx("primary")}>
         Join
@@ -182,7 +192,7 @@ const TimerArt = () => (
 const displayToggles = [
   { icon: Celebration, label: "Reactions", toggledOn: true },
   { icon: ModeNight, label: "Stars", toggledOn: true },
-  { icon: Visibility, label: "Observers", toggledOn: false },
+  { icon: Gavel, label: "Scrumlords", toggledOn: false },
   { icon: ModeComment, label: "Activity", toggledOn: true },
   { icon: Timer, label: "Timer", toggledOn: false },
 ];
@@ -209,7 +219,12 @@ const schemePreview = [
 
 const PointSchemeArt = () => (
   <Stack spacing={1.5} sx={mockPanelSx}>
-    <MenuRow icon={Edit} label="Edit point scheme" />
+    <Stack direction="row" alignItems="center" spacing={1} justifyContent="center">
+      <Edit fontSize="small" color="primary" />
+      <Typography variant="body2" sx={mockOutlineButtonSx("primary")}>
+        Point scheme
+      </Typography>
+    </Stack>
     <Stack
       direction="row"
       alignItems="center"
@@ -230,33 +245,39 @@ const PointSchemeArt = () => (
 );
 
 const LeaveArt = () => (
-  <Box sx={mockMenuSx}>
-    <Typography variant="caption" color="text.secondary" sx={mockMenuSectionLabelSx}>
-      Joined as &quot;cheerfulOtter&quot;
-    </Typography>
-    <Box sx={mockMenuActionRowSx}>
+  <Box sx={mockSidePanelSx}>
+    <Stack direction="row" alignItems="center" sx={mockSidePanelHeaderSx}>
+      <Typography variant="overline" sx={mockSidePanelTitleSx}>
+        Room
+      </Typography>
+      <ChevronLeft fontSize="small" color="disabled" />
+    </Stack>
+    <Stack spacing={1} sx={mockSidePanelBodySx}>
+      <Typography variant="caption" color="text.disabled">
+        Joined as
+      </Typography>
       <Typography variant="body2" sx={mockOutlineButtonSx("secondary")}>
         Leave
       </Typography>
-    </Box>
-    <Divider sx={mockMenuDividerSx} />
-    <Box sx={mockMenuActionRowSx}>
+      <Typography variant="body2" sx={mockOutlineButtonSx("primary")}>
+        Point scheme
+      </Typography>
       <Typography variant="body2" sx={mockOutlineButtonSx("error")}>
         Delete room
       </Typography>
-    </Box>
+    </Stack>
   </Box>
 );
 
 export const communityTutorialPages = [
   {
-    title: "Open the menu to join",
-    body: "Everything in a room hangs off the menu in the top left corner. Open it and hit Join room to take a seat at the table.",
-    art: <JoinMenuArt />,
+    title: "Join the room",
+    body: "The Room panel runs down the left side. Hit Join room to take a seat at the table. Once you are in, the panel shows who you joined as, with Leave underneath. Scrumlords also get Point scheme and Delete room there. Use the chevron to collapse it to a strip of icons.",
+    art: <JoinPanelArt />,
   },
   {
     title: "Set yourself up",
-    body: "Pick a user name and a color for your tile. Switch Voting member off to sit in without casting votes, handy if you are running the session rather than estimating. Then hit Join.",
+    body: "Pick a user name and a color for your tile, then choose how you are joining. Voters get a card and estimate. Scrumlords run the session from their own panel without casting votes. Then hit Join.",
     art: <JoinDialogArt />,
   },
   {
@@ -281,17 +302,17 @@ export const communityTutorialPages = [
   },
   {
     title: "Show only what you need",
-    body: "The Display section of the menu switches each piece of the room on and off: the reactions bar, the animated background, the observers column, the activity log, and the voting timer.",
+    body: "The Display section of the menu switches each piece of the room on and off: the reactions bar, the animated background, the scrumlords panel, the activity log, and the voting timer.",
     art: <DisplayTogglesArt />,
   },
   {
     title: "Pick a point scheme",
-    body: "Edit point scheme changes what the room votes with. Fibonacci, t-shirt sizes, yes/no, thumbs, even food emojis. The whole room switches together.",
+    body: "Point scheme, in the Room panel, changes what the room votes with. Fibonacci, t-shirt sizes, yes/no, thumbs, even food emojis. The whole room switches together, and only scrumlords can change it.",
     art: <PointSchemeArt />,
   },
   {
     title: "Leaving and cleaning up",
-    body: "Leave takes you out of the group and frees up your tile; you can always rejoin. Delete room removes the room for everyone in it, so use that one carefully.",
+    body: "Leave takes you out of the group and frees up your tile; you can always rejoin. Delete room, which only scrumlords see, removes the room for everyone in it, so use that one carefully.",
     art: <LeaveArt />,
   },
   {

@@ -23,23 +23,19 @@ Cypress.Commands.add("closeMenu", () => {
   cy.get("body").type("{esc}");
 });
 
-const typeUsernameThenSetVotingMembership = (username, voting) => {
+const typeUsernameThenSelectUserType = (username, userType) => {
   cy.get("#username").clear().type(username);
-  if (!voting) {
-    cy.get('input[type="checkbox"]').uncheck();
-  }
+  cy.get(`#user-type-${userType}`).click();
 };
 
-Cypress.Commands.add("joinRoom", (username, { voting = true } = {}) => {
-  cy.openRoomMenu();
-  cy.contains("button", "Join room").click();
+Cypress.Commands.add("joinRoom", (username, { userType = "voter" } = {}) => {
+  cy.get("#room-join-button").click();
 
-  typeUsernameThenSetVotingMembership(username, voting);
+  typeUsernameThenSelectUserType(username, userType);
 
   cy.contains("button", /^Join$/).click();
-  cy.closeMenu();
 
-  if (voting) {
+  if (userType === "voter") {
     cy.get("#vote-card-container", { timeout: 10000 }).should(
       "contain",
       username

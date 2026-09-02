@@ -46,7 +46,14 @@ const createHandlers = ({
 
   const handleJoinCommunity = async (payload) => {
     const {
-      community: { id: communityId, username, userId, userColor, votingMember },
+      community: {
+        id: communityId,
+        username,
+        userId,
+        userColor,
+        userType,
+        votingMember,
+      },
     } = payload;
 
     const updatedCommunity = await communityClient.joinCommunity({
@@ -54,6 +61,7 @@ const createHandlers = ({
       username,
       userId,
       userColor: userColor ?? color.randomColor({ luminosity: "bright" }),
+      userType,
       votingMember,
     });
 
@@ -61,7 +69,7 @@ const createHandlers = ({
       message: {
         type: "community-joined-reply",
         payload: {
-          joinedUser: { username, userId, votingMember, userColor },
+          joinedUser: { username, userId, userType, votingMember, userColor },
           community: updatedCommunity,
         },
       },

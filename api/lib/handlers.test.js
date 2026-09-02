@@ -74,7 +74,7 @@ describe("join-community", () => {
     const { handlers, communityClient, notifyClients } = makeDeps();
 
     await handlers["join-community"]({
-      community: { id: "c1", ...user, votingMember: true },
+      community: { id: "c1", ...user, userType: "voter", votingMember: true },
     });
 
     expect(communityClient.joinCommunity).toHaveBeenCalledWith({
@@ -82,6 +82,7 @@ describe("join-community", () => {
       username: "sam",
       userId: "u1",
       userColor: "#fff",
+      userType: "voter",
       votingMember: true,
     });
     expect(notifyClients).toHaveBeenCalledWith({
@@ -91,6 +92,7 @@ describe("join-community", () => {
           joinedUser: {
             username: "sam",
             userId: "u1",
+            userType: "voter",
             votingMember: true,
             userColor: "#fff",
           },
@@ -99,6 +101,23 @@ describe("join-community", () => {
       },
       communityId: "c1",
     });
+  });
+
+  it("carries the scrum lord user type through as a non-voting member", async () => {
+    const { handlers, communityClient } = makeDeps();
+
+    await handlers["join-community"]({
+      community: {
+        id: "c1",
+        ...user,
+        userType: "scrumlord",
+        votingMember: false,
+      },
+    });
+
+    expect(communityClient.joinCommunity).toHaveBeenCalledWith(
+      expect.objectContaining({ userType: "scrumlord", votingMember: false })
+    );
   });
 
   it("falls back to a random color when none is given", async () => {

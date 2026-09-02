@@ -30,7 +30,17 @@ export const controlsBarSx = (theme) => ({
 
 export const controlsBarInnerSx = { maxWidth: 1200, mx: "auto", width: "100%" };
 
+export const mainRegionSx = {
+  display: "flex",
+  minHeight: 0,
+  width: "100%",
+  maxWidth: "100%",
+  overflow: "hidden",
+};
+
 export const mainGridSx = {
+  flex: 1,
+  minWidth: 0,
   minHeight: 0,
   height: "100%",
   pt: 2,

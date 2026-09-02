@@ -20,8 +20,6 @@ export const menuPaperSx = (theme) => ({
   backdropFilter: "blur(10px)",
 });
 
-export const menuActionRowSx = { px: 2, py: 0.5 };
-
 export const menuCaptionRowSx = { px: 2, py: 0.5, textAlign: "center" };
 
 export const menuSectionLabelSx = {

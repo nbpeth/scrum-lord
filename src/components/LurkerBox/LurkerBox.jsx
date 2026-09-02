@@ -1,53 +1,78 @@
+import { Gavel } from "@mui/icons-material";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Grid, Tooltip, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import {
   deleteLurkerIconSx,
-  lurkerBoxSx,
+  lurkerColorDotSx,
+  lurkerCountSx,
+  lurkerEmptySx,
+  lurkerHeaderIconSx,
+  lurkerHeaderSx,
+  lurkerListSx,
   lurkerNameSx,
+  lurkerPanelSx,
+  lurkerRowSx,
+  lurkerTitleSx,
 } from "./LurkerBox.styles";
+
+const titleFor = (count) => (count === 1 ? "Scrumlord" : "Scrumlords");
 
 export const LurkerBox = ({ lurkers, handleDeleteUser }) => {
   return (
-    <Grid
-      id="lurker-box"
-      container
-      direction="column"
-      sx={lurkerBoxSx}
-      alignContent="flex-start"
-      alignItems="flex-start"
-    >
-      <Grid item>
-        <Tooltip
-          title={`Non-voting members: ${lurkers.length} present`}
-          arrow
-          placement="top-end"
+    <Box id="lurker-box" sx={lurkerPanelSx}>
+      <Tooltip
+        title="Scrumlords run the room without casting a vote"
+        placement="top-start"
+        arrow
+      >
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1}
+          sx={lurkerHeaderSx}
         >
-          {lurkers.length > 0 ? (
-            <Visibility color="warning" />
-          ) : (
-            <VisibilityOff color="info" />
-          )}
-        </Tooltip>
-      </Grid>
-      <Grid id="lurker-box-list" container item direction="column">
-        {lurkers.map((lurker) => (
-          <Grid container id="lurker-box-list-item" key={lurker.userId}>
-            <Grid item>
-              <DeleteTwoToneIcon
-                fontSize="small"
-                sx={deleteLurkerIconSx}
-                onClick={() => handleDeleteUser(lurker)}
-              />
-            </Grid>
-            <Grid item>
-              <Typography variant="subtitle2" fontSize="small" sx={lurkerNameSx}>
+          <Gavel sx={lurkerHeaderIconSx} />
+          <Typography variant="overline" sx={lurkerTitleSx}>
+            {titleFor(lurkers.length)}
+          </Typography>
+          <Box component="span" sx={lurkerCountSx}>
+            {lurkers.length}
+          </Box>
+        </Stack>
+      </Tooltip>
+
+      <Box id="lurker-box-list" sx={lurkerListSx}>
+        {lurkers.length ? (
+          lurkers.map((lurker) => (
+            <Stack
+              id="lurker-box-list-item"
+              key={lurker.userId}
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={lurkerRowSx}
+            >
+              <Box sx={lurkerColorDotSx(lurker.userColor)} />
+              <Typography variant="body2" sx={lurkerNameSx}>
                 {lurker.username}
               </Typography>
-            </Grid>
-          </Grid>
-        ))}
-      </Grid>
-    </Grid>
+              <IconButton
+                className="lurker-remove"
+                size="small"
+                aria-label={`Remove ${lurker.username}`}
+                onClick={() => handleDeleteUser(lurker)}
+                sx={deleteLurkerIconSx}
+              >
+                <DeleteTwoToneIcon fontSize="inherit" />
+              </IconButton>
+            </Stack>
+          ))
+        ) : (
+          <Typography variant="caption" sx={lurkerEmptySx}>
+            No one is running the show
+          </Typography>
+        )}
+      </Box>
+    </Box>
   );
 };

@@ -72,13 +72,20 @@ describe("joinCommunity", () => {
       username: "sam",
       userId: "u1",
       userColor: "#fff",
+      userType: "voter",
       votingMember: true,
     });
 
     const [query, values] = mockClient.query.mock.calls[0];
     expect(query).toContain("jsonb_set");
     expect(JSON.parse(values[0])).toEqual([
-      { username: "sam", userId: "u1", votingMember: true, userColor: "#fff" },
+      {
+        username: "sam",
+        userId: "u1",
+        userType: "voter",
+        votingMember: true,
+        userColor: "#fff",
+      },
     ]);
     expect(values[1]).toBe("c1");
   });

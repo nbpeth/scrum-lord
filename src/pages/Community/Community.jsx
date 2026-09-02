@@ -11,6 +11,7 @@ import { JoinCommunityModal } from "../../components/JoinCommunityModal/JoinComm
 import { LurkerBox } from "../../components/LurkerBox/LurkerBox";
 import { MessageBoard } from "../../components/MessageBoard/MessageBoard";
 import { ReactionMachine } from "../../components/ReactionMachine/ReactionMachine";
+import { RoomSidePanel } from "../../components/RoomSidePanel/RoomSidePanel";
 import { communityTutorialPages } from "../../components/TutorialModal/communityTutorialPages";
 import { TutorialModal } from "../../components/TutorialModal/TutorialModal";
 import useCommunity from "../../hooks/useCommunity";
@@ -23,6 +24,7 @@ import {
   controlsBarSx,
   lurkerColumnSx,
   mainGridSx,
+  mainRegionSx,
   stickyHeaderSx,
 } from "./Community.styles";
 
@@ -81,6 +83,7 @@ export const Community = ({
     useState(false);
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [hotdogAlert, setHotdogAlert] = useState(false);
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useState(false);
 
   useEffect(() => {
     const cachedUserId = readUserState()[communityId];
@@ -138,11 +141,18 @@ export const Community = ({
       return;
     }
 
-    const { username, userId, votingMember, userColor } = newUser;
+    const { username, userId, userType, votingMember, userColor } = newUser;
     saveUserToStorage(userId);
 
-    joinCommunity({ communityId, userId, username, userColor, votingMember });
-    setIAmCitizen({ userId, username, votingMember, userColor });
+    joinCommunity({
+      communityId,
+      userId,
+      username,
+      userColor,
+      userType,
+      votingMember,
+    });
+    setIAmCitizen({ userId, username, userType, votingMember, userColor });
   };
 
   const handleTimerClicked = ({ timerValue }) => {
@@ -230,11 +240,6 @@ export const Community = ({
             hotdogOverload={hotdogAlert}
             readyState={readyState}
             version={version}
-            iAmCitizen={iAmCitizen}
-            onJoin={() => setJoinCommunityModalOpen(true)}
-            onLeave={handleLeave}
-            onEditPointScheme={() => setEditPointSchemeModalOpen(true)}
-            onDeleteRoom={() => setDeleteCommunityModalOpen(true)}
             onShowTutorial={() => setTutorialModalOpen(true)}
             settings={settings}
             toggleReactions={toggleReactions}
@@ -263,51 +268,63 @@ export const Community = ({
         </Box>
       </Box>
 
-      <Grid
-        container
-        rowSpacing={2}
-        columnSpacing={{ xs: 2, md: showActivity ? 0 : 2 }}
-        sx={mainGridSx}
-      >
-        {currentCommunity ? (
-          <>
-            {showLurkerColumn && (
-              <Grid item xs={12} md={2} sx={lurkerColumnSx(showActivity)}>
-                <LurkerBox
-                  lurkers={lurkers}
-                  handleDeleteUser={handleDeleteUser}
-                />
-              </Grid>
-            )}
-            <Grid
-              item
-              xs={12}
-              md={citizensMd}
-              sx={citizensColumnSx(showActivity)}
-            >
-              <CommunityCitizens
-                citizens={citizens}
-                iAmCitizen={iAmCitizen}
-                handleDeleteUser={handleDeleteUser}
-                currentCommunity={currentCommunity}
-              />
-            </Grid>
-            {showActivity && (
+      <Box sx={mainRegionSx}>
+        <RoomSidePanel
+          collapsed={sidePanelCollapsed}
+          onToggleCollapsed={() => setSidePanelCollapsed((prev) => !prev)}
+          iAmCitizen={iAmCitizen}
+          onJoin={() => setJoinCommunityModalOpen(true)}
+          onLeave={handleLeave}
+          onEditPointScheme={() => setEditPointSchemeModalOpen(true)}
+          onDeleteRoom={() => setDeleteCommunityModalOpen(true)}
+        />
+
+        <Grid
+          container
+          rowSpacing={2}
+          columnSpacing={{ xs: 2, md: showActivity ? 0 : 2 }}
+          sx={mainGridSx}
+        >
+          {currentCommunity ? (
+            <>
+              {showLurkerColumn && (
+                <Grid item xs={12} md={2} sx={lurkerColumnSx(showActivity)}>
+                  <LurkerBox
+                    lurkers={lurkers}
+                    handleDeleteUser={handleDeleteUser}
+                  />
+                </Grid>
+              )}
               <Grid
                 item
                 xs={12}
-                md={activityMd}
-                sx={activityPanelSx(settings?.communityAnimationEnabled)}
+                md={citizensMd}
+                sx={citizensColumnSx(showActivity)}
               >
-                <MessageBoard
-                  messageHistory={messageHistory}
-                  communityId={communityId}
+                <CommunityCitizens
+                  citizens={citizens}
+                  iAmCitizen={iAmCitizen}
+                  handleDeleteUser={handleDeleteUser}
+                  currentCommunity={currentCommunity}
                 />
               </Grid>
-            )}
-          </>
-        ) : null}
-      </Grid>
+              {showActivity && (
+                <Grid
+                  item
+                  xs={12}
+                  md={activityMd}
+                  sx={activityPanelSx(settings?.communityAnimationEnabled)}
+                >
+                  <MessageBoard
+                    messageHistory={messageHistory}
+                    communityId={communityId}
+                  />
+                </Grid>
+              )}
+            </>
+          ) : null}
+        </Grid>
+      </Box>
     </Box>
   );
 };
