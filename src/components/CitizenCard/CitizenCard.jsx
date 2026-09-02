@@ -2,20 +2,20 @@ import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import {
   Box,
   Card,
-  CardActionArea,
-  CardActions,
   CardContent,
-  Grid,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
+  cardActionsRowSx,
+  cardContentSx,
   cardContentVisibilitySx,
   citizenCardSx,
+  citizenNameSx,
   citizenVoteBackground,
   deleteIconSx,
-  desktopCardContentSx,
   voteValueSx,
 } from "./CitizenCard.styles";
 
@@ -25,7 +25,6 @@ export const CitizenCard = ({
   handleDeleteUser,
   iAmCitizen,
   position,
-  fullsizeScreen,
   animationClassPosition,
 }) => {
   const theme = useTheme();
@@ -63,79 +62,45 @@ export const CitizenCard = ({
   const backgroundColor = citizenVoteBackground({ theme, hasVoted, doubleVote });
 
   return (
-    <Card
-      sx={citizenCardSx({
-        isMyCard,
-        backgroundColor,
-        cardAnimating,
-        animationClassPosition,
-      })}
-    >
-      <Box component="span" sx={cardContentVisibilitySx(contentHidden)}>
-        {fullsizeScreen ? (
-          <>
-            <CardContent sx={desktopCardContentSx}>
-              <CitizenName username={username} userColor={userColor} />
-              <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
-            </CardContent>
-            <CardActionArea>
-              <CardActions>
-                <DeleteTwoToneIcon
-                  fontSize="x-small"
-                  sx={deleteIconSx(isMyCard)}
-                  onClick={isMyCard ? undefined : () => handleDeleteUser(citizen)}
-                />
-              </CardActions>
-            </CardActionArea>
-          </>
-        ) : (
-          <Grid
-            container
-            spacing={2}
-            justifyContent="space-between"
-            alignItems="center"
-            direction="row"
-          >
-            <Grid item xs={8}>
-              <CitizenName username={username} userColor={userColor} />
-            </Grid>
-            <Grid item xs={2}>
-              <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
-            </Grid>
-            <Grid item xs={2}>
-              {!isMyCard && (
-                <DeleteTwoToneIcon
-                  fontSize="x-small"
-                  sx={deleteIconSx(false)}
-                  onClick={() => handleDeleteUser(citizen)}
-                />
-              )}
-            </Grid>
-          </Grid>
-        )}
-      </Box>
-    </Card>
+    <Tooltip title={username} placement="top" arrow enterTouchDelay={0}>
+      <Card
+        sx={citizenCardSx({
+          isMyCard,
+          backgroundColor,
+          userColor,
+          cardAnimating,
+          animationClassPosition,
+        })}
+      >
+        <Box component="span" sx={cardContentVisibilitySx(contentHidden)}>
+          <CardContent sx={cardContentSx}>
+            <CitizenName username={username} userColor={userColor} />
+            <CitizenVote isMyCard={isMyCard} vote={vote} revealed={revealed} />
+          </CardContent>
+          <Box sx={cardActionsRowSx}>
+            <DeleteTwoToneIcon
+              aria-label={isMyCard ? undefined : `Remove ${username}`}
+              sx={deleteIconSx(isMyCard)}
+              onClick={isMyCard ? undefined : () => handleDeleteUser(citizen)}
+            />
+          </Box>
+        </Box>
+      </Card>
+    </Tooltip>
   );
 };
 
-const CitizenName = ({ username, userColor }) => {
-  const theme = useTheme();
-  return (
-    <Typography
-      variant="body"
-      fontWeight="bold"
-      color={userColor ?? theme.palette.grey[100]}
-    >
-      {username}
-    </Typography>
-  );
-};
+const CitizenName = ({ username, userColor }) => (
+  <Typography variant="body2" sx={citizenNameSx(userColor)}>
+    {username}
+  </Typography>
+);
 
 export const CitizenVote = ({ isMyCard, revealed, vote }) => {
   const value = revealed || isMyCard ? vote ?? "-" : "?";
 
   return (
-    <Typography variant="h3" sx={voteValueSx}>
+    <Typography variant="h3" component="div" sx={voteValueSx}>
       {value}
     </Typography>
   );
