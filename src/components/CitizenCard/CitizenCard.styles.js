@@ -45,24 +45,13 @@ export const citizenCardSx =
     animationClassPosition,
   }) =>
   (theme) => ({
-    position: "relative",
-    overflow: "hidden",
-    padding: { xs: "9px 3px 4px", sm: "14px 10px 10px" },
+    padding: { xs: "5px 3px 4px", sm: "9px 10px 10px" },
     minWidth: 0,
     border: `1px solid ${
       isMyCard ? theme.palette.primary.dark : theme.palette.grey[800]
     }`,
+    borderTop: `4px solid ${userColor ?? theme.palette.grey[700]}`,
     backgroundColor,
-    // Identity stripe: the only way to tell people apart once names are hidden.
-    "&::before": {
-      content: '""',
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      height: { xs: 4, sm: 5 },
-      backgroundColor: userColor ?? theme.palette.grey[700],
-    },
     cursor: "pointer",
     transition: "background .5s ease-in-out",
     "&:hover": {
@@ -75,16 +64,12 @@ export const citizenCardSx =
     }),
   });
 
-export const cardContentVisibilitySx = (contentHidden) =>
-  contentHidden
-    ? { visibility: "hidden" }
-    : {
-        animation: "citizen-card-content-show 500ms ease-in forwards",
-        "@keyframes citizen-card-content-show": {
-          "0%": { opacity: 0 },
-          "100%": { opacity: 1 },
-        },
-      };
+export const cardContentVisibilitySx = (contentHidden) => ({
+  display: "block",
+  opacity: contentHidden ? 0 : 1,
+  visibility: contentHidden ? "hidden" : "visible",
+  transition: "opacity 500ms ease-in",
+});
 
 export const cardContentSx = {
   padding: { xs: "2px", sm: "5px" },

@@ -19,7 +19,6 @@ import {
 export const CommunityReactionButtons = ({ onReaction, compact = false }) => {
   const [trayAnchor, setTrayAnchor] = useState(null);
 
-  // When there is no room for the pinned row, everything lives in the tray.
   const inline = compact ? [] : PINNED_REACTIONS;
   const trayed = compact ? REACTION_EVENTS : OVERFLOW_REACTIONS;
 

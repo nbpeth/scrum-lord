@@ -5,7 +5,6 @@ import { act } from "react-dom/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { darkTheme } from "../../theme";
 
-// React 18 requires this flag for act() outside a test renderer.
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const stubMatchMedia = (width) => {
@@ -27,7 +26,6 @@ const stubMatchMedia = (width) => {
   });
 };
 
-// Mirrors how Community.jsx decides the panel's collapsed state.
 const Probe = ({ onRender }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });

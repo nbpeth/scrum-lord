@@ -67,7 +67,6 @@ export const CommunityControls = ({
   settings,
 }) => {
   const theme = useTheme();
-  // Below md the full-width bar wraps into the sticky header; shed the labels.
   const compact = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
 
   if (!iAmCitizen) {

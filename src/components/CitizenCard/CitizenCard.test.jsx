@@ -3,7 +3,10 @@ import { renderToString } from "react-dom/server";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { darkTheme } from "../../theme";
 import { CitizenCard } from "./CitizenCard";
-import { citizenCardSx } from "./CitizenCard.styles";
+import {
+  cardContentVisibilitySx,
+  citizenCardSx,
+} from "./CitizenCard.styles";
 
 const SSR_LAYOUT_EFFECT_WARNING = "useLayoutEffect does nothing on the server";
 
@@ -90,7 +93,7 @@ describe("CitizenCard", () => {
       userColor: "#4F90DA",
     })(darkTheme);
 
-    expect(style["&::before"].backgroundColor).toBe("#4F90DA");
+    expect(style.borderTop).toContain("#4F90DA");
   });
 
   it("falls back to a neutral stripe when a citizen has no colour", () => {
@@ -98,7 +101,27 @@ describe("CitizenCard", () => {
       darkTheme
     );
 
-    expect(style["&::before"].backgroundColor).toBe(darkTheme.palette.grey[700]);
+    expect(style.borderTop).toContain(darkTheme.palette.grey[700]);
+  });
+
+  it("does not rely on overflow clipping for the stripe", () => {
+    const style = citizenCardSx({ isMyCard: false, userColor: "#4F90DA" })(
+      darkTheme
+    );
+
+    expect(style.overflow).toBeUndefined();
+    expect(style.position).toBeUndefined();
+    expect(style["&::before"]).toBeUndefined();
+  });
+
+  it("fades content with a transition, never a forwards animation", () => {
+    const shown = cardContentVisibilitySx(false);
+    const hidden = cardContentVisibilitySx(true);
+
+    expect(shown.opacity).toBe(1);
+    expect(hidden.opacity).toBe(0);
+    expect(shown.animation).toBeUndefined();
+    expect(JSON.stringify(shown)).not.toContain("forwards");
   });
 
   it("still marks your own card through the border", () => {

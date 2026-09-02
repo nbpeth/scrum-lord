@@ -6,8 +6,6 @@ import { CommunityControls } from "./CommunityControls";
 
 const noop = () => {};
 
-// MUI's ThemeProvider and ButtonBase use useLayoutEffect, which React always
-// warns about under renderToString. Keep that noise out without hiding real errors.
 const SSR_LAYOUT_EFFECT_WARNING = "useLayoutEffect does nothing on the server";
 
 beforeAll(() => {

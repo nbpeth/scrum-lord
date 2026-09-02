@@ -47,10 +47,7 @@ export const Community = ({
   const { communityId } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
-  // Below md the grid columns stack, so the activity pane has nowhere to go.
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
-  // The rail's fixed width sits outside the grid's column math, so it starts
-  // squeezing the cards well before the columns actually stack.
   const isNarrow = useMediaQuery(theme.breakpoints.down("lg"), { noSsr: true });
 
   const {
@@ -198,7 +195,6 @@ export const Community = ({
     setDeleteCommunityModalOpen(false);
   };
 
-  // Collapsed by default on mobile, expanded on desktop, until you say otherwise.
   const sidePanelCollapsed = collapsedOverride ?? isNarrow;
 
   const lurkers = citizens.filter((c) => !c?.votingMember);
