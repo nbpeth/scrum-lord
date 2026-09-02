@@ -1,16 +1,21 @@
+import { ExpandMore, TimerOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
+  ButtonBase,
+  ButtonGroup,
   Paper,
-  Select,
+  Popover,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import {
+  DEFAULT_TIMER_SECONDS,
+  TIMER_PRESETS,
+  clampTimerSeconds,
+  formatCountdown,
+} from "../../util/timer";
 import { VoteOptions } from "../../util/voteOptions";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 import { CommunityReactionButtons } from "./CommunityReactionButtons";
@@ -20,21 +25,23 @@ import {
   mainControlsSx,
   resetButtonSx,
   revealButtonSx,
-  timerButtonSx,
-  timerDisplayBoxSx,
-  timerErrorSx,
+  timerCustomRowSx,
   timerGroupSx,
+  timerIconSx,
   timerInputProps,
   timerInputSx,
-  voteButtonSx,
+  timerPresetRowSx,
+  timerPresetSx,
+  timerPresetsPaperSx,
+  timerPresetsToggleSx,
+  timerStartButtonSx,
+  voteCardSx,
+  voteDeckGridSx,
+  voteDeckSx,
   voteGroupSx,
-  voteMenuProps,
-  voteSelectFormControlSx,
-  voteSelectSx,
+  voteTriggerIconSx,
+  voteTriggerSx,
 } from "./CommunityControls.styles";
-
-const MAX_TIMER_SECONDS = 600;
-const DEFAULT_TIMER_SECONDS = 60;
 
 export const CommunityControls = ({
   handleReveal,
@@ -47,24 +54,19 @@ export const CommunityControls = ({
   communityReaction,
   settings,
 }) => {
-  const [selectOptions, setSelectOptions] = useState(null);
-  const [selectedVote, setSelectedVote] = useState(0);
-
-  useEffect(() => {
-    if (community) {
-      setSelectOptions(
-        VoteOptions[community?.pointScheme]?.values ??
-          VoteOptions.fibonacci.values
-      );
-    }
-  }, [community]);
-
   if (!iAmCitizen) {
     return null;
   }
 
-  const onVoteSubmit = () => {
-    submitVote({ communityId, ...iAmCitizen, vote: selectedVote });
+  const voteOptions =
+    VoteOptions[community?.pointScheme]?.values ?? VoteOptions.fibonacci.values;
+
+  const myVote = community?.citizens?.find(
+    (citizen) => citizen.userId === iAmCitizen.userId
+  )?.vote;
+
+  const onVoteSubmit = (vote) => {
+    submitVote({ communityId, ...iAmCitizen, vote });
   };
 
   const onReaction = ({ event }) => {
@@ -89,40 +91,11 @@ export const CommunityControls = ({
           sx={mainControlsSx(showReactions)}
         >
           {showVote && (
-            <Stack
-              direction="row"
-              spacing={0.75}
-              alignItems="center"
-              sx={voteGroupSx}
-            >
-              <FormControl size="small" sx={voteSelectFormControlSx}>
-                <InputLabel id="vote-selector-label">Pts</InputLabel>
-                <Select
-                  labelId="vote-selector-label"
-                  id="vote-selector"
-                  value={selectedVote}
-                  label="Pts"
-                  onChange={(event) => setSelectedVote(event.target.value)}
-                  MenuProps={voteMenuProps}
-                  sx={voteSelectSx}
-                >
-                  {selectOptions?.map((option) => (
-                    <MenuItem key={option} value={option} dense>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <Button
-                size="small"
-                variant="contained"
-                color="primary"
-                onClick={onVoteSubmit}
-                sx={voteButtonSx}
-              >
-                Vote
-              </Button>
-            </Stack>
+            <VoteDeck
+              options={voteOptions}
+              currentVote={myVote}
+              onVote={onVoteSubmit}
+            />
           )}
 
           {showTimer && (
@@ -160,73 +133,155 @@ export const CommunityControls = ({
   );
 };
 
-export const TimerControl = ({ community, handleTimerClicked }) => {
-  const [timerValue, setTimerValue] = useState(DEFAULT_TIMER_SECONDS);
-  const [error, setError] = useState(undefined);
+export const VoteDeck = ({ options, currentVote, onVote }) => {
+  const [deckAnchor, setDeckAnchor] = useState(null);
+  const hasVoted = currentVote !== undefined && currentVote !== null;
 
-  const onTimerValueChanged = (event) => {
-    event.preventDefault();
-    const cleansedValue = event.target.value.replace(/\D/g, "");
-
-    if (cleansedValue > MAX_TIMER_SECONDS) {
-      setError(`Max timer value is ${MAX_TIMER_SECONDS} seconds`);
-    } else if (error) {
-      setError(undefined);
-    }
-
-    setTimerValue(cleansedValue);
-  };
-
-  const onTimerClicked = () => {
-    handleTimerClicked({
-      timerValue: timerValue || DEFAULT_TIMER_SECONDS,
-      communityId: community.id,
-    });
+  const pick = (vote) => {
+    onVote(vote);
+    setDeckAnchor(null);
   };
 
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      spacing={0.75}
-      flexWrap="wrap"
-      sx={timerGroupSx}
-    >
+    <Box sx={voteGroupSx}>
       <Button
-        disabled={timerValue > MAX_TIMER_SECONDS}
+        id="vote-button"
         size="small"
-        variant="contained"
-        color="secondary"
-        onClick={onTimerClicked}
-        sx={timerButtonSx}
+        color="primary"
+        variant={hasVoted ? "outlined" : "contained"}
+        onClick={(event) => setDeckAnchor(event.currentTarget)}
+        endIcon={<ExpandMore sx={voteTriggerIconSx} />}
+        sx={voteTriggerSx}
       >
-        {community?.timer?.running ? "Cancel" : "Timer"}
+        {hasVoted ? currentVote : "Vote"}
       </Button>
-      <TextField
-        type="number"
-        size="small"
-        error={Boolean(error)}
-        placeholder="Sec"
-        inputProps={timerInputProps}
-        disabled={community?.timer?.running}
-        variant="outlined"
-        value={timerValue}
-        onChange={onTimerValueChanged}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            onTimerClicked();
-          }
-        }}
-        sx={timerInputSx}
-      />
-      <Box sx={timerDisplayBoxSx}>
-        <TimerDisplay community={community} />
+
+      <Popover
+        open={Boolean(deckAnchor)}
+        anchorEl={deckAnchor}
+        onClose={() => setDeckAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{ paper: { sx: voteDeckSx } }}
+      >
+        <Box id="vote-deck" sx={voteDeckGridSx}>
+          {options.map((option) => (
+            <ButtonBase
+              key={option}
+              onClick={() => pick(option)}
+              aria-pressed={option === currentVote}
+              sx={voteCardSx(option === currentVote)}
+            >
+              {option}
+            </ButtonBase>
+          ))}
+        </Box>
+      </Popover>
+    </Box>
+  );
+};
+
+export const TimerControl = ({ community, handleTimerClicked }) => {
+  const [duration, setDuration] = useState(DEFAULT_TIMER_SECONDS);
+  const [presetsAnchor, setPresetsAnchor] = useState(null);
+  const [customValue, setCustomValue] = useState("");
+
+  const running = Boolean(community?.timer?.running);
+
+  const toggleTimer = (timerValue) =>
+    handleTimerClicked({ timerValue, communityId: community?.id });
+
+  const startWith = (seconds) => {
+    setDuration(seconds);
+    setPresetsAnchor(null);
+    setCustomValue("");
+    toggleTimer(seconds);
+  };
+
+  const startCustom = () => {
+    const seconds = clampTimerSeconds(customValue);
+    if (seconds) {
+      startWith(seconds);
+    }
+  };
+
+  if (running) {
+    return (
+      <Box sx={timerGroupSx}>
+        <TimerDisplay community={community} onCancel={() => toggleTimer()} />
       </Box>
-      {error && (
-        <Typography variant="caption" color="error" sx={timerErrorSx}>
-          {error}
-        </Typography>
-      )}
-    </Stack>
+    );
+  }
+
+  return (
+    <Box sx={timerGroupSx}>
+      <ButtonGroup size="small" variant="contained" color="secondary">
+        <Button
+          id="timer-button"
+          onClick={() => startWith(duration)}
+          startIcon={<TimerOutlined sx={timerIconSx} />}
+          sx={timerStartButtonSx}
+        >
+          {formatCountdown(duration)}
+        </Button>
+        <Button
+          id="timer-presets-button"
+          aria-label="Choose timer length"
+          onClick={(event) => setPresetsAnchor(event.currentTarget)}
+          sx={timerPresetsToggleSx}
+        >
+          <ExpandMore sx={timerIconSx} />
+        </Button>
+      </ButtonGroup>
+
+      <Popover
+        open={Boolean(presetsAnchor)}
+        anchorEl={presetsAnchor}
+        onClose={() => setPresetsAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{ paper: { sx: timerPresetsPaperSx } }}
+      >
+        <Box id="timer-presets" sx={timerPresetRowSx}>
+          {TIMER_PRESETS.map((seconds) => (
+            <ButtonBase
+              key={seconds}
+              onClick={() => startWith(seconds)}
+              sx={timerPresetSx}
+            >
+              {formatCountdown(seconds)}
+            </ButtonBase>
+          ))}
+        </Box>
+
+        <Box sx={timerCustomRowSx}>
+          <TextField
+            type="number"
+            size="small"
+            id="timer-custom-input"
+            placeholder="Sec"
+            inputProps={timerInputProps}
+            value={customValue}
+            onChange={(event) => setCustomValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                startCustom();
+              }
+            }}
+            sx={timerInputSx}
+          />
+          <Button
+            id="timer-custom-start"
+            size="small"
+            variant="outlined"
+            color="secondary"
+            disabled={!clampTimerSeconds(customValue)}
+            onClick={startCustom}
+          >
+            Start
+          </Button>
+        </Box>
+      </Popover>
+    </Box>
   );
 };

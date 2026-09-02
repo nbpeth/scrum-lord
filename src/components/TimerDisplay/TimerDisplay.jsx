@@ -1,43 +1,44 @@
-import { Typography } from "@mui/material";
-import { differenceInSeconds } from "date-fns";
-import { useEffect, useState } from "react";
-import { timerValueSx } from "./TimerDisplay.styles";
+import { TimerOutlined } from "@mui/icons-material";
+import { Box, Button, LinearProgress, Tooltip } from "@mui/material";
+import { useCountdown } from "../../hooks/useCountdown";
+import { countdownTone, formatCountdown } from "../../util/timer";
+import {
+  countdownButtonSx,
+  countdownIconSx,
+  countdownProgressSx,
+  countdownWrapSx,
+} from "./TimerDisplay.styles";
 
-export const TimerDisplay = ({ community }) => {
-  const [timerEndDate, setTimerEndDate] = useState();
-  const [timeRemaining, setTimeRemaining] = useState();
+const URGENT_SECONDS = 10;
 
-  const timerRunning = Boolean(community?.timer?.running);
+export const TimerDisplay = ({ community, onCancel }) => {
+  const { secondsRemaining, totalSeconds, fractionRemaining } =
+    useCountdown(community);
 
-  useEffect(() => {
-    if (timerRunning) {
-      setTimerEndDate(community?.timer?.timerEnd);
-    }
-  }, [community, timerRunning]);
-
-  useEffect(() => {
-    setTimeRemaining(differenceInSeconds(timerEndDate, new Date()));
-  }, [timerEndDate]);
-
-  useEffect(() => {
-    const timerWasStarted = timerRunning && community?.timer?.value;
-    const timerWasCancelled = timerEndDate && !timerRunning;
-
-    if (timerWasStarted) {
-      const countdown = setInterval(() => {
-        setTimeRemaining(differenceInSeconds(timerEndDate, new Date()));
-      }, 1000);
-
-      return () => clearInterval(countdown);
-    }
-    if (timerWasCancelled) {
-      setTimeRemaining(undefined);
-    }
-  }, [community, timerEndDate, timerRunning]);
+  const tone = countdownTone(secondsRemaining, totalSeconds);
+  const urgent = secondsRemaining <= URGENT_SECONDS;
 
   return (
-    <Typography variant="h6" component="div" sx={timerValueSx}>
-      {timeRemaining > 0 ? timeRemaining : "-"}
-    </Typography>
+    <Box sx={countdownWrapSx}>
+      <Tooltip title="Cancel timer" placement="top" arrow>
+        <Button
+          id="timer-countdown"
+          size="small"
+          variant="outlined"
+          color={tone}
+          onClick={onCancel}
+          startIcon={<TimerOutlined sx={countdownIconSx} />}
+          sx={countdownButtonSx(tone, urgent)}
+        >
+          {formatCountdown(secondsRemaining)}
+        </Button>
+      </Tooltip>
+      <LinearProgress
+        variant="determinate"
+        color={tone}
+        value={fractionRemaining * 100}
+        sx={countdownProgressSx}
+      />
+    </Box>
   );
 };

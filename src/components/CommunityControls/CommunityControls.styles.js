@@ -42,19 +42,62 @@ export const mainControlsSx = (showReactions) => ({
 
 export const voteGroupSx = { flexShrink: 0 };
 
-export const voteSelectFormControlSx = { minWidth: 76, maxWidth: 110 };
+export const voteTriggerSx = {
+  ...controlButtonSx,
+  minWidth: 72,
+  px: 1.5,
+  fontSize: "0.95rem",
+  fontWeight: 700,
+};
 
-export const voteSelectSx = (theme) => ({
-  borderRadius: 1,
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: alpha(theme.palette.divider, 0.85),
-  },
-  "& .MuiSelect-select": { py: 0.45 },
+export const voteTriggerIconSx = { fontSize: 16 };
+
+export const voteDeckSx = (theme) => ({
+  mt: 0.75,
+  p: 1,
+  maxHeight: 300,
+  overflowY: "auto",
+  borderRadius: 2,
+  border: "1px solid",
+  borderColor: "divider",
+  background: alpha(theme.palette.background.paper, 0.95),
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  backgroundImage: "none",
 });
 
-export const voteMenuProps = { PaperProps: { style: { maxHeight: 320 } } };
+export const voteDeckGridSx = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 52px)",
+  gap: 0.75,
+};
 
-export const voteButtonSx = { ...controlButtonSx, px: 1.5 };
+export const voteCardSx = (selected) => (theme) => ({
+  height: 44,
+  borderRadius: 1.5,
+  fontWeight: 700,
+  fontSize: "0.95rem",
+  lineHeight: 1,
+  border: "1px solid",
+  borderColor: selected ? theme.palette.primary.main : alpha(theme.palette.divider, 0.85),
+  backgroundColor: selected
+    ? alpha(theme.palette.primary.main, 0.22)
+    : alpha(theme.palette.background.default, 0.5),
+  color: selected ? theme.palette.primary.light : theme.palette.text.primary,
+  transition: theme.transitions.create(
+    ["transform", "background-color", "border-color"],
+    { duration: theme.transitions.duration.shortest }
+  ),
+  "&:hover": {
+    transform: "translateY(-2px)",
+    borderColor: theme.palette.primary.main,
+    backgroundColor: alpha(theme.palette.primary.main, 0.14),
+  },
+  "&.Mui-focusVisible": {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: alpha(theme.palette.primary.main, 0.14),
+  },
+});
 
 export const resetButtonSx = (theme) => ({
   ...controlButtonSx,
@@ -74,19 +117,78 @@ export const revealButtonSx = (theme) => ({
 
 export const timerGroupSx = { flexShrink: 0 };
 
-export const timerButtonSx = (theme) => ({
+export const timerStartButtonSx = (theme) => ({
   ...controlButtonSx,
+  fontVariantNumeric: "tabular-nums",
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
   "&:hover": {
     boxShadow: `0 2px 10px ${alpha(theme.palette.secondary.main, 0.3)}`,
   },
 });
 
+export const timerPresetsToggleSx = {
+  ...controlButtonSx,
+  px: 0.5,
+  minWidth: 28,
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+};
+
+export const timerIconSx = { fontSize: 16 };
+
+export const timerPresetsPaperSx = (theme) => ({
+  mt: 0.75,
+  p: 1,
+  borderRadius: 2,
+  border: "1px solid",
+  borderColor: "divider",
+  background: alpha(theme.palette.background.paper, 0.95),
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  backgroundImage: "none",
+});
+
+export const timerPresetRowSx = { display: "flex", gap: 0.75 };
+
+export const timerPresetSx = (theme) => ({
+  minWidth: 46,
+  px: 1,
+  py: 0.5,
+  borderRadius: 1.5,
+  fontWeight: 700,
+  fontSize: "0.8rem",
+  fontVariantNumeric: "tabular-nums",
+  border: "1px solid",
+  borderColor: alpha(theme.palette.divider, 0.85),
+  color: theme.palette.text.primary,
+  transition: theme.transitions.create(
+    ["transform", "background-color", "border-color"],
+    { duration: theme.transitions.duration.shortest }
+  ),
+  "&:hover": {
+    transform: "translateY(-2px)",
+    borderColor: theme.palette.secondary.main,
+    backgroundColor: alpha(theme.palette.secondary.main, 0.14),
+  },
+});
+
+export const timerCustomRowSx = {
+  display: "flex",
+  alignItems: "center",
+  gap: 0.75,
+  mt: 1,
+  pt: 1,
+  borderTop: "1px solid",
+  borderColor: "divider",
+};
+
 export const timerInputSx = {
-  width: 64,
+  width: 72,
   flexShrink: 0,
   "& .MuiOutlinedInput-root": {
-    borderRadius: 1,
-    "& input": { py: 0.65 },
+    borderRadius: 1.5,
+    "& input": { py: 0.5 },
   },
 };
 
@@ -95,12 +197,3 @@ export const timerInputProps = {
   min: 1,
   max: 600,
 };
-
-export const timerDisplayBoxSx = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minWidth: 40,
-};
-
-export const timerErrorSx = { width: "100%" };

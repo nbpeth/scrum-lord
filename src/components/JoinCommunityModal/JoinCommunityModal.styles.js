@@ -143,19 +143,37 @@ export const joinButtonSx = (theme) => ({
 
 export const joinButtonIconSx = { fontSize: 18 };
 
-export const colorMenuSx = (theme) => ({
-  maxHeight: 360,
-  background: alpha(theme.palette.background.default, 0.95),
-  backdropFilter: "blur(12px)",
-  border: "1px solid",
-  borderColor: "divider",
-});
+export const colorFieldSx = { width: "100%" };
 
-export const colorSwatchSx = (color) => ({
-  height: 12,
-  width: 12,
-  borderRadius: 0.5,
-  backgroundColor: color,
-  border: "1px solid",
-  borderColor: "divider",
-});
+export const colorValueSx = {
+  ml: "auto",
+  fontFamily: "monospace",
+  color: "text.disabled",
+};
+
+export const colorGridSx = {
+  width: "100%",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(26px, 1fr))",
+  gap: 1,
+};
+
+export const colorSwatchSx = (color, selected) => (theme) => {
+  const ring = `0 0 0 2px ${theme.palette.background.default}, 0 0 0 4px ${color}`;
+
+  return {
+    width: "100%",
+    aspectRatio: "1 / 1",
+    borderRadius: "50%",
+    backgroundColor: color,
+    transition: theme.transitions.create(["transform", "box-shadow"], {
+      duration: theme.transitions.duration.shortest,
+    }),
+    boxShadow: selected
+      ? ring
+      : `0 0 0 1px ${alpha(theme.palette.common.black, 0.35)}`,
+    ...(selected && { transform: "scale(1.08)" }),
+    "&:hover": { transform: "scale(1.18)" },
+    "&.Mui-focusVisible": { boxShadow: ring, transform: "scale(1.08)" },
+  };
+};

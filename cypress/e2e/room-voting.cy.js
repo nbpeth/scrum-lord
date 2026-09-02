@@ -16,11 +16,11 @@ describe("room voting", () => {
   });
 
   it("casts a vote, reveals it, and resets the round", () => {
-    cy.get("#vote-selector").click();
-    cy.get('ul[role="listbox"]').contains(/^5$/).click();
-    cy.contains("button", "Vote").click();
+    cy.get("#vote-button").click();
+    cy.get("#vote-deck").contains("button", /^5$/).click();
 
     cy.get("#vote-card-container", { timeout: 10000 }).should("contain", "5");
+    cy.get("#vote-button").should("contain", "5");
 
     cy.contains("button", "Reveal").should("be.enabled").click();
     cy.contains("button", "Reveal", { timeout: 10000 }).should("be.disabled");
@@ -39,9 +39,8 @@ describe("room voting", () => {
       `"${username}" has joined`
     );
 
-    cy.get("#vote-selector").click();
-    cy.get('ul[role="listbox"]').contains(/^8$/).click();
-    cy.contains("button", "Vote").click();
+    cy.get("#vote-button").click();
+    cy.get("#vote-deck").contains("button", /^8$/).click();
 
     cy.get("#community-message-board", { timeout: 10000 }).should(
       "contain",
@@ -50,17 +49,41 @@ describe("room voting", () => {
   });
 
   it("sends reactions to the room", () => {
-    cy.get('button[title="party"]').click();
+    cy.get('button[title="hotdog"]').click();
 
     cy.get("#community-message-board", { timeout: 10000 }).should(
       "contain",
-      "🎉"
+      "🌭"
+    );
+  });
+
+  it("sends an overflow reaction from the tray", () => {
+    cy.get('button[title="shrug"]').should("not.exist");
+
+    cy.get("#more-reactions-button").click();
+    cy.get("#reaction-tray").find('button[title="shrug"]').click();
+
+    cy.get("#community-message-board", { timeout: 10000 }).should(
+      "contain",
+      "🤷"
     );
   });
 
   it("starts and cancels the voting timer", () => {
-    cy.contains("button", "Timer").should("be.visible").click();
-    cy.contains("button", "Cancel", { timeout: 10000 }).click();
-    cy.contains("button", "Timer", { timeout: 10000 }).should("be.visible");
+    cy.get("#timer-button").should("contain", "1:00").click();
+
+    cy.get("#timer-countdown", { timeout: 10000 }).should("be.visible").click();
+
+    cy.get("#timer-button", { timeout: 10000 }).should("be.visible");
+  });
+
+  it("starts the timer from a preset", () => {
+    cy.get("#timer-presets-button").click();
+    cy.get("#timer-presets").contains("button", "0:30").click();
+
+    cy.get("#timer-countdown", { timeout: 10000 }).should("be.visible");
+    cy.get("#timer-countdown").click();
+
+    cy.get("#timer-button", { timeout: 10000 }).should("contain", "0:30");
   });
 });

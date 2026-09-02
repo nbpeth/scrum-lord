@@ -45,6 +45,7 @@ export const illustrationSx = (theme) => ({
   border: "1px solid",
   borderColor: alpha(theme.palette.divider, 0.6),
   background: alpha(theme.palette.common.black, 0.25),
+  overflow: "hidden",
   pointerEvents: "none",
   userSelect: "none",
 });
@@ -172,7 +173,13 @@ export const mockSidePanelTitleSx = {
   color: "text.secondary",
 };
 
-export const mockSidePanelBodySx = { px: 1.25, py: 1.25 };
+export const mockSidePanelBodySx = { px: 1.25, py: 1 };
+
+export const mockPanelButtonSx = (color) => (theme) => ({
+  ...mockOutlineButtonSx(color)(theme),
+  py: 0.5,
+  fontSize: "0.8rem",
+});
 
 export const mockMenuRowSx = { px: 1.5, py: 0.4 };
 
@@ -236,6 +243,69 @@ export const colorSwatchPreviewSx = (color) => ({
   height: 16,
   borderRadius: "50%",
   bgcolor: color,
+});
+
+export const colorSwatchSelectedPreviewSx = (color) => (theme) => ({
+  width: 16,
+  height: 16,
+  borderRadius: "50%",
+  bgcolor: color,
+  boxShadow: `0 0 0 2px ${theme.palette.background.default}, 0 0 0 3px ${color}`,
+});
+
+export const mockDeckSx = (theme) => ({
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 40px)",
+  gap: 0.75,
+  p: 1,
+  borderRadius: 1,
+  border: "1px solid",
+  borderColor: alpha(theme.palette.divider, 0.9),
+  background: alpha(theme.palette.background.paper, 0.7),
+});
+
+export const mockDeckCardSx = (selected) => (theme) => ({
+  height: 30,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: 1,
+  fontWeight: 700,
+  border: "1px solid",
+  borderColor: selected
+    ? theme.palette.primary.main
+    : alpha(theme.palette.divider, 0.85),
+  backgroundColor: selected
+    ? alpha(theme.palette.primary.main, 0.22)
+    : "transparent",
+  color: selected ? theme.palette.primary.light : theme.palette.text.primary,
+});
+
+export const mockSplitGroupSx = { display: "flex", alignItems: "stretch" };
+
+export const mockSplitCaretSx = (theme) => ({
+  display: "flex",
+  alignItems: "center",
+  px: 0.5,
+  borderRadius: "0 4px 4px 0",
+  bgcolor: theme.palette.secondary.dark,
+  color: theme.palette.secondary.contrastText,
+});
+
+export const mockCountdownColumnSx = { display: "flex", flexDirection: "column", gap: 0.5 };
+
+export const mockProgressTrackSx = (theme) => ({
+  height: 3,
+  borderRadius: 2,
+  overflow: "hidden",
+  backgroundColor: alpha(theme.palette.common.white, 0.1),
+});
+
+export const mockProgressFillSx = (theme) => ({
+  height: "100%",
+  width: "70%",
+  borderRadius: 2,
+  backgroundColor: theme.palette.warning.main,
 });
 
 export const timerReadoutSx = (theme) => ({
