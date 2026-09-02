@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   appTitleSx,
+  appTitleWrapperSx,
   homeLinkStyle,
   menuIconSx,
   menuIconWrapperSx,
@@ -29,7 +30,7 @@ export const ScrumLordMenu = ({ children }) => {
             {children}
           </Menu>
         </Grid>
-        <Grid item>
+        <Grid item sx={appTitleWrapperSx}>
           <Link to="/" style={homeLinkStyle}>
             <Typography
               fontFamily="monospace"
