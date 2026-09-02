@@ -24,7 +24,8 @@ describe("room management", () => {
       "contain",
       "cypress-observer"
     );
-    cy.get("#vote-card-container").should("not.contain", "cypress-observer");
+    cy.get("#vote-card-container").should("not.exist");
+    cy.get("#empty-room").should("contain", "Nobody is holding a card");
 
     cy.toggleRoomSetting("Scrumlords");
     cy.get("#lurker-box").should("not.exist");
