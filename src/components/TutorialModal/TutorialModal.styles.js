@@ -238,6 +238,14 @@ export const colorSwatchPreviewSx = (color) => ({
   bgcolor: color,
 });
 
+export const colorSwatchSelectedPreviewSx = (color) => (theme) => ({
+  width: 16,
+  height: 16,
+  borderRadius: "50%",
+  bgcolor: color,
+  boxShadow: `0 0 0 2px ${theme.palette.background.default}, 0 0 0 3px ${color}`,
+});
+
 export const timerReadoutSx = (theme) => ({
   px: 1.5,
   py: 1,

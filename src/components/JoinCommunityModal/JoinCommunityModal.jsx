@@ -8,9 +8,8 @@ import {
 import {
   Box,
   Button,
-  MenuItem,
+  ButtonBase,
   Modal,
-  Select,
   Stack,
   TextField,
   ToggleButton,
@@ -31,8 +30,10 @@ import {
   actionRowSx,
   backdropSx,
   cancelButtonSx,
-  colorMenuSx,
+  colorFieldSx,
+  colorGridSx,
   colorSwatchSx,
+  colorValueSx,
   dialogBodySx,
   dialogPaperSx,
   dialogTitleSx,
@@ -230,25 +231,29 @@ export const JoinCommunityModal = ({ open, handleClose }) => {
 
 export const ColorSelector = ({ value, onColorChange }) => {
   return (
-    <Select
-      fullWidth
-      size="small"
-      id="color-selector"
-      value={value}
-      onChange={(e) => onColorChange(e.target.value)}
-      MenuProps={{ PaperProps: { sx: colorMenuSx } }}
-    >
-      {USER_COLORS.map((color) => (
-        <MenuItem key={color} value={color}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Box sx={colorSwatchSx(color)} />
-            <Typography variant="body2" color="text.secondary">
-              {color}
-            </Typography>
-          </Stack>
-        </MenuItem>
-      ))}
-    </Select>
+    <Stack spacing={1} sx={colorFieldSx}>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Typography variant="body2" color="text.secondary" component="span">
+          Tile color
+        </Typography>
+        <Typography variant="caption" sx={colorValueSx}>
+          {value}
+        </Typography>
+      </Stack>
+
+      <Box id="color-selector" sx={colorGridSx}>
+        {USER_COLORS.map((color) => (
+          <ButtonBase
+            key={color}
+            title={color}
+            aria-label={color}
+            aria-pressed={color === value}
+            onClick={() => onColorChange(color)}
+            sx={colorSwatchSx(color, color === value)}
+          />
+        ))}
+      </Box>
+    </Stack>
   );
 };
 

@@ -18,6 +18,7 @@ import {
   citizenTileVoteSx,
   citizenTilesRowSx,
   colorSwatchPreviewSx,
+  colorSwatchSelectedPreviewSx,
   mockChipRowSx,
   mockChipSelectedSx,
   mockChipSx,
@@ -68,6 +69,16 @@ const JoinPanelArt = () => (
   </Box>
 );
 
+const swatchPreview = [
+  "#AD28FC",
+  "#D160BD",
+  "#4F90DA",
+  "#DFB48D",
+  "#EA0208",
+  "#71EB28",
+  "#6FE7BD",
+];
+
 const JoinDialogArt = () => (
   <Stack spacing={1.25} sx={mockPanelSx}>
     <Box>
@@ -78,20 +89,20 @@ const JoinDialogArt = () => (
         cheerfulOtter
       </Typography>
     </Box>
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      sx={mockFieldSx}
-    >
+    <Box>
+      <Typography variant="caption" color="text.secondary" sx={mockFieldLabelSx}>
+        Tile color
+      </Typography>
       <Stack direction="row" alignItems="center" spacing={1}>
-        <Box sx={colorSwatchPreviewSx("#4F90DA")} />
-        <Typography variant="body2" color="text.secondary">
-          #4F90DA
-        </Typography>
+        {swatchPreview.map((color) =>
+          color === "#4F90DA" ? (
+            <Box key={color} sx={colorSwatchSelectedPreviewSx(color)} />
+          ) : (
+            <Box key={color} sx={colorSwatchPreviewSx(color)} />
+          )
+        )}
       </Stack>
-      <KeyboardArrowDown fontSize="small" color="disabled" />
-    </Stack>
+    </Box>
     <Stack direction="row" alignItems="center" spacing={1}>
       <Typography variant="body2" color="text.secondary" sx={mockMenuLabelSx}>
         Join as
