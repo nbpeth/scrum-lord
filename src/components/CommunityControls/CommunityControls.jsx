@@ -1,13 +1,22 @@
-import { ExpandMore, TimerOutlined } from "@mui/icons-material";
+import {
+  ExpandMore,
+  RestartAlt,
+  TimerOutlined,
+  Visibility,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
   ButtonBase,
   ButtonGroup,
+  IconButton,
   Paper,
   Popover,
   Stack,
   TextField,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import {
@@ -20,11 +29,14 @@ import { VoteOptions } from "../../util/voteOptions";
 import { TimerDisplay } from "../TimerDisplay/TimerDisplay";
 import { CommunityReactionButtons } from "./CommunityReactionButtons";
 import {
+  controlIconButtonSx,
+  controlIconSx,
   controlsLayoutSx,
   controlsPanelSx,
   mainControlsSx,
   resetButtonSx,
   revealButtonSx,
+  timerCompactButtonSx,
   timerCustomRowSx,
   timerGroupSx,
   timerIconSx,
@@ -54,6 +66,10 @@ export const CommunityControls = ({
   communityReaction,
   settings,
 }) => {
+  const theme = useTheme();
+  // Below md the full-width bar wraps into the sticky header; shed the labels.
+  const compact = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
+
   if (!iAmCitizen) {
     return null;
   }
@@ -79,8 +95,10 @@ export const CommunityControls = ({
 
   return (
     <Paper elevation={0} sx={controlsPanelSx}>
-      <Box sx={controlsLayoutSx(showReactions)}>
-        {showReactions && <CommunityReactionButtons onReaction={onReaction} />}
+      <Box sx={controlsLayoutSx(showReactions, compact)}>
+        {showReactions && (
+          <CommunityReactionButtons onReaction={onReaction} compact={compact} />
+        )}
 
         <Stack
           direction="row"
@@ -88,13 +106,14 @@ export const CommunityControls = ({
           flexWrap="wrap"
           useFlexGap
           spacing={1}
-          sx={mainControlsSx(showReactions)}
+          sx={mainControlsSx(showReactions, compact)}
         >
           {showVote && (
             <VoteDeck
               options={voteOptions}
               currentVote={myVote}
               onVote={onVoteSubmit}
+              compact={compact}
             />
           )}
 
@@ -102,30 +121,32 @@ export const CommunityControls = ({
             <TimerControl
               community={community}
               handleTimerClicked={handleTimerClicked}
+              compact={compact}
             />
           )}
 
           <Stack direction="row" spacing={0.75} flexShrink={0}>
-            <Button
+            <RoundAction
+              id="reset-button"
+              label="Reset"
+              icon={RestartAlt}
+              tone="warning"
+              compact={compact}
               disabled={community && !community.revealed}
-              size="small"
-              variant="outlined"
-              color="warning"
               onClick={() => handleReset({ ...iAmCitizen, communityId })}
               sx={resetButtonSx}
-            >
-              Reset
-            </Button>
-            <Button
-              disabled={community && community.revealed}
-              size="small"
+            />
+            <RoundAction
+              id="reveal-button"
+              label="Reveal"
+              icon={Visibility}
+              tone="success"
               variant="contained"
-              color="success"
+              compact={compact}
+              disabled={community && community.revealed}
               onClick={() => handleReveal({ ...iAmCitizen, communityId })}
               sx={revealButtonSx}
-            >
-              Reveal
-            </Button>
+            />
           </Stack>
         </Stack>
       </Box>
@@ -133,7 +154,47 @@ export const CommunityControls = ({
   );
 };
 
-export const VoteDeck = ({ options, currentVote, onVote }) => {
+const RoundAction = ({
+  id,
+  label,
+  icon: Icon,
+  tone,
+  variant = "outlined",
+  compact,
+  disabled,
+  onClick,
+  sx,
+}) =>
+  compact ? (
+    <Tooltip title={label} placement="top" arrow>
+      <Box component="span">
+        <IconButton
+          id={id}
+          size="small"
+          aria-label={label}
+          disabled={disabled}
+          onClick={onClick}
+          sx={controlIconButtonSx(tone)}
+        >
+          <Icon sx={controlIconSx} />
+        </IconButton>
+      </Box>
+    </Tooltip>
+  ) : (
+    <Button
+      id={id}
+      size="small"
+      variant={variant}
+      color={tone}
+      disabled={disabled}
+      onClick={onClick}
+      sx={sx}
+    >
+      {label}
+    </Button>
+  );
+
+export const VoteDeck = ({ options, currentVote, onVote, compact = false }) => {
   const [deckAnchor, setDeckAnchor] = useState(null);
   const hasVoted = currentVote !== undefined && currentVote !== null;
 
@@ -150,8 +211,8 @@ export const VoteDeck = ({ options, currentVote, onVote }) => {
         color="primary"
         variant={hasVoted ? "outlined" : "contained"}
         onClick={(event) => setDeckAnchor(event.currentTarget)}
-        endIcon={<ExpandMore sx={voteTriggerIconSx} />}
-        sx={voteTriggerSx}
+        endIcon={compact ? undefined : <ExpandMore sx={voteTriggerIconSx} />}
+        sx={voteTriggerSx(compact)}
       >
         {hasVoted ? currentVote : "Vote"}
       </Button>
@@ -181,7 +242,7 @@ export const VoteDeck = ({ options, currentVote, onVote }) => {
   );
 };
 
-export const TimerControl = ({ community, handleTimerClicked }) => {
+export const TimerControl = ({ community, handleTimerClicked, compact = false }) => {
   const [duration, setDuration] = useState(DEFAULT_TIMER_SECONDS);
   const [presetsAnchor, setPresetsAnchor] = useState(null);
   const [customValue, setCustomValue] = useState("");
@@ -215,24 +276,38 @@ export const TimerControl = ({ community, handleTimerClicked }) => {
 
   return (
     <Box sx={timerGroupSx}>
-      <ButtonGroup size="small" variant="contained" color="secondary">
-        <Button
-          id="timer-button"
-          onClick={() => startWith(duration)}
-          startIcon={<TimerOutlined sx={timerIconSx} />}
-          sx={timerStartButtonSx}
-        >
-          {formatCountdown(duration)}
-        </Button>
-        <Button
-          id="timer-presets-button"
-          aria-label="Choose timer length"
-          onClick={(event) => setPresetsAnchor(event.currentTarget)}
-          sx={timerPresetsToggleSx}
-        >
-          <ExpandMore sx={timerIconSx} />
-        </Button>
-      </ButtonGroup>
+      {compact ? (
+        <Tooltip title="Start a timer" placement="top" arrow>
+          <IconButton
+            id="timer-presets-button"
+            size="small"
+            aria-label="Start a timer"
+            onClick={(event) => setPresetsAnchor(event.currentTarget)}
+            sx={timerCompactButtonSx}
+          >
+            <TimerOutlined sx={controlIconSx} />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <ButtonGroup size="small" variant="contained" color="secondary">
+          <Button
+            id="timer-button"
+            onClick={() => startWith(duration)}
+            startIcon={<TimerOutlined sx={timerIconSx} />}
+            sx={timerStartButtonSx}
+          >
+            {formatCountdown(duration)}
+          </Button>
+          <Button
+            id="timer-presets-button"
+            aria-label="Choose timer length"
+            onClick={(event) => setPresetsAnchor(event.currentTarget)}
+            sx={timerPresetsToggleSx}
+          >
+            <ExpandMore sx={timerIconSx} />
+          </Button>
+        </ButtonGroup>
+      )}
 
       <Popover
         open={Boolean(presetsAnchor)}

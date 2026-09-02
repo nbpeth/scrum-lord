@@ -20,35 +20,54 @@ export const controlsPanelSx = (theme) => ({
   boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
 });
 
-export const controlsLayoutSx = (showReactions) => ({
+export const controlsLayoutSx = (showReactions, compact) => ({
   display: "flex",
-  flexDirection: { xs: "column", sm: "row" },
-  alignItems: { xs: "stretch", sm: "center" },
-  justifyContent: showReactions
-    ? { xs: "flex-start", sm: "space-between" }
-    : { xs: "flex-start", sm: "flex-end" },
-  gap: { xs: 1.25, sm: 2 },
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: showReactions ? "space-between" : "flex-end",
+  gap: compact ? 0.75 : 2,
   width: "100%",
-  flexWrap: "wrap",
+  flexWrap: compact ? "nowrap" : "wrap",
 });
 
-export const mainControlsSx = (showReactions) => ({
-  justifyContent: { xs: "flex-start", sm: "flex-end" },
-  flex: { sm: showReactions ? "1 1 auto" : "0 1 auto" },
+export const mainControlsSx = (showReactions, compact) => ({
+  justifyContent: "flex-end",
+  flex: showReactions ? "1 1 auto" : "0 1 auto",
   minWidth: 0,
-  columnGap: 1,
-  rowGap: 1,
+  columnGap: compact ? 0.5 : 1,
+  rowGap: compact ? 0.5 : 1,
+  flexWrap: compact ? "nowrap" : "wrap",
 });
 
 export const voteGroupSx = { flexShrink: 0 };
 
-export const voteTriggerSx = {
+export const voteTriggerSx = (compact) => ({
   ...controlButtonSx,
-  minWidth: 72,
-  px: 1.5,
+  minWidth: compact ? 44 : 72,
+  px: compact ? 1 : 1.5,
   fontSize: "0.95rem",
   fontWeight: 700,
-};
+});
+
+export const controlIconButtonSx = (tone) => (theme) => ({
+  width: 32,
+  height: 32,
+  flexShrink: 0,
+  borderRadius: 1.5,
+  border: "1px solid",
+  borderColor: alpha(theme.palette[tone].main, 0.6),
+  color: theme.palette[tone].main,
+  "&:hover": {
+    borderColor: theme.palette[tone].main,
+    backgroundColor: alpha(theme.palette[tone].main, 0.12),
+  },
+  "&.Mui-disabled": {
+    borderColor: alpha(theme.palette.divider, 0.6),
+    color: theme.palette.text.disabled,
+  },
+});
+
+export const controlIconSx = { fontSize: 18 };
 
 export const voteTriggerIconSx = { fontSize: 16 };
 
@@ -116,6 +135,20 @@ export const revealButtonSx = (theme) => ({
 });
 
 export const timerGroupSx = { flexShrink: 0 };
+
+export const timerCompactButtonSx = (theme) => ({
+  width: 32,
+  height: 32,
+  flexShrink: 0,
+  borderRadius: 1.5,
+  border: "1px solid",
+  borderColor: alpha(theme.palette.secondary.main, 0.6),
+  color: theme.palette.secondary.main,
+  "&:hover": {
+    borderColor: theme.palette.secondary.main,
+    backgroundColor: alpha(theme.palette.secondary.main, 0.12),
+  },
+});
 
 export const timerStartButtonSx = (theme) => ({
   ...controlButtonSx,

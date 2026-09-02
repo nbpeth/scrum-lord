@@ -5,6 +5,9 @@ import { act } from "react-dom/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { darkTheme } from "../../theme";
 
+// React 18 requires this flag for act() outside a test renderer.
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
 const stubMatchMedia = (width) => {
   window.matchMedia = vi.fn().mockImplementation((query) => {
     const max = /max-width:\s*([\d.]+)px/.exec(query);
